@@ -2,5 +2,6 @@
 {
     public class RequestDTO
     {
+        public string Token { get; set; }
     }
 }

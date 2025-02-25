@@ -1,0 +1,37 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace Planify_BackEnd.Models;
+
+public partial class Task
+{
+    public int Id { get; set; }
+
+    public Guid? CreateBy { get; set; }
+
+    public string TaskName { get; set; } = null!;
+
+    public string? TaskDescription { get; set; }
+
+    public DateTime? CreateDate { get; set; }
+
+    public DateTime StartTime { get; set; }
+
+    public DateTime Deadline { get; set; }
+
+    public int? GroupId { get; set; }
+
+    public decimal AmountBudget { get; set; }
+
+    public double Progress { get; set; }
+
+    public int Status { get; set; }
+
+    public virtual User? CreateByNavigation { get; set; }
+
+    public virtual Group? Group { get; set; }
+
+    public virtual ICollection<InvoiceImagesTask> InvoiceImagesTasks { get; set; } = new List<InvoiceImagesTask>();
+
+    public virtual ICollection<SubTask> SubTasks { get; set; } = new List<SubTask>();
+}
