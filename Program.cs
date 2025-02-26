@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Planify_BackEnd.Entities;
 using Planify_BackEnd.Models;
+using Planify_BackEnd.Repositories.User;
+using Planify_BackEnd.Services.User;
 using System.Security.Claims;
 using System.Text;
 
@@ -45,6 +47,8 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddControllers();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ProfileService>();
+builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 
 // Thêm Authorization
 builder.Services.AddAuthorization();
