@@ -11,6 +11,49 @@ namespace Planify_BackEnd.Services.Events
         {
             _repository = repository;
         }
+        public EventVMSpectator GetEventById(int id)
+        {
+            var e = _repository.GetEventById(id);
+            EventVMSpectator eventVM = new EventVMSpectator
+            {
+                Id = e.Id,
+                EventTitle = e.EventTitle,
+                EventDescription = e.EventDescription,
+                CampusId = e.CampusId,
+                CampusDTO = e.Campus == null ? null : new DTOs.Campus.CampusDTO
+                {
+                    Id = e.Campus.Id,
+                    CampusName = e.Campus.CampusName
+                },
+                Status = e.Status,
+                CategoryEventId = e.CategoryEventId,
+                CategoryViewModel = e.CategoryEvent == null ? null : new DTOs.Categories.CategoryViewModel
+                {
+                    Id = e.CategoryEvent.Id,
+                    CategoryEventName = e.CategoryEvent.CategoryEventName
+                },
+                CreatedAt = e.CreatedAt,
+                EndOfEvent = e.EndOfEvent,
+                EndTime = e.EndOfEvent,
+                IsPublic = e.IsPublic,
+                Placed = e.Placed,
+                StartTime = e.StartTime,
+                TimeOfEvent = e.TimeOfEvent,
+                TimePublic = e.TimePublic,
+                EventMedias = e.EventMedia == null ? null : e.EventMedia.Select(em => new DTOs.Medias.EventMediumViewMediaModel
+                {
+                    Id = em.Id,
+                    EventId = em.EventId,
+                    MediaId = em.MediaId,
+                    Status = em.Status,
+                    MediaDTO = new DTOs.Medias.MediaItemDTO
+                    {
+                        Id = em.Media.Id,
+                        MediaUrl = em.Media.MediaUrl
+                    }
+                }).ToList()
+            };
+        }
         public List<EventBasicVMSpectator> GetEventOrderByStartDate(int page, int pageSize)
         {
             List<Event> events = _repository.GetEventsOrderByStartDate(page, pageSize);
@@ -21,14 +64,14 @@ namespace Planify_BackEnd.Services.Events
                 {
                     Id = item.Id,
                     CampusId = item.CampusId,
-                    CampusDTO = new DTOs.Campus.CampusDTO
+                    CampusDTO = item.Campus==null?null: new DTOs.Campus.CampusDTO
                     {
                         Id = item.Campus.Id,
                         CampusName = item.Campus.CampusName,
                         Status = item.Campus.Status
                     },
                     CategoryEventId = item.CategoryEventId,
-                    CategoryViewModel = new DTOs.Categories.CategoryViewModel
+                    CategoryViewModel = item.CategoryEvent == null ? null : new DTOs.Categories.CategoryViewModel
                     {
                         Id = item.CategoryEvent.Id,
                         CategoryEventName = item.CategoryEvent.CategoryEventName
@@ -42,7 +85,7 @@ namespace Planify_BackEnd.Services.Events
                     IsPublic = item.IsPublic,
                     Placed = item.Placed,
                     TimeOfEvent = item.TimeOfEvent,
-                    EventMedias = item.EventMedia.Select(em => new DTOs.Medias.EventMediumViewMediaModel
+                    EventMedias = item.EventMedia == null ? null : item.EventMedia.Select(em => new DTOs.Medias.EventMediumViewMediaModel
                     {
                         Id = em.Id,
                         EventId = em.Id,
@@ -70,14 +113,14 @@ namespace Planify_BackEnd.Services.Events
                 {
                     Id = item.Id,
                     CampusId = item.CampusId,
-                    CampusDTO = new DTOs.Campus.CampusDTO
+                    CampusDTO = item.Campus == null ? null : new DTOs.Campus.CampusDTO
                     {
                         Id = item.Campus.Id,
                         CampusName = item.Campus.CampusName,
                         Status = item.Campus.Status
                     },
                     CategoryEventId = item.CategoryEventId,
-                    CategoryViewModel = new DTOs.Categories.CategoryViewModel
+                    CategoryViewModel = item.CategoryEvent == null ? null : new DTOs.Categories.CategoryViewModel
                     {
                         Id = item.CategoryEvent.Id,
                         CategoryEventName = item.CategoryEvent.CategoryEventName
@@ -91,7 +134,7 @@ namespace Planify_BackEnd.Services.Events
                     IsPublic = item.IsPublic,
                     Placed = item.Placed,
                     TimeOfEvent = item.TimeOfEvent,
-                    EventMedias = item.EventMedia.Select(em => new DTOs.Medias.EventMediumViewMediaModel
+                    EventMedias = item.EventMedia == null ? null : item.EventMedia.Select(em => new DTOs.Medias.EventMediumViewMediaModel
                     {
                         Id = em.Id,
                         EventId = em.Id,
