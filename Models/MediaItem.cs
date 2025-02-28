@@ -7,9 +7,7 @@ public partial class MediaItem
 {
     public int Id { get; set; }
 
-    public string MediaUrl { get; set; } = null!;
-
-    public virtual ICollection<Admin> Admins { get; set; } = new List<Admin>();
+    public string? MediaUrl { get; set; }
 
     public virtual ICollection<EventMedium> EventMedia { get; set; } = new List<EventMedium>();
 

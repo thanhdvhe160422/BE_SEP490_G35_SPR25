@@ -11,7 +11,7 @@ public partial class CategoryEvent
 
     public int? CampusId { get; set; }
 
-    public int Status { get; set; }
+    public int? Status { get; set; }
 
     public virtual Campus? Campus { get; set; }
 

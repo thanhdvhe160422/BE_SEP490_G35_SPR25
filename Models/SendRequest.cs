@@ -13,7 +13,7 @@ public partial class SendRequest
 
     public string? Reason { get; set; }
 
-    public int Status { get; set; }
+    public int? Status { get; set; }
 
     public virtual Event? Event { get; set; }
 

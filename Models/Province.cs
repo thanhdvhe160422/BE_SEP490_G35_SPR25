@@ -9,7 +9,7 @@ public partial class Province
 
     public string ProvinceName { get; set; } = null!;
 
-    public int Status { get; set; }
+    public int? Status { get; set; }
 
     public virtual ICollection<District> Districts { get; set; } = new List<District>();
 
