@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Planify_BackEnd.Entities;
 using Planify_BackEnd.Models;
+using Planify_BackEnd.Services.Auth;
 using System.Security.Claims;
 using System.Text;
 
@@ -37,13 +38,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization(options =>
 {
+    options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
     options.AddPolicy("CampusManager", policy => policy.RequireRole("Campus Manager"));
     options.AddPolicy("Implementer", policy => policy.RequireRole("Implementer"));
     options.AddPolicy("Spectator", policy => policy.RequireRole("Spectator"));
 });
 
 builder.Services.AddControllers();
-builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 // Thêm Authorization
