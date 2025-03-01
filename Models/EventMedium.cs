@@ -11,7 +11,7 @@ public partial class EventMedium
 
     public int? MediaId { get; set; }
 
-    public int Status { get; set; }
+    public int? Status { get; set; }
 
     public virtual Event? Event { get; set; }
 

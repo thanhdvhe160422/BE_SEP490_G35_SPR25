@@ -11,15 +11,13 @@ public partial class JoinProject
 
     public Guid? UserId { get; set; }
 
-    public DateTime TimeJoinProject { get; set; }
+    public DateTime? TimeJoinProject { get; set; }
 
     public DateTime? TimeOutProject { get; set; }
 
     public int? Role { get; set; }
 
     public virtual Event? Event { get; set; }
-
-    public virtual Role? RoleNavigation { get; set; }
 
     public virtual User? User { get; set; }
 }

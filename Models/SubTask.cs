@@ -11,17 +11,19 @@ public partial class SubTask
 
     public Guid? CreateBy { get; set; }
 
-    public string SubTaskName { get; set; } = null!;
+    public string? SubTaskName { get; set; }
 
     public string? SubTaskDescription { get; set; }
 
-    public DateTime StartTime { get; set; }
+    public DateTime? StartTime { get; set; }
 
-    public DateTime Deadline { get; set; }
+    public DateTime? Deadline { get; set; }
 
-    public decimal AmountBudget { get; set; }
+    public decimal? AmountBudget { get; set; }
 
-    public int Status { get; set; }
+    public int? Status { get; set; }
+
+    public virtual ICollection<AssignTask> AssignTasks { get; set; } = new List<AssignTask>();
 
     public virtual User? CreateByNavigation { get; set; }
 

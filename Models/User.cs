@@ -11,15 +11,15 @@ public partial class User
 
     public string Email { get; set; } = null!;
 
-    public string FirstName { get; set; } = null!;
+    public string? FirstName { get; set; }
 
-    public string LastName { get; set; } = null!;
+    public string? LastName { get; set; }
 
     public string Password { get; set; } = null!;
 
-    public DateTime DateOfBirth { get; set; }
+    public DateTime? DateOfBirth { get; set; }
 
-    public string PhoneNumber { get; set; } = null!;
+    public string? PhoneNumber { get; set; }
 
     public int? WardId { get; set; }
 
@@ -33,21 +33,15 @@ public partial class User
 
     public int? Role { get; set; }
 
-    public Guid? CreateByAdmin { get; set; }
-
-    public Guid? CreateByManage { get; set; }
-
     public int? CampusId { get; set; }
 
-    public int Status { get; set; }
+    public int? Status { get; set; }
+
+    public virtual ICollection<AssignTask> AssignTasks { get; set; } = new List<AssignTask>();
 
     public virtual MediaItem? AvatarNavigation { get; set; }
 
     public virtual Campus? Campus { get; set; }
-
-    public virtual Admin? CreateByAdminNavigation { get; set; }
-
-    public virtual User? CreateByManageNavigation { get; set; }
 
     public virtual District? District { get; set; }
 
@@ -57,11 +51,17 @@ public partial class User
 
     public virtual ICollection<Group> Groups { get; set; } = new List<Group>();
 
-    public virtual ICollection<User> InverseCreateByManageNavigation { get; set; } = new List<User>();
+    public virtual ICollection<JoinGroup> JoinGroups { get; set; } = new List<JoinGroup>();
 
     public virtual ICollection<JoinProject> JoinProjects { get; set; } = new List<JoinProject>();
 
+    public virtual ICollection<JoinTask> JoinTasks { get; set; } = new List<JoinTask>();
+
     public virtual Province? Province { get; set; }
+
+    public virtual ICollection<Report> ReportReportUsers { get; set; } = new List<Report>();
+
+    public virtual ICollection<Report> ReportSendFromNavigations { get; set; } = new List<Report>();
 
     public virtual Role? RoleNavigation { get; set; }
 

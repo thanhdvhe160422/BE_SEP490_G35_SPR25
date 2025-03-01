@@ -6,8 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Planify_BackEnd.Entities;
 using Planify_BackEnd.Models;
-using Planify_BackEnd.Repositories.User;
-using Planify_BackEnd.Services.User;
 using System.Security.Claims;
 using System.Text;
 
@@ -17,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 
 // Cấu hình kết nối database
-builder.Services.AddDbContext<PlanifyDbContext>(options =>
+builder.Services.AddDbContext<PlanifyContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add services to the container
@@ -39,13 +37,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization(options =>
 {
+    options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
     options.AddPolicy("CampusManager", policy => policy.RequireRole("Campus Manager"));
     options.AddPolicy("Implementer", policy => policy.RequireRole("Implementer"));
     options.AddPolicy("Spectator", policy => policy.RequireRole("Spectator"));
 });
 
 builder.Services.AddControllers();
-builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ProfileService>();
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();

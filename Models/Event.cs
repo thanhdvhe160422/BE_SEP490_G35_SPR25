@@ -13,23 +13,23 @@ public partial class Event
 
     public Guid? CreateBy { get; set; }
 
-    public DateTime StartTime { get; set; }
+    public DateTime? StartTime { get; set; }
 
-    public DateTime EndTime { get; set; }
+    public DateTime? EndTime { get; set; }
 
-    public DateTime TimeOfEvent { get; set; }
+    public DateTime? TimeOfEvent { get; set; }
 
-    public DateTime EndOfEvent { get; set; }
+    public DateTime? EndOfEvent { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 
-    public decimal AmountBudget { get; set; }
+    public decimal? AmountBudget { get; set; }
 
-    public int IsPublic { get; set; }
+    public int? IsPublic { get; set; }
 
-    public DateTime TimePublic { get; set; }
+    public DateTime? TimePublic { get; set; }
 
-    public int Status { get; set; }
+    public int? Status { get; set; }
 
     public Guid? ManagerId { get; set; }
 
@@ -37,7 +37,7 @@ public partial class Event
 
     public int? CategoryEventId { get; set; }
 
-    public string Placed { get; set; } = null!;
+    public string? Placed { get; set; }
 
     public virtual Campus? Campus { get; set; }
 
