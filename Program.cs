@@ -45,8 +45,10 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services.AddControllers();
-builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<EventService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IEventRepository, EventRepository>();
 
 // Thêm Authorization
 builder.Services.AddAuthorization();
