@@ -1,7 +1,8 @@
 ﻿
 using Planify_BackEnd.DTOs;
+using Planify_BackEnd.Services.Event;
 
-public class EventService
+public class EventService : IEventService
 {
     private readonly IEventRepository _eventRepository;
     public EventService(IEventRepository eventRepository)
