@@ -7,8 +7,9 @@ using Planify_BackEnd.Models;
 using Planify_BackEnd.Entities;
 using Google.Apis.Auth;
 using Planify_BackEnd.DTOs.Login;
+using Planify_BackEnd.Services.Auth;
 
-public class AuthService
+public class AuthService : IAuthService
 {
     private readonly IConfiguration _configuration;
     private readonly IUserRepository _userRepository;

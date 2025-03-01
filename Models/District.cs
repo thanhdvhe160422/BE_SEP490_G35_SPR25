@@ -11,7 +11,7 @@ public partial class District
 
     public int? ProvinceId { get; set; }
 
-    public int Status { get; set; }
+    public int? Status { get; set; }
 
     public virtual Province? Province { get; set; }
 

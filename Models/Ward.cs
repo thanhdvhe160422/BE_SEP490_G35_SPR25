@@ -11,7 +11,7 @@ public partial class Ward
 
     public int? DistrictId { get; set; }
 
-    public int Status { get; set; }
+    public int? Status { get; set; }
 
     public virtual District? District { get; set; }
 
