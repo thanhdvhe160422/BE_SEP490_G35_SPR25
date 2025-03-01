@@ -112,6 +112,20 @@ public class AuthService : IAuthService
 
         var handler = new JwtSecurityTokenHandler();
         var token = handler.ReadJwtToken(accessToken);
+
+        var expClaim = token.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Exp)?.Value;
+        if (expClaim == null)
+        {
+            throw new Exception("Invalid access token.");
+        }
+
+        var expiryDate = DateTimeOffset.FromUnixTimeSeconds(long.Parse(expClaim)).UtcDateTime;
+
+        if (expiryDate > DateTime.Now)
+        {
+            throw new Exception("Access token is still valid.");
+        }
+
         var userId = token.Claims.First(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
 
         var user = await _userRepository.GetUserByIdAsync(Guid.Parse(userId));
@@ -134,4 +148,5 @@ public class AuthService : IAuthService
             RefreshToken = newRefreshToken
         };
     }
+
 }
