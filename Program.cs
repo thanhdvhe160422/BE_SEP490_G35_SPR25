@@ -16,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 
 // Cấu hình kết nối database
-builder.Services.AddDbContext<PlanifyDbContext>(options =>
+builder.Services.AddDbContext<PlanifyContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add services to the container
