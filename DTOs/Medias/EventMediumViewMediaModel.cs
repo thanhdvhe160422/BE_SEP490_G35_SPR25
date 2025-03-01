@@ -10,7 +10,7 @@ namespace Planify_BackEnd.DTOs.Medias
 
         public int? MediaId { get; set; }
 
-        public int Status { get; set; }
+        public int? Status { get; set; }
         public MediaItemDTO? MediaDTO { get; set; }
     }
 }

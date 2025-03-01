@@ -6,6 +6,6 @@
 
         public string CampusName { get; set; }
 
-        public int Status { get; set; }
+        public int? Status { get; set; }
     }
 }

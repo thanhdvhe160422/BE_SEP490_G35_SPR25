@@ -3,7 +3,7 @@ using Planify_BackEnd.Repositories.User;
 
 namespace Planify_BackEnd.Services.User
 {
-    public class ProfileService
+    public class ProfileService : IProfileService
     {
         private readonly IProfileRepository _profileRepository;
         public ProfileService(IProfileRepository profileRepository)

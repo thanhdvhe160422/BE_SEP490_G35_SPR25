@@ -6,8 +6,8 @@ namespace Planify_BackEnd.Repositories.User
 {
     public class ProfileRepository : IProfileRepository
     {
-        private readonly PlanifyDbContext _context;
-        public ProfileRepository(PlanifyDbContext context)
+        private readonly PlanifyContext _context;
+        public ProfileRepository(PlanifyContext context)
         {
             _context = context;
         }

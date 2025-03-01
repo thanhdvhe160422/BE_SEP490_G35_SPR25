@@ -5,8 +5,8 @@ namespace Planify_BackEnd.Repositories.Events
 {
     public class EventSpectatorRepository : IEventSpectatorRepository
     {
-        private readonly PlanifyDbContext _context;
-        public EventSpectatorRepository(PlanifyDbContext context)
+        private readonly PlanifyContext _context;
+        public EventSpectatorRepository(PlanifyContext context)
         {
             _context = context;
         }

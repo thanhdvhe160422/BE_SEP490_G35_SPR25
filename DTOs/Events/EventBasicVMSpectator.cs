@@ -11,23 +11,23 @@ namespace Planify_BackEnd.DTOs.Events
         public string EventTitle { get; set; } = null!;
 
         public string? EventDescription { get; set; }
-        public DateTime StartTime { get; set; }
+        public DateTime? StartTime { get; set; }
 
-        public DateTime EndTime { get; set; }
+        public DateTime? EndTime { get; set; }
 
-        public DateTime TimeOfEvent { get; set; }
+        public DateTime? TimeOfEvent { get; set; }
 
-        public DateTime EndOfEvent { get; set; }
+        public DateTime? EndOfEvent { get; set; }
 
-        public int IsPublic { get; set; }
+        public int? IsPublic { get; set; }
 
-        public int Status { get; set; }
+        public int? Status { get; set; }
 
         public int? CampusId { get; set; }
 
         public int? CategoryEventId { get; set; }
 
-        public string Placed { get; set; } = null!;
+        public string? Placed { get; set; } = null!;
 
         public CampusDTO? CampusDTO { get; set; }
 

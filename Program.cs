@@ -6,6 +6,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Planify_BackEnd.Entities;
 using Planify_BackEnd.Models;
+using Planify_BackEnd.Repositories.Events;
+using Planify_BackEnd.Repositories.User;
+using Planify_BackEnd.Services.Auth;
+using Planify_BackEnd.Services.Events;
+using Planify_BackEnd.Services.User;
 using System.Security.Claims;
 using System.Text;
 
@@ -46,8 +51,10 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddControllers();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<ProfileService>();
+builder.Services.AddScoped<IProfileService,ProfileService>();
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
+builder.Services.AddScoped<IEventSpectatorRepository, EventSpectatorRepository>();
+builder.Services.AddScoped<IEventSpectatorService, EventSpectatorService>();
 
 // Thêm Authorization
 builder.Services.AddAuthorization();
