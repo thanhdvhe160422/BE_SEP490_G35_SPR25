@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Planify_BackEnd.Models;
 
@@ -41,6 +42,7 @@ public partial class Event
 
     public virtual Campus? Campus { get; set; }
 
+    [JsonIgnore]
     public virtual CategoryEvent? CategoryEvent { get; set; }
 
     public virtual User? CreateByNavigation { get; set; }

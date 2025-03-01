@@ -7,7 +7,8 @@ using Planify_BackEnd.Models;
 using Planify_BackEnd.Entities;
 using Google.Apis.Auth;
 using Planify_BackEnd.DTOs.Login;
-using Planify_BackEnd.Services.Auth;
+using Planify_BackEnd.Services.Auths;
+using Planify_BackEnd.DTOs;
 
 public class AuthService : IAuthService
 {
@@ -20,41 +21,40 @@ public class AuthService : IAuthService
         _userRepository = userRepository;
     }
 
-    public AuthResponseDTO GoogleLogin(GoogleLoginRequestDTO request)
+    public async Task<ResponseDTO> GoogleLoginAsync(GoogleLoginRequestDTO request)
     {
-        var googleUserInfo = ValidateGoogleToken(request.GoogleToken);
+        var googleUserInfo = await ValidateGoogleTokenAsync(request.GoogleToken);
         if (googleUserInfo == null || string.IsNullOrEmpty(googleUserInfo.Email))
         {
-            throw new Exception("Invalid Google token or email not provided.");
+            return new ResponseDTO(400, "Invalid Google token or email not provided.", null);
         }
 
-        var user = _userRepository.GetUserByEmail(googleUserInfo.Email);
-        if (user == null || request.CampusName != user.Campus.CampusName)
+        var user = await _userRepository.GetUserByEmailAsync(googleUserInfo.Email);
+        if (user == null || !string.Equals(request.CampusName, user.Campus.CampusName, StringComparison.OrdinalIgnoreCase))
         {
-            throw new Exception("Email not found in the system. Please register or contact an admin.");
+            return new ResponseDTO(401, "Email not found in the system. Please register or contact an admin.", null);
         }
 
         var jwtToken = GenerateJwtToken(user);
-
         var refreshToken = GenerateRefreshToken();
 
-        return new AuthResponseDTO
+        return new ResponseDTO(200, "Login successful!", new AuthResponseDTO
         {
             UserId = user.Id,
-            FullName = user.FirstName + " " + user.LastName,
+            FullName = $"{user.FirstName} {user.LastName}",
             Email = user.Email,
             Campus = user.Campus.CampusName,
             Role = user.RoleNavigation.RoleName,
             AccessToken = jwtToken,
             RefreshToken = refreshToken
-        };
+        });
     }
-    private GoogleUserInfo ValidateGoogleToken(string googleToken)
+
+    private async Task<GoogleUserInfo> ValidateGoogleTokenAsync(string googleToken)
     {
         try
         {
-            var payload = GoogleJsonWebSignature.ValidateAsync(googleToken).Result;
-
+            var payload = await GoogleJsonWebSignature.ValidateAsync(googleToken);
             return new GoogleUserInfo
             {
                 Email = payload.Email,
@@ -69,6 +69,7 @@ public class AuthService : IAuthService
     }
 
 
+
     private string GenerateJwtToken(User user)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
@@ -78,7 +79,8 @@ public class AuthService : IAuthService
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim(ClaimTypes.Role, user.Role.ToString() ?? "1"),
+            new Claim(ClaimTypes.Role, user.RoleNavigation.RoleName),
+            new Claim("campusId", user.CampusId.ToString()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
@@ -86,7 +88,7 @@ public class AuthService : IAuthService
             issuer: _configuration["Jwt:Issuer"],
             audience: _configuration["Jwt:Audience"],
             claims: claims,
-            expires: DateTime.Now.AddMinutes(Convert.ToDouble(_configuration["Jwt:ExpiryMinutes"])),
+            expires: DateTime.Now.AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpirationMinutes"])),
             signingCredentials: creds
         );
 
@@ -101,7 +103,7 @@ public class AuthService : IAuthService
         return Convert.ToBase64String(randomNumber);
     }
 
-    public AuthResponseDTO RefreshToken(string refreshToken, string accessToken)
+    public async Task<AuthResponseDTO> RefreshToken(string refreshToken, string accessToken)
     {
         if (string.IsNullOrEmpty(refreshToken))
         {
@@ -112,7 +114,7 @@ public class AuthService : IAuthService
         var token = handler.ReadJwtToken(accessToken);
         var userId = token.Claims.First(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
 
-        var user = _userRepository.GetUserById(Guid.Parse(userId));
+        var user = await _userRepository.GetUserByIdAsync(Guid.Parse(userId));
         if (user == null)
         {
             throw new Exception("User not found.");

@@ -1,9 +1,13 @@
 ﻿using Google;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Planify_BackEnd.DTOs;
+using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.Models;
+using Planify_BackEnd.Services.Events;
+using System.Security.Claims;
 
 namespace Planify_BackEnd.Controllers
 {
@@ -11,9 +15,9 @@ namespace Planify_BackEnd.Controllers
     [ApiController]
     public class EventsController : ControllerBase
     {
-        private readonly EventService _eventService;
+        private readonly IEventService _eventService;
 
-        public EventsController(EventService eventService)
+        public EventsController(IEventService eventService)
         {
             _eventService = eventService;
         }
@@ -35,6 +39,17 @@ namespace Planify_BackEnd.Controllers
                 return BadRequest(new { message = ex.Message });
 
             }
+        }
+
+        [HttpPost("create")]
+        [Authorize(Roles = "Event Organizer")]
+        public async Task<IActionResult> CreateEvent([FromBody] EventCreateRequestDTO eventDTO)
+        {
+            var organizerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+            var response = await _eventService.CreateEventAsync(eventDTO, organizerId);
+
+            return StatusCode(response.Status, response);
         }
     }
 }
