@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Planify_BackEnd.Entities;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories.Events;
@@ -11,6 +12,7 @@ using Planify_BackEnd.Repositories.User;
 using Planify_BackEnd.Services.Auth;
 using Planify_BackEnd.Services.Events;
 using Planify_BackEnd.Services.User;
+using Planify_BackEnd.Repositories;
 using System.Security.Claims;
 using System.Text;
 
@@ -22,6 +24,8 @@ var config = builder.Configuration;
 // Cấu hình kết nối database
 builder.Services.AddDbContext<PlanifyContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddHttpContextAccessor();
 
 // Add services to the container
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -44,24 +48,55 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
     options.AddPolicy("CampusManager", policy => policy.RequireRole("Campus Manager"));
+    options.AddPolicy("EventOrganizer", policy => policy.RequireRole("Event Organizer"));
     options.AddPolicy("Implementer", policy => policy.RequireRole("Implementer"));
     options.AddPolicy("Spectator", policy => policy.RequireRole("Spectator"));
 });
 
 builder.Services.AddControllers();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProfileService,ProfileService>();
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<IEventSpectatorRepository, EventSpectatorRepository>();
 builder.Services.AddScoped<IEventSpectatorService, EventSpectatorService>();
+builder.Services.AddScoped<IEventRepository, EventRepository>();
 
 // Thêm Authorization
 builder.Services.AddAuthorization();
 
 // Thêm Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Planify API", Version = "v1" });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Nhập token theo format: Bearer {your_token}"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
 
 builder.Services.AddCors(options =>
 {

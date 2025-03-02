@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Planify_BackEnd.DTOs.Login;
-using Planify_BackEnd.Services.Auth;
+using Planify_BackEnd.Services.Auths;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -14,11 +14,11 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("google-login")]
-    public IActionResult GoogleLogin([FromBody] GoogleLoginRequestDTO request)
+    public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequestDTO request)
     {
         try
         {
-            var response = _authService.GoogleLogin(request);
+            var response = await _authService.GoogleLoginAsync(request);
             return Ok(response);
         }
         catch (Exception ex)
@@ -28,11 +28,11 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("refresh-token")]
-    public IActionResult RefreshToken([FromBody] RefreshTokenRequestDTO request)
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDTO request)
     {
         try
         {
-            var response = _authService.RefreshToken(request.RefreshToken, request.AccessToken);
+            var response = await _authService.RefreshToken(request.RefreshToken, request.AccessToken);
             return Ok(response);
         }
         catch (Exception ex)
