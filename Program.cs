@@ -7,9 +7,12 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Planify_BackEnd.Entities;
 using Planify_BackEnd.Models;
-using Planify_BackEnd.Repositories;
+using Planify_BackEnd.Repositories.Events;
+using Planify_BackEnd.Repositories.User;
 using Planify_BackEnd.Services.Auths;
 using Planify_BackEnd.Services.Events;
+using Planify_BackEnd.Services.User;
+using Planify_BackEnd.Repositories;
 using System.Security.Claims;
 using System.Text;
 
@@ -54,6 +57,10 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IProfileService,ProfileService>();
+builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
+builder.Services.AddScoped<IEventSpectatorRepository, EventSpectatorRepository>();
+builder.Services.AddScoped<IEventSpectatorService, EventSpectatorService>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 
 // Thêm Authorization
