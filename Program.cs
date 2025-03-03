@@ -15,6 +15,7 @@ using Planify_BackEnd.Services.User;
 using Planify_BackEnd.Repositories;
 using System.Security.Claims;
 using System.Text;
+using Planify_BackEnd.Services.SubTasks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,13 +57,14 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddControllers();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEventService, EventService>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IEventSpectatorService, EventSpectatorService>();
+builder.Services.AddScoped<ISubTaskService, SubTaskService>();
 builder.Services.AddScoped<IProfileService,ProfileService>();
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<IEventSpectatorRepository, EventSpectatorRepository>();
-builder.Services.AddScoped<IEventSpectatorService, EventSpectatorService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
-
+builder.Services.AddScoped<ISubTaskRepository, SubTaskRepository>();
 // Thêm Authorization
 builder.Services.AddAuthorization();
 
