@@ -9,7 +9,7 @@ using Planify_BackEnd.Entities;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories.Events;
 using Planify_BackEnd.Repositories.User;
-using Planify_BackEnd.Services.Auth;
+using Planify_BackEnd.Services.Auths;
 using Planify_BackEnd.Services.Events;
 using Planify_BackEnd.Services.User;
 using Planify_BackEnd.Repositories;
