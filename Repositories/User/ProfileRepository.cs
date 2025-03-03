@@ -19,7 +19,7 @@ namespace Planify_BackEnd.Repositories.User
                 .Include(u=>u.Province)
                 .Include(u=>u.District)
                 .Include(u=>u.Ward)
-                .Include(u=>u.Role)
+                .Include(u=>u.RoleNavigation)
                 .FirstOrDefault(u => u.Id.Equals(id));
         }
     }

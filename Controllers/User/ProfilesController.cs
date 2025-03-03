@@ -9,8 +9,8 @@ namespace Planify_BackEnd.Controllers.User
     [ApiController]
     public class ProfilesController : ControllerBase
     {
-        private readonly ProfileService _profileService;
-        public ProfilesController(ProfileService profileService)
+        private readonly IProfileService _profileService;
+        public ProfilesController(IProfileService profileService)
         {
             _profileService = profileService;
         }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Planify_BackEnd.Repositories.Events;
+using Planify_BackEnd.Services.Events;
 
 namespace Planify_BackEnd.Controllers.Events
 {
@@ -8,17 +9,17 @@ namespace Planify_BackEnd.Controllers.Events
     [ApiController]
     public class EventForSpectatorsController : ControllerBase
     {
-        private readonly IEventSpectatorRepository _repository;
-        public EventForSpectatorsController(IEventSpectatorRepository repository)
+        private readonly IEventSpectatorService _service;
+        public EventForSpectatorsController(IEventSpectatorService service)
         {
-            _repository = repository;
+            _service = service;
         }
         [HttpGet]
         public IActionResult GetEvents(int page, int pageSize)
         {
             try
             {
-                var response = _repository.GetEventsOrderByStartDate(page, pageSize);
+                var response = _service.GetEventsOrderByStartDate(page, pageSize);
                 return Ok(response);
             }catch (Exception ex)
             {
@@ -30,7 +31,7 @@ namespace Planify_BackEnd.Controllers.Events
         {
             try
             {
-                var response = _repository.GetEventById(id);
+                var response = _service.GetEventById(id);
                 return Ok(response); 
             }catch(Exception ex)
             {
@@ -42,7 +43,7 @@ namespace Planify_BackEnd.Controllers.Events
         {
             try
             {
-                var response = _repository.SearchEventOrderByStartDate(page, pageSize, name, startDate, endDate);
+                var response = _service.SearchEventOrderByStartDate(page, pageSize, name, startDate, endDate);
                 return Ok(response);
             }catch(Exception ex)
             {

@@ -19,12 +19,12 @@ namespace Planify_BackEnd.Services.User
                 {
                     Id = user.Id,
                     Avatar = user.Avatar,
-                    MediaItemDTO = new DTOs.Medias.MediaItemDTO
+                    MediaItemDTO = user.AvatarNavigation==null?null: new DTOs.Medias.MediaItemDTO
                     {
                         Id = user.AvatarNavigation.Id,
                         MediaUrl = user.AvatarNavigation.MediaUrl
                     },
-                    CampusDTO = new DTOs.Campus.CampusDTO
+                    CampusDTO = user.Campus == null ? null : new DTOs.Campus.CampusDTO
                     {
                         Id = user.Campus.Id,
                         CampusName = user.Campus.CampusName,
@@ -40,7 +40,11 @@ namespace Planify_BackEnd.Services.User
                     UserName = user.UserName,
                     Password = user.Password,
                     Role = user.Role,
-                    RoleNavigation = user.RoleNavigation,
+                    RoleNavigation = user.RoleNavigation == null ? null : new DTOs.Roles.RoleDTO
+                    {
+                        Id =user.RoleNavigation.Id,
+                        RoleName  = user.RoleNavigation.RoleName
+                    },
                     Province = user.Province,
                     ProvinceId = user.ProvinceId,
                     District = user.District,
