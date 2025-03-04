@@ -15,6 +15,18 @@ namespace Planify_BackEnd.Services.Groups
             _groupRepository = groupRepository;
             _httpContextAccessor = httpContextAccessor;
         }
+        public bool AllocateCostToGroup(int groupId, decimal cost)
+        {
+            try
+            {
+                _groupRepository.AllocateCostToGroup(groupId, cost);
+                return true;
+            }catch (Exception ex)
+            {
+                Console.WriteLine("group service - allocate cost to group: "+ex.Message);
+                return false;
+            }
+        }
         public async Task<ResponseDTO> CreateGroupAsync(GroupCreateRequestDTO groupDTO, Guid organizerId)
         {
             try

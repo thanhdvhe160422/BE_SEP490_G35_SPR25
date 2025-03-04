@@ -8,6 +8,20 @@ namespace Planify_BackEnd.Repositories.Groups
         {
             _context = context;
         }
+        public bool AllocateCostToGroup(int groupId, decimal cost)
+        {
+            try
+            {
+                var group = _context.Groups.FirstOrDefault(g => g.Id == groupId);
+                group.AmountBudget = cost;
+                _context.Groups.Update(group);
+                _context.SaveChanges();
+                return true;
+            }catch (Exception ex)
+            {
+                return false;
+            }
+        }
         public async Task<Group> CreateGroupAsync(Group newGroup)
         {
             try
