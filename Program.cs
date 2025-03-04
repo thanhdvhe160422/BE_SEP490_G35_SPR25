@@ -15,6 +15,8 @@ using Planify_BackEnd.Services.User;
 using Planify_BackEnd.Repositories;
 using System.Security.Claims;
 using System.Text;
+using Planify_BackEnd.Repositories.Groups;
+using Planify_BackEnd.Services.Groups;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,6 +64,8 @@ builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<IEventSpectatorRepository, EventSpectatorRepository>();
 builder.Services.AddScoped<IEventSpectatorService, EventSpectatorService>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
+builder.Services.AddScoped<IGroupRepository, GroupRepository>();
+builder.Services.AddScoped<IGroupService,GroupService>();
 
 // Thêm Authorization
 builder.Services.AddAuthorization();
