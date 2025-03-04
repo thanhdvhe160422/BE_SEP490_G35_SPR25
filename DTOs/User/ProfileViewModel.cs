@@ -1,5 +1,6 @@
 ﻿using Planify_BackEnd.DTOs.Campus;
 using Planify_BackEnd.DTOs.Medias;
+using Planify_BackEnd.DTOs.Roles;
 using Planify_BackEnd.Models;
 
 namespace Planify_BackEnd.DTOs.User
@@ -36,7 +37,7 @@ namespace Planify_BackEnd.DTOs.User
 
         public int? CampusId { get; set; }
 
-        public Role? RoleNavigation { get; set; }
+        public RoleDTO? RoleNavigation { get; set; }
         public CampusDTO? CampusDTO { get; set; }
         public MediaItemDTO? MediaItemDTO{ get; set; }
         public District? District { get; set; }

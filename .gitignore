@@ -25,6 +25,7 @@ bld/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
+Migration/
 
 # Visual Studio 2015 cache/options directory
 .vs/
@@ -272,3 +273,6 @@ __pycache__/
 # tools/
 
 # End of https://www.toptal.com/developers/gitignore/api/aspnetcore
+obj/Debug/net8.0/Planify_BackEnd.GeneratedMSBuildEditorConfig.editorconfig
+obj/Debug/net8.0/Planify_BackEnd.genruntimeconfig.cache
+obj/Debug/net8.0/apphost.exe
