@@ -2,15 +2,18 @@
 using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories;
+using Planify_BackEnd.Repositories.Groups;
 using Planify_BackEnd.Services.Events;
 
 public class EventService : IEventService
 {
     private readonly IEventRepository _eventRepository;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    public EventService(IEventRepository eventRepository, IHttpContextAccessor httpContextAccessor)
+    private readonly IGroupRepository _groupRepository;
+    public EventService(IEventRepository eventRepository, IHttpContextAccessor httpContextAccessor, IGroupRepository groupRepository)
     {
         _eventRepository = eventRepository;
+        _groupRepository = groupRepository;
         _httpContextAccessor = httpContextAccessor;
     }
     public ResponseDTO GetAllEvent()
@@ -33,7 +36,7 @@ public class EventService : IEventService
                 return new ResponseDTO(400, "Start time must be earlier than end time.", null);
             }
 
-            if (eventDTO.TimePublic < DateTime.Now)
+            if (eventDTO.TimePublic.HasValue && eventDTO.TimePublic < DateTime.Now)
             {
                 return new ResponseDTO(400, "Public time must be later than current time.", null);
             }
@@ -62,6 +65,46 @@ public class EventService : IEventService
             };
 
             await _eventRepository.CreateEventAsync(newEvent);
+
+            foreach (var group in eventDTO.Groups)
+            {
+                var newGroup = new Group
+                {
+                    EventId = newEvent.Id,
+                    GroupName = group.GroupName,
+                    CreateBy = organizerId,
+                };
+                await _groupRepository.CreateGroupAsync(newGroup);
+
+                foreach (var implementerId in group.ImplementerIds)
+                {
+                    var joinGroup = new JoinGroup
+                    {
+                        GroupId = newGroup.Id,
+                        ImplementerId = implementerId,
+                        TimeJoin = DateTime.UtcNow,
+                        Status = 1,
+                    };
+                    await _groupRepository.AddImplementerToGroupAsync(joinGroup);
+                }
+            }
+
+            foreach (var image in eventDTO.EventMediaUrls)
+            {
+                var mediaItem = new MediaItem
+                {
+                    MediaUrl = image
+                };
+                await _eventRepository.CreateMediaItemAsync(mediaItem);
+
+                var eventMedia = new EventMedium
+                {
+                    EventId = newEvent.Id,
+                    MediaId = mediaItem.Id,
+                    Status = 1
+                };
+                await _eventRepository.AddEventMediaAsync(eventMedia);
+            }         
 
             return new ResponseDTO(201, "Event creates successfully!", newEvent);
         }

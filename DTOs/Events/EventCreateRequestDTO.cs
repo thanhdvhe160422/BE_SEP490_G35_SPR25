@@ -21,18 +21,28 @@ namespace Planify_BackEnd.DTOs.Events
 
         public DateTime? TimePublic { get; set; }
 
-        public int? Status { get; set; } = 0; // Mặc định là chưa duyệt
-
-        [Required]
-        public int CampusId { get; set; }
+        public int? Status { get; set; } = 0;
 
         [Required]
         public int CategoryEventId { get; set; }
 
         public string? Placed { get; set; }
 
-        public Guid OrganizerId { get; set; } // Người tạo sự kiện
+        public Guid CreateBy { get; set; }
+
+        public List<GroupCreateDTO> Groups { get; set; } = new();
+
+        public List<string>? EventMediaUrls { get; set; }
 
         public EventCreateRequestDTO() { }
+    }
+
+    public class GroupCreateDTO
+    {
+        [Required]
+        public string GroupName { get; set; } = null!;
+        public Guid CreateBy { get; set; }
+        public int EventId { get; set; }
+        public List<Guid> ImplementerIds { get; set; } = new();
     }
 }

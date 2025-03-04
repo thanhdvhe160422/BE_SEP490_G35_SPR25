@@ -1,5 +1,4 @@
 ﻿using Planify_BackEnd.Models;
-
 namespace Planify_BackEnd.Repositories.Groups
 {
     public class GroupRepository : IGroupRepository
@@ -23,5 +22,25 @@ namespace Planify_BackEnd.Repositories.Groups
                 return false;
             }
         }
+        public async Task<Group> CreateGroupAsync(Group newGroup)
+        {
+            try
+            {
+                await _context.Groups.AddAsync(newGroup);
+                await _context.SaveChangesAsync();
+                return newGroup;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An unexpected error occurred.", ex);
+            }
+        }
+
+        public async System.Threading.Tasks.Task AddImplementerToGroupAsync(JoinGroup joinGroup)
+        {
+            _context.JoinGroups.Add(joinGroup);
+            await _context.SaveChangesAsync();
+        }
+
     }
 }
