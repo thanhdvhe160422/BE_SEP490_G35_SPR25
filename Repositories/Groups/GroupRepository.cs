@@ -22,6 +22,11 @@ namespace Planify_BackEnd.Repositories.Groups
             }
         }
 
-     
+        public async System.Threading.Tasks.Task AddImplementerToGroupAsync(JoinGroup joinGroup)
+        {
+            _context.JoinGroups.Add(joinGroup);
+            await _context.SaveChangesAsync();
+        }
+
     }
 }
