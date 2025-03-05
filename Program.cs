@@ -20,6 +20,8 @@ using Planify_BackEnd.Services.Tasks;
 using Planify_BackEnd.Repositories.Tasks;
 using Planify_BackEnd.Services.Groups;
 using Planify_BackEnd.Repositories.Groups;
+using Planify_BackEnd.Services.JoinProjects;
+using Planify_BackEnd.Repositories.JoinGroups;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,6 +69,7 @@ builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<ISubTaskService, SubTaskService>();
 builder.Services.AddScoped<IProfileService,ProfileService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
+builder.Services.AddScoped<IJoinProjectService, JoinProjectService>();
 // Thêm Repository
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<IEventSpectatorRepository, EventSpectatorRepository>();
@@ -75,6 +78,7 @@ builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<ISubTaskRepository, SubTaskRepository>();
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
+builder.Services.AddScoped<IJoinProjectRepository, JoinProjectRepository>();
 // Thêm Authorization
 builder.Services.AddAuthorization();
 

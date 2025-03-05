@@ -28,5 +28,19 @@ namespace Planify_BackEnd.Controllers
 
             return StatusCode(response.Status, response);
         }
+        [HttpGet("search")]
+        [Authorize(Roles = "Event Organizer")]
+        public IActionResult SearchTasks(int page, int pageSize, string? name, DateTime startDate, DateTime deadline)
+        {
+            try
+            {
+                var response = _taskService.SearchTaskOrderByStartDate(page, pageSize, name, startDate, deadline);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
