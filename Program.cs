@@ -82,6 +82,11 @@ builder.Services.AddScoped<IJoinProjectRepository, JoinProjectRepository>();
 // Thêm Authorization
 builder.Services.AddAuthorization();
 
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+});
+
 // Thêm Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
