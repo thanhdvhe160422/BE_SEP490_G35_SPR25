@@ -9,10 +9,10 @@ namespace Planify_BackEnd.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SubTaskController : ControllerBase
+    public class SubTasksController : ControllerBase
     {
         private readonly ISubTaskService _subTaskService;
-        public SubTaskController(ISubTaskService subTaskService)
+        public SubTasksController(ISubTaskService subTaskService)
         {
             _subTaskService = subTaskService;
         }

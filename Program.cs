@@ -22,6 +22,8 @@ using Planify_BackEnd.Services.Groups;
 using Planify_BackEnd.Repositories.Groups;
 using Planify_BackEnd.Services.JoinProjects;
 using Planify_BackEnd.Repositories.JoinGroups;
+using Planify_BackEnd.Services.Campus;
+using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,6 +72,7 @@ builder.Services.AddScoped<ISubTaskService, SubTaskService>();
 builder.Services.AddScoped<IProfileService,ProfileService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<IJoinProjectService, JoinProjectService>();
+builder.Services.AddScoped<ICampusService, CampusService>();
 // Thêm Repository
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<IEventSpectatorRepository, EventSpectatorRepository>();
@@ -79,13 +82,15 @@ builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<ISubTaskRepository, SubTaskRepository>();
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 builder.Services.AddScoped<IJoinProjectRepository, JoinProjectRepository>();
+builder.Services.AddScoped<ICampusRepository, CampusRepository>();
 // Thêm Authorization
 builder.Services.AddAuthorization();
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
-    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles; // Tránh vòng lặp mà không tạo `$id`
 });
+
 
 // Thêm Swagger
 builder.Services.AddEndpointsApiExplorer();
