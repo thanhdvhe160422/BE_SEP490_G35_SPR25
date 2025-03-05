@@ -50,5 +50,30 @@ namespace Planify_BackEnd.Services.Tasks
                 return new ResponseDTO(500, "Error orcurs while creating sub-task!", ex.Message);
             }
         }
+        public List<TaskSearchResponeDTO> SearchTaskOrderByStartDate(int page, int pageSize, string? name, DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                List<TaskModel> tasks = _taskRepository.SearchTaskOrderByStartDate(page, pageSize, name, startDate, endDate);
+
+                return tasks.Select(item => new TaskSearchResponeDTO
+                {
+                    Id = item.Id,
+                    TaskName = item.TaskName,
+                    TaskDescription = item.TaskDescription,
+                    StartTime = item.StartTime,
+                    Deadline = item.Deadline,
+                    AmountBudget = item.AmountBudget,
+                    Progress = item.Progress,
+                    Status = item.Status
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("task - searchTask: " + ex.Message);
+                return new List<TaskSearchResponeDTO>();
+            }
+        }
+
     }
 }
