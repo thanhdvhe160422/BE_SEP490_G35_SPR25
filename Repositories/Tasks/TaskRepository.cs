@@ -22,7 +22,7 @@ namespace Planify_BackEnd.Repositories.Tasks
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"🚨 Unexpected Error: {ex}");
+                
                 throw new Exception("An unexpected error occurred.", ex);
             }
         }

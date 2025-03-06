@@ -43,9 +43,14 @@ namespace Planify_BackEnd.Services.Groups
                     EventId = groupDTO.EventId,
                     AmountBudget = groupDTO.AmountBudget,
                 };
-              
-
-                await _groupRepository.CreateGroupAsync(newGroup);
+                try
+                {
+                    await _groupRepository.CreateGroupAsync(newGroup);
+                }
+                catch (Exception ex)
+                {
+                    return new ResponseDTO(500, "Error orcurs while creating group!", ex.Message);
+                }
 
                 return new ResponseDTO(201, "Group creates successfully!", newGroup);
             }
