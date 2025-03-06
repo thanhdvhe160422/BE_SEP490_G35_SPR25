@@ -22,9 +22,11 @@ namespace Planify_BackEnd.Repositories.Tasks
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"🚨 Unexpected Error: {ex}");
                 throw new Exception("An unexpected error occurred.", ex);
             }
         }
+
         public List<Models.Task> SearchTaskOrderByStartDate(int page, int pageSize, string? name, DateTime startDate, DateTime endDate)
         {
             try
@@ -42,6 +44,10 @@ namespace Planify_BackEnd.Repositories.Tasks
                 throw new Exception("An unexpected error occurred.", ex);
             }
         
+        }
+        public bool IsTaskExists(int taskId)
+        {
+            return _context.Tasks.Any(g => g.Id == taskId);
         }
     }
 }

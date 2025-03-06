@@ -16,7 +16,7 @@ namespace Planify_BackEnd.DTOs.Tasks
         [Required]
         public DateTime? Deadline { get; set; }
         [Required]
-        public int? GroupId { get; set; }
+        public int GroupId { get; set; }
 
         public decimal? AmountBudget { get; set; }
 
