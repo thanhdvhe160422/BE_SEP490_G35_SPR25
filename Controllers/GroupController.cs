@@ -19,11 +19,11 @@ namespace Planify_BackEnd.Controllers
             _groupService = groupService;
         }
         [HttpPost("create")]
-        [Authorize(Roles = "Event Organizer")]
+        //[Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> CreateGroup([FromBody] GroupCreateRequestDTO groupDTO)
         {
             var organizerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-
+            
             var response = await _groupService.CreateGroupAsync(groupDTO, organizerId);
 
             return StatusCode(response.Status, response);
