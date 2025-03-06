@@ -13,11 +13,13 @@ public class EventRepository : IEventRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<Event>> GetAllEvent()
+    public async Task<IEnumerable<Event>> GetAllEvent(int page, int pageSize)
     {
         try
         {
-            return await _context.Events.ToListAsync();
+            return await _context.Events
+                 .Skip((page - 1) * pageSize).Take(pageSize)
+                .ToListAsync();
         }
         catch (Exception ex)
         {

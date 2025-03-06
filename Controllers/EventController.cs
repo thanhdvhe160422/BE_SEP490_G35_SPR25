@@ -28,11 +28,11 @@ namespace Planify_BackEnd.Controllers
         /// <returns>A list of all events.</returns>
         [HttpGet ("List")]
         [Authorize(Roles = "Campus Manager")]
-        public async Task<IActionResult> GetAllEvents()
+        public async Task<IActionResult> GetAllEvents(int page, int pageSize)
         {
             try
             {
-                var response = await _eventService.GetAllEvent();
+                var response = await _eventService.GetAllEvent( page,  pageSize);
                 return Ok(response);
             }
             catch (Exception ex)

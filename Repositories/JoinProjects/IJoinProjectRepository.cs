@@ -4,7 +4,6 @@ namespace Planify_BackEnd.Repositories.JoinGroups
 {
     public interface IJoinProjectRepository
     {
-
-        public List<JoinProject> GetAllJoinedProjects(Guid userId, int page, int pageSize);
+        Task<IEnumerable<JoinProject>> GetAllJoinedProjects(Guid userId, int page, int pageSize);
     }
 }

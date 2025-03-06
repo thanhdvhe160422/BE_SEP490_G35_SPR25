@@ -17,9 +17,9 @@ public class EventService : IEventService
         _groupRepository = groupRepository;
         _httpContextAccessor = httpContextAccessor;
     }
-    public async Task<IEnumerable<EventGetListResponseDTO>> GetAllEvent()
+    public async Task<IEnumerable<EventGetListResponseDTO>> GetAllEvent(int page, int pageSize)
     {
-        var events =  await _eventRepository.GetAllEvent();
+        var events =  await _eventRepository.GetAllEvent( page,  pageSize);
         var eventDTOs = events.Select(e => new EventGetListResponseDTO
         {
             Id = e.Id,

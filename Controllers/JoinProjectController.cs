@@ -14,13 +14,13 @@ namespace Planify_BackEnd.Controllers
         {
             _joinProjectService = joinProjectService;
         }
-        [HttpGet]
-        public IActionResult GetAllJoinedProjects(int page, int pageSize)
+        [HttpGet("List")]
+        public async Task<IActionResult> GetAllJoinedProjects(int page, int pageSize)
         {
             try
             {
-                var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var response = _joinProjectService.GetAllJoinedProjects(Guid.Parse(userId), page, pageSize);
+                var userId =Guid.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value) ;
+                var response = await _joinProjectService.GetAllJoinedProjects(userId, page, pageSize);
                 return Ok(response);
             }
             catch (Exception ex)
