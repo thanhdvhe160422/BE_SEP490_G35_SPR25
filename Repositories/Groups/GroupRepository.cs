@@ -35,7 +35,10 @@ namespace Planify_BackEnd.Repositories.Groups
                 throw new Exception("An unexpected error occurred.", ex);
             }
         }
-
+        public bool IsGroupExists(int groupId)
+        {
+            return _context.Groups.Any(g => g.Id == groupId);
+        }
         public async System.Threading.Tasks.Task AddImplementerToGroupAsync(JoinGroup joinGroup)
         {
             _context.JoinGroups.Add(joinGroup);

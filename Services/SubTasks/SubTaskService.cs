@@ -2,15 +2,18 @@
 using Planify_BackEnd.DTOs.SubTasks;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories;
+using Planify_BackEnd.Repositories.Tasks;
 
 namespace Planify_BackEnd.Services.SubTasks
 {
     public class SubTaskService : ISubTaskService
     {
+        private readonly ITaskRepository _taskRepository;
         private readonly ISubTaskRepository _subTaskRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public SubTaskService(ISubTaskRepository subTaskRepository, IHttpContextAccessor httpContextAccessor)
+        public SubTaskService(ISubTaskRepository subTaskRepository, IHttpContextAccessor httpContextAccessor, ITaskRepository taskRepository)
         {
+            _taskRepository = taskRepository;
             _subTaskRepository = subTaskRepository;
             _httpContextAccessor = httpContextAccessor;
         }
@@ -18,6 +21,10 @@ namespace Planify_BackEnd.Services.SubTasks
         {
             try
             {
+                if (!_taskRepository.IsTaskExists(subTaskDTO.TaskId))
+                {
+                    throw new ArgumentException("Task does not exists.");
+                }
                 if (string.IsNullOrWhiteSpace(subTaskDTO.SubTaskName))
                 {
                     return new ResponseDTO(400, "Sub-task name is required.", null);
@@ -31,7 +38,7 @@ namespace Planify_BackEnd.Services.SubTasks
                 {
                     TaskId = subTaskDTO.TaskId,
                     SubTaskName = subTaskDTO.SubTaskName,
-                    SubTaskDescription = subTaskDTO.SubTaskName,
+                    SubTaskDescription = subTaskDTO.SubTaskDescription,
                     StartTime = subTaskDTO.StartTime,
                     Deadline = subTaskDTO.Deadline,
                     AmountBudget = subTaskDTO.AmountBudget,
@@ -40,7 +47,14 @@ namespace Planify_BackEnd.Services.SubTasks
                
                 };
 
-                await _subTaskRepository.CreateSubTaskAsync(newSubTask);
+                try
+                {
+                    await _subTaskRepository.CreateSubTaskAsync(newSubTask);
+                }
+                catch (Exception dbEx)
+                {
+                    return new ResponseDTO(500, "Database error while creating sub-task!", dbEx.Message);
+                }
 
                 return new ResponseDTO(201, "Sub-task creates successfully!", newSubTask);
             }
