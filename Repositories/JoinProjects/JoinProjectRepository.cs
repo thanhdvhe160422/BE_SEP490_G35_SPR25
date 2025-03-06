@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Planify_BackEnd.Models;
 
 namespace Planify_BackEnd.Repositories.JoinGroups
@@ -12,15 +13,14 @@ namespace Planify_BackEnd.Repositories.JoinGroups
             _context = context;
         }
 
-        public List<JoinProject> GetAllJoinedProjects(Guid userId, int page, int pageSize)
+        public async Task<IEnumerable<JoinProject>> GetAllJoinedProjects(Guid userId, int page, int pageSize)
         {
             try
             {
-                var joinedProjects = _context.JoinProjects
-               .Where(jp => jp.UserId == userId)
-               .Skip((page - 1) * pageSize).Take(pageSize).ToList();
-
-                return joinedProjects;
+                return await _context.JoinProjects
+                    .Where(jp => jp.UserId == userId)
+                    .Skip((page - 1) * pageSize).Take(pageSize)
+                    .ToListAsync(); 
             }
             catch (Exception ex) {
                 throw new Exception(ex.Message);

@@ -1,4 +1,5 @@
 ﻿using Planify_BackEnd.DTOs;
+using Planify_BackEnd.DTOs.Campus;
 using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories;
@@ -16,10 +17,32 @@ public class EventService : IEventService
         _groupRepository = groupRepository;
         _httpContextAccessor = httpContextAccessor;
     }
-    public ResponseDTO GetAllEvent()
+    public async Task<IEnumerable<EventGetListResponseDTO>> GetAllEvent(int page, int pageSize)
     {
-        var events = _eventRepository.GetAllEvent();
-        return new ResponseDTO(200, "Events retrieved successfully", events);
+        var events =  await _eventRepository.GetAllEvent( page,  pageSize);
+        var eventDTOs = events.Select(e => new EventGetListResponseDTO
+        {
+            Id = e.Id,
+            EventTitle = e.EventTitle,
+            EventDescription = e.EventDescription,
+            StartTime = e.StartTime,
+            EndTime = e.EndTime,
+            AmountBudget = e.AmountBudget,
+            IsPublic = e.IsPublic,
+            TimePublic = e.TimePublic,
+            Status = e.Status,
+            CampusId = e.CampusId,
+            CategoryEventId = e.CategoryEventId,
+            Placed = e.Placed,
+            CreateBy = e.CreateBy,
+            CreatedAt = e.CreatedAt,
+            EndOfEvent = e.EndOfEvent,
+            ManagerId = e.ManagerId,
+            TimeOfEvent = e.TimeOfEvent
+
+        }).ToList();
+        
+      return eventDTOs;
     }
 
     public async Task<ResponseDTO> CreateEventAsync(EventCreateRequestDTO eventDTO, Guid organizerId)
