@@ -6,7 +6,7 @@ namespace Planify_BackEnd.Services.Events
 {
     public interface IEventService
     {
-        ResponseDTO GetAllEvent();
+        Task<IEnumerable<EventGetListResponseDTO>> GetAllEvent();
         Task<ResponseDTO> CreateEventAsync(EventCreateRequestDTO eventDTO, Guid organizerId);
     }
 }

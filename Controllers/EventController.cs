@@ -26,13 +26,13 @@ namespace Planify_BackEnd.Controllers
         /// Retrieves all events with related data.
         /// </summary>
         /// <returns>A list of all events.</returns>
-        [HttpGet]
+        [HttpGet ("List")]
         [Authorize(Roles = "Campus Manager")]
-        public ActionResult<ResponseDTO> GetAllEvents()
+        public async Task<IActionResult> GetAllEvents()
         {
             try
             {
-                var response = _eventService.GetAllEvent();
+                var response = await _eventService.GetAllEvent();
                 return Ok(response);
             }
             catch (Exception ex)

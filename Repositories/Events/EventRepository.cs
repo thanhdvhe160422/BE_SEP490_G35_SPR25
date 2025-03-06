@@ -13,20 +13,11 @@ public class EventRepository : IEventRepository
         _context = context;
     }
 
-    public List<Event> GetAllEvent()
+    public async Task<IEnumerable<Event>> GetAllEvent()
     {
         try
         {
-            return _context.Events
-                        .Include(e => e.Campus)
-                        .Include(e => e.CategoryEvent)
-                        .Include(e => e.CreateByNavigation)
-                        .Include(e => e.EventMedia)
-                        .Include(e => e.Groups)
-                        .Include(e => e.JoinProjects)
-                        .Include(e => e.Manager)
-                        .Include(e => e.SendRequests)
-                        .ToList();
+            return await _context.Events.ToListAsync();
         }
         catch (Exception ex)
         {
