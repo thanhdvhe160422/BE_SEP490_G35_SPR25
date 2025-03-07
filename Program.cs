@@ -15,8 +15,11 @@ using Planify_BackEnd.Services.User;
 using Planify_BackEnd.Repositories;
 using System.Security.Claims;
 using System.Text;
-using Planify_BackEnd.Repositories.Groups;
+using Planify_BackEnd.Services.SubTasks;
+using Planify_BackEnd.Services.Tasks;
+using Planify_BackEnd.Repositories.Tasks;
 using Planify_BackEnd.Services.Groups;
+using Planify_BackEnd.Repositories.Groups;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,20 +58,30 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("Spectator", policy => policy.RequireRole("Spectator"));
 });
 
+// Them Service
 builder.Services.AddControllers();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEventService, EventService>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IEventSpectatorService, EventSpectatorService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<ISubTaskService, SubTaskService>();
 builder.Services.AddScoped<IProfileService,ProfileService>();
+builder.Services.AddScoped<IGroupService, GroupService>();
+// Thêm Repository
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<IEventSpectatorRepository, EventSpectatorRepository>();
-builder.Services.AddScoped<IEventSpectatorService, EventSpectatorService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
+builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+builder.Services.AddScoped<ISubTaskRepository, SubTaskRepository>();
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
-builder.Services.AddScoped<IGroupService,GroupService>();
-
 // Thêm Authorization
 builder.Services.AddAuthorization();
+
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+});
 
 // Thêm Swagger
 builder.Services.AddEndpointsApiExplorer();

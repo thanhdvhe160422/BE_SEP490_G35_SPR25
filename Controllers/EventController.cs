@@ -27,6 +27,7 @@ namespace Planify_BackEnd.Controllers
         /// </summary>
         /// <returns>A list of all events.</returns>
         [HttpGet]
+        [Authorize(Roles = "Campus Manager")]
         public ActionResult<ResponseDTO> GetAllEvents()
         {
             try
