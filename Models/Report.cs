@@ -13,7 +13,7 @@ public partial class Report
 
     public string Reason { get; set; } = null!;
 
-    public Guid ReportUserId { get; set; }
+    public Guid SendTo { get; set; }
 
     public DateTime SendTime { get; set; }
 
@@ -21,9 +21,9 @@ public partial class Report
 
     public virtual ICollection<ReportMedium> ReportMedia { get; set; } = new List<ReportMedium>();
 
-    public virtual User ReportUser { get; set; } = null!;
-
     public virtual User SendFromNavigation { get; set; } = null!;
+
+    public virtual User SendToNavigation { get; set; } = null!;
 
     public virtual Task Task { get; set; } = null!;
 }
