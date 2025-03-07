@@ -5,6 +5,7 @@
     {
         bool AllocateCostToGroup(int groupId, decimal cost);
         Task<Group> CreateGroupAsync(Group newGroup);
+        bool IsGroupExists(int groupId);
         System.Threading.Tasks.Task AddImplementerToGroupAsync(JoinGroup joinGroup);
     }
 }

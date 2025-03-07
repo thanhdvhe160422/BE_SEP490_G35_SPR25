@@ -7,33 +7,31 @@ public partial class Task
 {
     public int Id { get; set; }
 
-    public Guid? CreateBy { get; set; }
+    public Guid CreateBy { get; set; }
 
-    public string? TaskName { get; set; }
+    public string TaskName { get; set; } = null!;
 
-    public string? TaskDescription { get; set; }
+    public string TaskDescription { get; set; } = null!;
 
-    public DateTime? CreateDate { get; set; }
+    public DateTime CreateDate { get; set; }
 
-    public DateTime? StartTime { get; set; }
+    public DateTime StartTime { get; set; }
 
-    public DateTime? Deadline { get; set; }
+    public DateTime Deadline { get; set; }
 
-    public int? GroupId { get; set; }
+    public int GroupId { get; set; }
 
-    public decimal? AmountBudget { get; set; }
+    public decimal AmountBudget { get; set; }
 
-    public double? Progress { get; set; }
+    public double Progress { get; set; }
 
-    public int? Status { get; set; }
+    public int Status { get; set; }
 
-    public virtual User? CreateByNavigation { get; set; }
+    public virtual User CreateByNavigation { get; set; } = null!;
 
-    public virtual Group? Group { get; set; }
+    public virtual Group Group { get; set; } = null!;
 
     public virtual ICollection<InvoiceImagesTask> InvoiceImagesTasks { get; set; } = new List<InvoiceImagesTask>();
-
-    public virtual ICollection<JoinTask> JoinTasks { get; set; } = new List<JoinTask>();
 
     public virtual ICollection<Report> Reports { get; set; } = new List<Report>();
 

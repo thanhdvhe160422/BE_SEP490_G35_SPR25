@@ -9,11 +9,11 @@ public partial class CategoryEvent
 
     public string CategoryEventName { get; set; } = null!;
 
-    public int? CampusId { get; set; }
+    public int CampusId { get; set; }
 
-    public int? Status { get; set; }
+    public int Status { get; set; }
 
-    public virtual Campus? Campus { get; set; }
+    public virtual Campus Campus { get; set; } = null!;
 
     public virtual ICollection<Event> Events { get; set; } = new List<Event>();
 }

@@ -9,13 +9,9 @@ public partial class District
 
     public string DistrictName { get; set; } = null!;
 
-    public int? ProvinceId { get; set; }
+    public int ProvinceId { get; set; }
 
-    public int? Status { get; set; }
-
-    public virtual Province? Province { get; set; }
-
-    public virtual ICollection<User> Users { get; set; } = new List<User>();
+    public virtual Province Province { get; set; } = null!;
 
     public virtual ICollection<Ward> Wards { get; set; } = new List<Ward>();
 }

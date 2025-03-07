@@ -44,7 +44,7 @@ public class AuthService : IAuthService
             FullName = $"{user.FirstName} {user.LastName}",
             Email = user.Email,
             Campus = user.Campus.CampusName,
-            Role = user.RoleNavigation.RoleName,
+            Role = user.UserRoles?.FirstOrDefault()?.Role?.RoleName,
             AccessToken = jwtToken,
             RefreshToken = refreshToken
         });
@@ -79,7 +79,7 @@ public class AuthService : IAuthService
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim(ClaimTypes.Role, user.RoleNavigation.RoleName),
+            new Claim(ClaimTypes.Role, user.UserRoles?.FirstOrDefault()?.Role?.RoleName),
             new Claim("campusId", user.CampusId.ToString()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
@@ -143,7 +143,7 @@ public class AuthService : IAuthService
             FullName = user.FirstName + " " + user.LastName,
             Email = user.Email,
             Campus = user.Campus.CampusName,
-            Role = user.RoleNavigation.RoleName,
+            Role = user.UserRoles?.FirstOrDefault()?.Role?.RoleName,
             AccessToken = newJwtToken,
             RefreshToken = newRefreshToken
         };

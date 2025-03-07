@@ -36,12 +36,9 @@ namespace Planify_BackEnd.Services.Events
                         CategoryEventName = e.CategoryEvent.CategoryEventName
                     },
                     CreatedAt = e.CreatedAt,
-                    EndOfEvent = e.EndOfEvent,
-                    EndTime = e.EndOfEvent,
                     IsPublic = e.IsPublic,
                     Placed = e.Placed,
                     StartTime = e.StartTime,
-                    TimeOfEvent = e.TimeOfEvent,
                     TimePublic = e.TimePublic,
                     EventMedias = e.EventMedia == null ? null : e.EventMedia.Select(em => new DTOs.Medias.EventMediumViewMediaModel
                     {
@@ -88,7 +85,6 @@ namespace Planify_BackEnd.Services.Events
                             Id = item.CategoryEvent.Id,
                             CategoryEventName = item.CategoryEvent.CategoryEventName
                         },
-                        EndOfEvent = item.EndOfEvent,
                         Status = item.Status,
                         StartTime = item.StartTime,
                         EndTime = item.EndTime,
@@ -96,7 +92,6 @@ namespace Planify_BackEnd.Services.Events
                         EventTitle = item.EventTitle,
                         IsPublic = item.IsPublic,
                         Placed = item.Placed,
-                        TimeOfEvent = item.TimeOfEvent,
                         EventMedias = item.EventMedia == null ? null : item.EventMedia.Select(em => new DTOs.Medias.EventMediumViewMediaModel
                         {
                             Id = em.Id,
@@ -145,7 +140,6 @@ namespace Planify_BackEnd.Services.Events
                             Id = item.CategoryEvent.Id,
                             CategoryEventName = item.CategoryEvent.CategoryEventName
                         },
-                        EndOfEvent = item.EndOfEvent,
                         Status = item.Status,
                         StartTime = item.StartTime,
                         EndTime = item.EndTime,
@@ -153,7 +147,6 @@ namespace Planify_BackEnd.Services.Events
                         EventTitle = item.EventTitle,
                         IsPublic = item.IsPublic,
                         Placed = item.Placed,
-                        TimeOfEvent = item.TimeOfEvent,
                         EventMedias = item.EventMedia == null ? null : item.EventMedia.Select(em => new DTOs.Medias.EventMediumViewMediaModel
                         {
                             Id = em.Id,

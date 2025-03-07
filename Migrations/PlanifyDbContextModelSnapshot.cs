@@ -22,35 +22,37 @@ namespace Planify_BackEnd.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Planify_BackEnd.Models.Admin", b =>
+            modelBuilder.Entity("Planify_BackEnd.Models.AssignTask", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("(newid())");
-
-                    b.Property<int?>("Avatar")
                         .HasColumnType("int");
 
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Status")
+                    b.Property<Guid?>("AssignId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("Status")
                         .HasColumnType("int");
 
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(255)");
+                    b.Property<int?>("SubTaskId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("TimeJoin")
+                        .HasColumnType("datetime");
+
+                    b.Property<DateTime?>("TimeOut")
+                        .HasColumnType("datetime");
 
                     b.HasKey("Id")
-                        .HasName("PK__Admin__3214EC078C6BBC5B");
+                        .HasName("PK__AssignTa__3214EC07D4FEF93A");
 
-                    b.HasIndex("Avatar");
+                    b.HasIndex("AssignId");
 
-                    b.ToTable("Admin", (string)null);
+                    b.HasIndex("SubTaskId");
+
+                    b.ToTable("AssignTask", (string)null);
                 });
 
             modelBuilder.Entity("Planify_BackEnd.Models.Campus", b =>
@@ -66,11 +68,11 @@ namespace Planify_BackEnd.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int>("Status")
+                    b.Property<int?>("Status")
                         .HasColumnType("int");
 
                     b.HasKey("Id")
-                        .HasName("PK__Campus__3214EC07699F6314");
+                        .HasName("PK__Campus__3214EC07A0547913");
 
                     b.ToTable("Campus", (string)null);
                 });
@@ -84,19 +86,18 @@ namespace Planify_BackEnd.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("CampusId")
-                        .HasColumnType("int")
-                        .HasColumnName("CampusID");
+                        .HasColumnType("int");
 
                     b.Property<string>("CategoryEventName")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int>("Status")
+                    b.Property<int?>("Status")
                         .HasColumnType("int");
 
                     b.HasKey("Id")
-                        .HasName("PK__Category__3214EC07B017394E");
+                        .HasName("PK__Category__3214EC07313FA59A");
 
                     b.HasIndex("CampusId");
 
@@ -119,11 +120,11 @@ namespace Planify_BackEnd.Migrations
                     b.Property<int?>("ProvinceId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Status")
+                    b.Property<int?>("Status")
                         .HasColumnType("int");
 
                     b.HasKey("Id")
-                        .HasName("PK__District__3214EC07F051D900");
+                        .HasName("PK__District__3214EC074E4FB66C");
 
                     b.HasIndex("ProvinceId");
 
@@ -138,7 +139,7 @@ namespace Planify_BackEnd.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("AmountBudget")
+                    b.Property<decimal?>("AmountBudget")
                         .HasColumnType("money");
 
                     b.Property<int?>("CampusId")
@@ -151,15 +152,13 @@ namespace Planify_BackEnd.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("CreatedAt")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasColumnName("Created_at")
-                        .HasDefaultValueSql("(getdate())");
+                        .HasColumnName("Created_at");
 
-                    b.Property<DateTime>("EndOfEvent")
+                    b.Property<DateTime?>("EndOfEvent")
                         .HasColumnType("datetime");
 
-                    b.Property<DateTime>("EndTime")
+                    b.Property<DateTime?>("EndTime")
                         .HasColumnType("datetime");
 
                     b.Property<string>("EventDescription")
@@ -170,31 +169,30 @@ namespace Planify_BackEnd.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int>("IsPublic")
+                    b.Property<int?>("IsPublic")
                         .HasColumnType("int");
 
                     b.Property<Guid?>("ManagerId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Placed")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime>("StartTime")
+                    b.Property<DateTime?>("StartTime")
                         .HasColumnType("datetime");
 
-                    b.Property<int>("Status")
+                    b.Property<int?>("Status")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("TimeOfEvent")
+                    b.Property<DateTime?>("TimeOfEvent")
                         .HasColumnType("datetime");
 
-                    b.Property<DateTime>("TimePublic")
+                    b.Property<DateTime?>("TimePublic")
                         .HasColumnType("datetime");
 
                     b.HasKey("Id")
-                        .HasName("PK__Event__3214EC07C3C53BBD");
+                        .HasName("PK__Event__3214EC07879E40D1");
 
                     b.HasIndex("CampusId");
 
@@ -221,11 +219,11 @@ namespace Planify_BackEnd.Migrations
                     b.Property<int?>("MediaId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Status")
+                    b.Property<int?>("Status")
                         .HasColumnType("int");
 
                     b.HasKey("Id")
-                        .HasName("PK__EventMed__3214EC07C361BBF6");
+                        .HasName("PK__EventMed__3214EC078B36DE97");
 
                     b.HasIndex("EventId");
 
@@ -242,7 +240,7 @@ namespace Planify_BackEnd.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("AmountBudget")
+                    b.Property<decimal?>("AmountBudget")
                         .HasColumnType("money");
 
                     b.Property<Guid?>("CreateBy")
@@ -252,12 +250,11 @@ namespace Planify_BackEnd.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("GroupName")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id")
-                        .HasName("PK__Group__3214EC073340868D");
+                        .HasName("PK__Group__3214EC079D0EF3F3");
 
                     b.HasIndex("CreateBy");
 
@@ -274,23 +271,22 @@ namespace Planify_BackEnd.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("ActualBudgetAmount")
+                    b.Property<decimal?>("ActualBudgetAmount")
                         .HasColumnType("money");
 
                     b.Property<string>("InvoiceImageUrl")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)")
                         .HasColumnName("InvoiceImageURL");
 
-                    b.Property<int>("Status")
+                    b.Property<int?>("Status")
                         .HasColumnType("int");
 
                     b.Property<int?>("SubTaskId")
                         .HasColumnType("int");
 
                     b.HasKey("Id")
-                        .HasName("PK__InvoiceI__3214EC0707FDF766");
+                        .HasName("PK__InvoiceI__3214EC079F7723FF");
 
                     b.HasIndex("SubTaskId");
 
@@ -305,27 +301,59 @@ namespace Planify_BackEnd.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("ActualBudgetAmount")
+                    b.Property<decimal?>("ActualBudgetAmount")
                         .HasColumnType("money");
 
                     b.Property<string>("InvoiceImageUrl")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)")
                         .HasColumnName("InvoiceImageURL");
 
-                    b.Property<int>("Status")
+                    b.Property<int?>("Status")
                         .HasColumnType("int");
 
                     b.Property<int?>("TaskId")
                         .HasColumnType("int");
 
                     b.HasKey("Id")
-                        .HasName("PK__InvoiceI__3214EC074D20B675");
+                        .HasName("PK__InvoiceI__3214EC07B5054C75");
 
                     b.HasIndex("TaskId");
 
                     b.ToTable("InvoiceImagesTask", (string)null);
+                });
+
+            modelBuilder.Entity("Planify_BackEnd.Models.JoinGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("GroupId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("ImplementerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("TimeJoin")
+                        .HasColumnType("datetime");
+
+                    b.Property<DateTime?>("TimeOut")
+                        .HasColumnType("datetime");
+
+                    b.HasKey("Id")
+                        .HasName("PK__JoinGrou__3214EC07C7D52D4A");
+
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("ImplementerId");
+
+                    b.ToTable("JoinGroup", (string)null);
                 });
 
             modelBuilder.Entity("Planify_BackEnd.Models.JoinProject", b =>
@@ -342,7 +370,7 @@ namespace Planify_BackEnd.Migrations
                     b.Property<int?>("Role")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("TimeJoinProject")
+                    b.Property<DateTime?>("TimeJoinProject")
                         .HasColumnType("datetime");
 
                     b.Property<DateTime?>("TimeOutProject")
@@ -354,15 +382,46 @@ namespace Planify_BackEnd.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id")
-                        .HasName("PK__JoinProj__3214EC0730D721C5");
+                        .HasName("PK__JoinProj__3214EC07659A18CC");
 
                     b.HasIndex("EventId");
-
-                    b.HasIndex("Role");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("JoinProject", (string)null);
+                });
+
+            modelBuilder.Entity("Planify_BackEnd.Models.JoinTask", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid?>("ImplementerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TaskId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("TimeJoin")
+                        .HasColumnType("datetime");
+
+                    b.Property<DateTime?>("TimeOut")
+                        .HasColumnType("datetime");
+
+                    b.HasKey("Id")
+                        .HasName("PK__JoinTask__3214EC07C883397F");
+
+                    b.HasIndex("ImplementerId");
+
+                    b.HasIndex("TaskId");
+
+                    b.ToTable("JoinTask", (string)null);
                 });
 
             modelBuilder.Entity("Planify_BackEnd.Models.MediaItem", b =>
@@ -374,13 +433,12 @@ namespace Planify_BackEnd.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("MediaUrl")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)")
                         .HasColumnName("MediaURL");
 
                     b.HasKey("Id")
-                        .HasName("PK__MediaIte__3214EC07B5BC8118");
+                        .HasName("PK__MediaIte__3214EC074378424F");
 
                     b.ToTable("MediaItems");
                 });
@@ -398,13 +456,73 @@ namespace Planify_BackEnd.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int>("Status")
+                    b.Property<int?>("Status")
                         .HasColumnType("int");
 
                     b.HasKey("Id")
-                        .HasName("PK__Province__3214EC077E6D8019");
+                        .HasName("PK__Province__3214EC0742D4AAED");
 
                     b.ToTable("Province", (string)null);
+                });
+
+            modelBuilder.Entity("Planify_BackEnd.Models.Report", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<Guid?>("ReportUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("SendFrom")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("SendTime")
+                        .HasColumnType("datetime");
+
+                    b.Property<int?>("TaskId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id")
+                        .HasName("PK__Report__3214EC07305FD60E");
+
+                    b.HasIndex("ReportUserId");
+
+                    b.HasIndex("SendFrom");
+
+                    b.HasIndex("TaskId");
+
+                    b.ToTable("Report", (string)null);
+                });
+
+            modelBuilder.Entity("Planify_BackEnd.Models.ReportMedium", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("MediaUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("MediaURL");
+
+                    b.Property<int?>("ReportId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id")
+                        .HasName("PK__ReportMe__3214EC07636296D0");
+
+                    b.HasIndex("ReportId");
+
+                    b.ToTable("ReportMedia");
                 });
 
             modelBuilder.Entity("Planify_BackEnd.Models.Role", b =>
@@ -421,7 +539,7 @@ namespace Planify_BackEnd.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id")
-                        .HasName("PK__Role__3214EC0791A7DB13");
+                        .HasName("PK__Role__3214EC07BAF9B1A7");
 
                     b.ToTable("Role", (string)null);
                 });
@@ -444,11 +562,11 @@ namespace Planify_BackEnd.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<int>("Status")
+                    b.Property<int?>("Status")
                         .HasColumnType("int");
 
                     b.HasKey("Id")
-                        .HasName("PK__SendRequ__3214EC07A267419B");
+                        .HasName("PK__SendRequ__3214EC075EEE23D7");
 
                     b.HasIndex("EventId");
 
@@ -465,26 +583,25 @@ namespace Planify_BackEnd.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("AmountBudget")
+                    b.Property<decimal?>("AmountBudget")
                         .HasColumnType("money");
 
                     b.Property<Guid?>("CreateBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("Deadline")
+                    b.Property<DateTime?>("Deadline")
                         .HasColumnType("datetime");
 
-                    b.Property<DateTime>("StartTime")
+                    b.Property<DateTime?>("StartTime")
                         .HasColumnType("datetime");
 
-                    b.Property<int>("Status")
+                    b.Property<int?>("Status")
                         .HasColumnType("int");
 
                     b.Property<string>("SubTaskDescription")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SubTaskName")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
@@ -492,7 +609,7 @@ namespace Planify_BackEnd.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id")
-                        .HasName("PK__SubTask__3214EC07F2A302FC");
+                        .HasName("PK__SubTask__3214EC0768B35C66");
 
                     b.HasIndex("CreateBy");
 
@@ -509,42 +626,39 @@ namespace Planify_BackEnd.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("AmountBudget")
+                    b.Property<decimal?>("AmountBudget")
                         .HasColumnType("money");
 
                     b.Property<Guid?>("CreateBy")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("CreateDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("(getdate())");
+                        .HasColumnType("datetime");
 
-                    b.Property<DateTime>("Deadline")
+                    b.Property<DateTime?>("Deadline")
                         .HasColumnType("datetime");
 
                     b.Property<int?>("GroupId")
                         .HasColumnType("int");
 
-                    b.Property<double>("Progress")
+                    b.Property<double?>("Progress")
                         .HasColumnType("float");
 
-                    b.Property<DateTime>("StartTime")
+                    b.Property<DateTime?>("StartTime")
                         .HasColumnType("datetime");
 
-                    b.Property<int>("Status")
+                    b.Property<int?>("Status")
                         .HasColumnType("int");
 
                     b.Property<string>("TaskDescription")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TaskName")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id")
-                        .HasName("PK__Task__3214EC07522E353D");
+                        .HasName("PK__Task__3214EC0750EFAB84");
 
                     b.HasIndex("CreateBy");
 
@@ -556,9 +670,7 @@ namespace Planify_BackEnd.Migrations
             modelBuilder.Entity("Planify_BackEnd.Models.User", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("Avatar")
                         .HasColumnType("int");
@@ -566,19 +678,11 @@ namespace Planify_BackEnd.Migrations
                     b.Property<int?>("CampusId")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("CreateByAdmin")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CreateByManage")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("CreatedAt")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasColumnName("Created_at")
-                        .HasDefaultValueSql("(getdate())");
+                        .HasColumnName("Created_at");
 
-                    b.Property<DateTime>("DateOfBirth")
+                    b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("datetime");
 
                     b.Property<int?>("DistrictId")
@@ -591,12 +695,10 @@ namespace Planify_BackEnd.Migrations
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("FirstName")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("LastName")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -605,7 +707,6 @@ namespace Planify_BackEnd.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("PhoneNumber")
-                        .IsRequired()
                         .HasMaxLength(10)
                         .IsUnicode(false)
                         .HasColumnType("varchar(10)");
@@ -616,7 +717,7 @@ namespace Planify_BackEnd.Migrations
                     b.Property<int?>("Role")
                         .HasColumnType("int");
 
-                    b.Property<int>("Status")
+                    b.Property<int?>("Status")
                         .HasColumnType("int");
 
                     b.Property<string>("UserName")
@@ -629,15 +730,11 @@ namespace Planify_BackEnd.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id")
-                        .HasName("PK__Users__3214EC079CA1F7F4");
+                        .HasName("PK__Users__3214EC07FEA36B21");
 
                     b.HasIndex("Avatar");
 
                     b.HasIndex("CampusId");
-
-                    b.HasIndex("CreateByAdmin");
-
-                    b.HasIndex("CreateByManage");
 
                     b.HasIndex("DistrictId");
 
@@ -659,10 +756,9 @@ namespace Planify_BackEnd.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("DistrictId")
-                        .HasColumnType("int")
-                        .HasColumnName("DistrictID");
+                        .HasColumnType("int");
 
-                    b.Property<int>("Status")
+                    b.Property<int?>("Status")
                         .HasColumnType("int");
 
                     b.Property<string>("WardName")
@@ -671,21 +767,28 @@ namespace Planify_BackEnd.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id")
-                        .HasName("PK__Ward__3214EC07CBA258CF");
+                        .HasName("PK__Ward__3214EC07B5ACCBA1");
 
                     b.HasIndex("DistrictId");
 
                     b.ToTable("Ward", (string)null);
                 });
 
-            modelBuilder.Entity("Planify_BackEnd.Models.Admin", b =>
+            modelBuilder.Entity("Planify_BackEnd.Models.AssignTask", b =>
                 {
-                    b.HasOne("Planify_BackEnd.Models.MediaItem", "AvatarNavigation")
-                        .WithMany("Admins")
-                        .HasForeignKey("Avatar")
-                        .HasConstraintName("FK__Admin__Avatar__48CFD27E");
+                    b.HasOne("Planify_BackEnd.Models.User", "Assign")
+                        .WithMany("AssignTasks")
+                        .HasForeignKey("AssignId")
+                        .HasConstraintName("FK__AssignTas__Assig__7C4F7684");
 
-                    b.Navigation("AvatarNavigation");
+                    b.HasOne("Planify_BackEnd.Models.SubTask", "SubTask")
+                        .WithMany("AssignTasks")
+                        .HasForeignKey("SubTaskId")
+                        .HasConstraintName("FK__AssignTas__SubTa__7D439ABD");
+
+                    b.Navigation("Assign");
+
+                    b.Navigation("SubTask");
                 });
 
             modelBuilder.Entity("Planify_BackEnd.Models.CategoryEvent", b =>
@@ -693,7 +796,7 @@ namespace Planify_BackEnd.Migrations
                     b.HasOne("Planify_BackEnd.Models.Campus", "Campus")
                         .WithMany("CategoryEvents")
                         .HasForeignKey("CampusId")
-                        .HasConstraintName("FK__CategoryE__Campu__3B75D760");
+                        .HasConstraintName("FK__CategoryE__Campu__44FF419A");
 
                     b.Navigation("Campus");
                 });
@@ -703,7 +806,7 @@ namespace Planify_BackEnd.Migrations
                     b.HasOne("Planify_BackEnd.Models.Province", "Province")
                         .WithMany("Districts")
                         .HasForeignKey("ProvinceId")
-                        .HasConstraintName("FK__District__Provin__403A8C7D");
+                        .HasConstraintName("FK__District__Provin__3F466844");
 
                     b.Navigation("Province");
                 });
@@ -713,22 +816,22 @@ namespace Planify_BackEnd.Migrations
                     b.HasOne("Planify_BackEnd.Models.Campus", "Campus")
                         .WithMany("Events")
                         .HasForeignKey("CampusId")
-                        .HasConstraintName("FK__Event__CampusId__59FA5E80");
+                        .HasConstraintName("FK__Event__CampusId__5165187F");
 
                     b.HasOne("Planify_BackEnd.Models.CategoryEvent", "CategoryEvent")
                         .WithMany("Events")
                         .HasForeignKey("CategoryEventId")
-                        .HasConstraintName("FK__Event__CategoryE__5AEE82B9");
+                        .HasConstraintName("FK__Event__CategoryE__52593CB8");
 
                     b.HasOne("Planify_BackEnd.Models.User", "CreateByNavigation")
                         .WithMany("EventCreateByNavigations")
                         .HasForeignKey("CreateBy")
-                        .HasConstraintName("FK__Event__CreateBy__571DF1D5");
+                        .HasConstraintName("FK__Event__CreateBy__4F7CD00D");
 
                     b.HasOne("Planify_BackEnd.Models.User", "Manager")
                         .WithMany("EventManagers")
                         .HasForeignKey("ManagerId")
-                        .HasConstraintName("FK__Event__ManagerId__59063A47");
+                        .HasConstraintName("FK__Event__ManagerId__5070F446");
 
                     b.Navigation("Campus");
 
@@ -744,12 +847,12 @@ namespace Planify_BackEnd.Migrations
                     b.HasOne("Planify_BackEnd.Models.Event", "Event")
                         .WithMany("EventMedia")
                         .HasForeignKey("EventId")
-                        .HasConstraintName("FK__EventMedi__Event__619B8048");
+                        .HasConstraintName("FK__EventMedi__Event__5535A963");
 
                     b.HasOne("Planify_BackEnd.Models.MediaItem", "Media")
                         .WithMany("EventMedia")
                         .HasForeignKey("MediaId")
-                        .HasConstraintName("FK__EventMedi__Media__628FA481");
+                        .HasConstraintName("FK__EventMedi__Media__5629CD9C");
 
                     b.Navigation("Event");
 
@@ -761,12 +864,12 @@ namespace Planify_BackEnd.Migrations
                     b.HasOne("Planify_BackEnd.Models.User", "CreateByNavigation")
                         .WithMany("Groups")
                         .HasForeignKey("CreateBy")
-                        .HasConstraintName("FK__Group__CreateBy__6B24EA82");
+                        .HasConstraintName("FK__Group__CreateBy__619B8048");
 
                     b.HasOne("Planify_BackEnd.Models.Event", "Event")
                         .WithMany("Groups")
                         .HasForeignKey("EventId")
-                        .HasConstraintName("FK__Group__EventId__6C190EBB");
+                        .HasConstraintName("FK__Group__EventId__628FA481");
 
                     b.Navigation("CreateByNavigation");
 
@@ -778,7 +881,7 @@ namespace Planify_BackEnd.Migrations
                     b.HasOne("Planify_BackEnd.Models.SubTask", "SubTask")
                         .WithMany("InvoiceImagesSubTasks")
                         .HasForeignKey("SubTaskId")
-                        .HasConstraintName("FK__InvoiceIm__SubTa__778AC167");
+                        .HasConstraintName("FK__InvoiceIm__SubTa__00200768");
 
                     b.Navigation("SubTask");
                 });
@@ -788,9 +891,26 @@ namespace Planify_BackEnd.Migrations
                     b.HasOne("Planify_BackEnd.Models.Task", "Task")
                         .WithMany("InvoiceImagesTasks")
                         .HasForeignKey("TaskId")
-                        .HasConstraintName("FK__InvoiceIm__TaskI__7A672E12");
+                        .HasConstraintName("FK__InvoiceIm__TaskI__02FC7413");
 
                     b.Navigation("Task");
+                });
+
+            modelBuilder.Entity("Planify_BackEnd.Models.JoinGroup", b =>
+                {
+                    b.HasOne("Planify_BackEnd.Models.Group", "Group")
+                        .WithMany("JoinGroups")
+                        .HasForeignKey("GroupId")
+                        .HasConstraintName("FK__JoinGroup__Group__75A278F5");
+
+                    b.HasOne("Planify_BackEnd.Models.User", "Implementer")
+                        .WithMany("JoinGroups")
+                        .HasForeignKey("ImplementerId")
+                        .HasConstraintName("FK__JoinGroup__Imple__74AE54BC");
+
+                    b.Navigation("Group");
+
+                    b.Navigation("Implementer");
                 });
 
             modelBuilder.Entity("Planify_BackEnd.Models.JoinProject", b =>
@@ -798,23 +918,67 @@ namespace Planify_BackEnd.Migrations
                     b.HasOne("Planify_BackEnd.Models.Event", "Event")
                         .WithMany("JoinProjects")
                         .HasForeignKey("EventId")
-                        .HasConstraintName("FK__JoinProje__Event__656C112C");
-
-                    b.HasOne("Planify_BackEnd.Models.Role", "RoleNavigation")
-                        .WithMany("JoinProjects")
-                        .HasForeignKey("Role")
-                        .HasConstraintName("FK__JoinProjec__Role__68487DD7");
+                        .HasConstraintName("FK__JoinProje__Event__5DCAEF64");
 
                     b.HasOne("Planify_BackEnd.Models.User", "User")
                         .WithMany("JoinProjects")
                         .HasForeignKey("UserId")
-                        .HasConstraintName("FK__JoinProje__UserI__66603565");
+                        .HasConstraintName("FK__JoinProje__UserI__5EBF139D");
 
                     b.Navigation("Event");
 
-                    b.Navigation("RoleNavigation");
-
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Planify_BackEnd.Models.JoinTask", b =>
+                {
+                    b.HasOne("Planify_BackEnd.Models.User", "Implementer")
+                        .WithMany("JoinTasks")
+                        .HasForeignKey("ImplementerId")
+                        .HasConstraintName("FK__JoinTask__Implem__797309D9");
+
+                    b.HasOne("Planify_BackEnd.Models.Task", "Task")
+                        .WithMany("JoinTasks")
+                        .HasForeignKey("TaskId")
+                        .HasConstraintName("FK__JoinTask__TaskId__787EE5A0");
+
+                    b.Navigation("Implementer");
+
+                    b.Navigation("Task");
+                });
+
+            modelBuilder.Entity("Planify_BackEnd.Models.Report", b =>
+                {
+                    b.HasOne("Planify_BackEnd.Models.User", "ReportUser")
+                        .WithMany("ReportReportUsers")
+                        .HasForeignKey("ReportUserId")
+                        .HasConstraintName("FK__Report__ReportUs__6EF57B66");
+
+                    b.HasOne("Planify_BackEnd.Models.User", "SendFromNavigation")
+                        .WithMany("ReportSendFromNavigations")
+                        .HasForeignKey("SendFrom")
+                        .HasConstraintName("FK__Report__SendFrom__6D0D32F4");
+
+                    b.HasOne("Planify_BackEnd.Models.Task", "Task")
+                        .WithMany("Reports")
+                        .HasForeignKey("TaskId")
+                        .HasConstraintName("FK__Report__TaskId__6E01572D");
+
+                    b.Navigation("ReportUser");
+
+                    b.Navigation("SendFromNavigation");
+
+                    b.Navigation("Task");
+                });
+
+            modelBuilder.Entity("Planify_BackEnd.Models.ReportMedium", b =>
+                {
+                    b.HasOne("Planify_BackEnd.Models.Report", "Report")
+                        .WithMany("ReportMedia")
+                        .HasForeignKey("ReportId")
+                        .HasConstraintName("FK__ReportMed__Repor__71D1E811");
+
+                    b.Navigation("Report");
                 });
 
             modelBuilder.Entity("Planify_BackEnd.Models.SendRequest", b =>
@@ -822,12 +986,12 @@ namespace Planify_BackEnd.Migrations
                     b.HasOne("Planify_BackEnd.Models.Event", "Event")
                         .WithMany("SendRequests")
                         .HasForeignKey("EventId")
-                        .HasConstraintName("FK__SendReque__Event__5DCAEF64");
+                        .HasConstraintName("FK__SendReque__Event__59063A47");
 
                     b.HasOne("Planify_BackEnd.Models.User", "Manager")
                         .WithMany("SendRequests")
                         .HasForeignKey("ManagerId")
-                        .HasConstraintName("FK__SendReque__Manag__5EBF139D");
+                        .HasConstraintName("FK__SendReque__Manag__59FA5E80");
 
                     b.Navigation("Event");
 
@@ -839,12 +1003,12 @@ namespace Planify_BackEnd.Migrations
                     b.HasOne("Planify_BackEnd.Models.User", "CreateByNavigation")
                         .WithMany("SubTasks")
                         .HasForeignKey("CreateBy")
-                        .HasConstraintName("FK__SubTask__CreateB__74AE54BC");
+                        .HasConstraintName("FK__SubTask__CreateB__6A30C649");
 
                     b.HasOne("Planify_BackEnd.Models.Task", "Task")
                         .WithMany("SubTasks")
                         .HasForeignKey("TaskId")
-                        .HasConstraintName("FK__SubTask__TaskId__73BA3083");
+                        .HasConstraintName("FK__SubTask__TaskId__693CA210");
 
                     b.Navigation("CreateByNavigation");
 
@@ -856,12 +1020,12 @@ namespace Planify_BackEnd.Migrations
                     b.HasOne("Planify_BackEnd.Models.User", "CreateByNavigation")
                         .WithMany("Tasks")
                         .HasForeignKey("CreateBy")
-                        .HasConstraintName("FK__Task__CreateBy__6EF57B66");
+                        .HasConstraintName("FK__Task__CreateBy__656C112C");
 
                     b.HasOne("Planify_BackEnd.Models.Group", "Group")
                         .WithMany("Tasks")
                         .HasForeignKey("GroupId")
-                        .HasConstraintName("FK__Task__GroupId__70DDC3D8");
+                        .HasConstraintName("FK__Task__GroupId__66603565");
 
                     b.Navigation("CreateByNavigation");
 
@@ -873,50 +1037,36 @@ namespace Planify_BackEnd.Migrations
                     b.HasOne("Planify_BackEnd.Models.MediaItem", "AvatarNavigation")
                         .WithMany("Users")
                         .HasForeignKey("Avatar")
-                        .HasConstraintName("FK__Users__Avatar__4F7CD00D");
+                        .HasConstraintName("FK__Users__Avatar__4AB81AF0");
 
                     b.HasOne("Planify_BackEnd.Models.Campus", "Campus")
                         .WithMany("Users")
                         .HasForeignKey("CampusId")
-                        .HasConstraintName("FK__Users__CampusId__5441852A");
-
-                    b.HasOne("Planify_BackEnd.Models.Admin", "CreateByAdminNavigation")
-                        .WithMany("Users")
-                        .HasForeignKey("CreateByAdmin")
-                        .HasConstraintName("FK__Users__CreateByA__52593CB8");
-
-                    b.HasOne("Planify_BackEnd.Models.User", "CreateByManageNavigation")
-                        .WithMany("InverseCreateByManageNavigation")
-                        .HasForeignKey("CreateByManage")
-                        .HasConstraintName("FK__Users__CreateByM__534D60F1");
+                        .HasConstraintName("FK__Users__CampusId__4CA06362");
 
                     b.HasOne("Planify_BackEnd.Models.District", "District")
                         .WithMany("Users")
                         .HasForeignKey("DistrictId")
-                        .HasConstraintName("FK__Users__DistrictI__4D94879B");
+                        .HasConstraintName("FK__Users__DistrictI__48CFD27E");
 
                     b.HasOne("Planify_BackEnd.Models.Province", "Province")
                         .WithMany("Users")
                         .HasForeignKey("ProvinceId")
-                        .HasConstraintName("FK__Users__ProvinceI__4E88ABD4");
+                        .HasConstraintName("FK__Users__ProvinceI__49C3F6B7");
 
                     b.HasOne("Planify_BackEnd.Models.Role", "RoleNavigation")
                         .WithMany("Users")
                         .HasForeignKey("Role")
-                        .HasConstraintName("FK__Users__Role__5165187F");
+                        .HasConstraintName("FK__Users__Role__4BAC3F29");
 
                     b.HasOne("Planify_BackEnd.Models.Ward", "Ward")
                         .WithMany("Users")
                         .HasForeignKey("WardId")
-                        .HasConstraintName("FK__Users__WardId__4CA06362");
+                        .HasConstraintName("FK__Users__WardId__47DBAE45");
 
                     b.Navigation("AvatarNavigation");
 
                     b.Navigation("Campus");
-
-                    b.Navigation("CreateByAdminNavigation");
-
-                    b.Navigation("CreateByManageNavigation");
 
                     b.Navigation("District");
 
@@ -932,14 +1082,9 @@ namespace Planify_BackEnd.Migrations
                     b.HasOne("Planify_BackEnd.Models.District", "District")
                         .WithMany("Wards")
                         .HasForeignKey("DistrictId")
-                        .HasConstraintName("FK__Ward__DistrictID__4316F928");
+                        .HasConstraintName("FK__Ward__DistrictId__4222D4EF");
 
                     b.Navigation("District");
-                });
-
-            modelBuilder.Entity("Planify_BackEnd.Models.Admin", b =>
-                {
-                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("Planify_BackEnd.Models.Campus", b =>
@@ -976,13 +1121,13 @@ namespace Planify_BackEnd.Migrations
 
             modelBuilder.Entity("Planify_BackEnd.Models.Group", b =>
                 {
+                    b.Navigation("JoinGroups");
+
                     b.Navigation("Tasks");
                 });
 
             modelBuilder.Entity("Planify_BackEnd.Models.MediaItem", b =>
                 {
-                    b.Navigation("Admins");
-
                     b.Navigation("EventMedia");
 
                     b.Navigation("Users");
@@ -995,15 +1140,20 @@ namespace Planify_BackEnd.Migrations
                     b.Navigation("Users");
                 });
 
+            modelBuilder.Entity("Planify_BackEnd.Models.Report", b =>
+                {
+                    b.Navigation("ReportMedia");
+                });
+
             modelBuilder.Entity("Planify_BackEnd.Models.Role", b =>
                 {
-                    b.Navigation("JoinProjects");
-
                     b.Navigation("Users");
                 });
 
             modelBuilder.Entity("Planify_BackEnd.Models.SubTask", b =>
                 {
+                    b.Navigation("AssignTasks");
+
                     b.Navigation("InvoiceImagesSubTasks");
                 });
 
@@ -1011,20 +1161,32 @@ namespace Planify_BackEnd.Migrations
                 {
                     b.Navigation("InvoiceImagesTasks");
 
+                    b.Navigation("JoinTasks");
+
+                    b.Navigation("Reports");
+
                     b.Navigation("SubTasks");
                 });
 
             modelBuilder.Entity("Planify_BackEnd.Models.User", b =>
                 {
+                    b.Navigation("AssignTasks");
+
                     b.Navigation("EventCreateByNavigations");
 
                     b.Navigation("EventManagers");
 
                     b.Navigation("Groups");
 
-                    b.Navigation("InverseCreateByManageNavigation");
+                    b.Navigation("JoinGroups");
 
                     b.Navigation("JoinProjects");
+
+                    b.Navigation("JoinTasks");
+
+                    b.Navigation("ReportReportUsers");
+
+                    b.Navigation("ReportSendFromNavigations");
 
                     b.Navigation("SendRequests");
 

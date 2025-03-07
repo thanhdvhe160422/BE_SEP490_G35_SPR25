@@ -26,13 +26,13 @@ namespace Planify_BackEnd.Controllers
         /// Retrieves all events with related data.
         /// </summary>
         /// <returns>A list of all events.</returns>
-        [HttpGet]
+        [HttpGet ("List")]
         [Authorize(Roles = "Campus Manager")]
-        public ActionResult<ResponseDTO> GetAllEvents()
+        public async Task<IActionResult> GetAllEvents(int page, int pageSize)
         {
             try
             {
-                var response = _eventService.GetAllEvent();
+                var response = await _eventService.GetAllEvent( page,  pageSize);
                 return Ok(response);
             }
             catch (Exception ex)
@@ -49,6 +49,15 @@ namespace Planify_BackEnd.Controllers
             var organizerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
             var response = await _eventService.CreateEventAsync(eventDTO, organizerId);
+
+            return StatusCode(response.Status, response);
+        }
+
+        [HttpPost("get-event-detail")]
+        [Authorize(Roles = "Event Organizer")]
+        public async Task<IActionResult> GetEventDetail(int eventId)
+        {
+            var response = await _eventService.GetEventDetailAsync(eventId);
 
             return StatusCode(response.Status, response);
         }
