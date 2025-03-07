@@ -49,9 +49,9 @@ public partial class User
 
     public virtual ICollection<JoinProject> JoinProjects { get; set; } = new List<JoinProject>();
 
-    public virtual ICollection<Report> ReportReportUsers { get; set; } = new List<Report>();
-
     public virtual ICollection<Report> ReportSendFromNavigations { get; set; } = new List<Report>();
+
+    public virtual ICollection<Report> ReportSendToNavigations { get; set; } = new List<Report>();
 
     public virtual ICollection<SendRequest> SendRequests { get; set; } = new List<SendRequest>();
 

@@ -59,11 +59,13 @@ public partial class PlanifyContext : DbContext
 
     public virtual DbSet<Ward> Wards { get; set; }
 
+    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Address>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Address__3214EC07B70B2BA2");
+            entity.HasKey(e => e.Id).HasName("PK__Address__3214EC07B0AB2338");
 
             entity.ToTable("Address");
 
@@ -77,7 +79,7 @@ public partial class PlanifyContext : DbContext
 
         modelBuilder.Entity<Campus>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Campus__3214EC07259A41A4");
+            entity.HasKey(e => e.Id).HasName("PK__Campus__3214EC0773E647DE");
 
             entity.ToTable("Campus");
 
@@ -86,7 +88,7 @@ public partial class PlanifyContext : DbContext
 
         modelBuilder.Entity<CategoryEvent>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Category__3214EC07F6DAC060");
+            entity.HasKey(e => e.Id).HasName("PK__Category__3214EC07DD5F1F51");
 
             entity.ToTable("CategoryEvent");
 
@@ -101,7 +103,7 @@ public partial class PlanifyContext : DbContext
 
         modelBuilder.Entity<District>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__District__3214EC07177E1F8B");
+            entity.HasKey(e => e.Id).HasName("PK__District__3214EC07EDA8543A");
 
             entity.ToTable("District");
 
@@ -115,7 +117,7 @@ public partial class PlanifyContext : DbContext
 
         modelBuilder.Entity<Event>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Event__3214EC07BC916730");
+            entity.HasKey(e => e.Id).HasName("PK__Event__3214EC07F04798FE");
 
             entity.ToTable("Event");
 
@@ -154,7 +156,7 @@ public partial class PlanifyContext : DbContext
 
         modelBuilder.Entity<EventMedium>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__EventMed__3214EC075466CDC4");
+            entity.HasKey(e => e.Id).HasName("PK__EventMed__3214EC074DB46BA9");
 
             entity.HasOne(d => d.Event).WithMany(p => p.EventMedia)
                 .HasForeignKey(d => d.EventId)
@@ -169,7 +171,7 @@ public partial class PlanifyContext : DbContext
 
         modelBuilder.Entity<Group>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Group__3214EC07E20136DA");
+            entity.HasKey(e => e.Id).HasName("PK__Group__3214EC072AFA6F0D");
 
             entity.ToTable("Group");
 
@@ -189,7 +191,7 @@ public partial class PlanifyContext : DbContext
 
         modelBuilder.Entity<InvoiceImagesSubTask>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__InvoiceI__3214EC079F934F22");
+            entity.HasKey(e => e.Id).HasName("PK__InvoiceI__3214EC07E4B4A7BB");
 
             entity.ToTable("InvoiceImagesSubTask");
 
@@ -208,7 +210,7 @@ public partial class PlanifyContext : DbContext
 
         modelBuilder.Entity<InvoiceImagesTask>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__InvoiceI__3214EC0785310AA3");
+            entity.HasKey(e => e.Id).HasName("PK__InvoiceI__3214EC079F0F1DA1");
 
             entity.ToTable("InvoiceImagesTask");
 
@@ -227,7 +229,7 @@ public partial class PlanifyContext : DbContext
 
         modelBuilder.Entity<JoinGroup>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__JoinGrou__3214EC07A48406A4");
+            entity.HasKey(e => e.Id).HasName("PK__JoinGrou__3214EC0704576E92");
 
             entity.ToTable("JoinGroup");
 
@@ -247,7 +249,7 @@ public partial class PlanifyContext : DbContext
 
         modelBuilder.Entity<JoinProject>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__JoinProj__3214EC074246B03A");
+            entity.HasKey(e => e.Id).HasName("PK__JoinProj__3214EC07FB0FD2A3");
 
             entity.ToTable("JoinProject");
 
@@ -274,7 +276,7 @@ public partial class PlanifyContext : DbContext
 
         modelBuilder.Entity<Medium>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Media__3214EC07B65F2C77");
+            entity.HasKey(e => e.Id).HasName("PK__Media__3214EC07A53CB768");
 
             entity.Property(e => e.MediaUrl)
                 .HasMaxLength(500)
@@ -283,7 +285,7 @@ public partial class PlanifyContext : DbContext
 
         modelBuilder.Entity<Province>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Province__3214EC0797B9D9BD");
+            entity.HasKey(e => e.Id).HasName("PK__Province__3214EC07BEC5875A");
 
             entity.ToTable("Province");
 
@@ -292,22 +294,22 @@ public partial class PlanifyContext : DbContext
 
         modelBuilder.Entity<Report>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Report__3214EC07D955C799");
+            entity.HasKey(e => e.Id).HasName("PK__Report__3214EC07270C41DE");
 
             entity.ToTable("Report");
 
             entity.Property(e => e.Reason).HasMaxLength(1000);
             entity.Property(e => e.SendTime).HasColumnType("datetime");
 
-            entity.HasOne(d => d.ReportUser).WithMany(p => p.ReportReportUsers)
-                .HasForeignKey(d => d.ReportUserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Report__ReportUs__70DDC3D8");
-
             entity.HasOne(d => d.SendFromNavigation).WithMany(p => p.ReportSendFromNavigations)
                 .HasForeignKey(d => d.SendFrom)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Report__SendFrom__6EF57B66");
+
+            entity.HasOne(d => d.SendToNavigation).WithMany(p => p.ReportSendToNavigations)
+                .HasForeignKey(d => d.SendTo)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Report__SendTo__70DDC3D8");
 
             entity.HasOne(d => d.Task).WithMany(p => p.Reports)
                 .HasForeignKey(d => d.TaskId)
@@ -317,7 +319,7 @@ public partial class PlanifyContext : DbContext
 
         modelBuilder.Entity<ReportMedium>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__ReportMe__3214EC071CFC58DF");
+            entity.HasKey(e => e.Id).HasName("PK__ReportMe__3214EC077E460D6D");
 
             entity.HasOne(d => d.Media).WithMany(p => p.ReportMedia)
                 .HasForeignKey(d => d.MediaId)
@@ -332,7 +334,7 @@ public partial class PlanifyContext : DbContext
 
         modelBuilder.Entity<Role>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Role__3214EC074268A212");
+            entity.HasKey(e => e.Id).HasName("PK__Role__3214EC070FA2515F");
 
             entity.ToTable("Role");
 
@@ -341,7 +343,7 @@ public partial class PlanifyContext : DbContext
 
         modelBuilder.Entity<SendRequest>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SendRequ__3214EC076522D0D3");
+            entity.HasKey(e => e.Id).HasName("PK__SendRequ__3214EC07A2AE8E62");
 
             entity.ToTable("SendRequest");
 
@@ -359,7 +361,7 @@ public partial class PlanifyContext : DbContext
 
         modelBuilder.Entity<SubTask>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SubTask__3214EC07F6F1633C");
+            entity.HasKey(e => e.Id).HasName("PK__SubTask__3214EC07AC10CF57");
 
             entity.ToTable("SubTask");
 
@@ -381,7 +383,7 @@ public partial class PlanifyContext : DbContext
 
         modelBuilder.Entity<Task>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Task__3214EC0747F3F48B");
+            entity.HasKey(e => e.Id).HasName("PK__Task__3214EC07BBDCA440");
 
             entity.ToTable("Task");
 
@@ -404,7 +406,7 @@ public partial class PlanifyContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__User__3214EC0764C6CB1E");
+            entity.HasKey(e => e.Id).HasName("PK__User__3214EC07FDD068E8");
 
             entity.ToTable("User");
 
@@ -441,7 +443,7 @@ public partial class PlanifyContext : DbContext
 
         modelBuilder.Entity<UserRole>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__UserRole__3214EC07ADF9A104");
+            entity.HasKey(e => e.Id).HasName("PK__UserRole__3214EC0766E9DDD1");
 
             entity.ToTable("UserRole");
 
@@ -458,7 +460,7 @@ public partial class PlanifyContext : DbContext
 
         modelBuilder.Entity<Ward>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Ward__3214EC0799D9E103");
+            entity.HasKey(e => e.Id).HasName("PK__Ward__3214EC07504C72E0");
 
             entity.ToTable("Ward");
 
