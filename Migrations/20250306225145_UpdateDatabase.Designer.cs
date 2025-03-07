@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Planify_BackEnd.Models;
 
@@ -11,9 +12,11 @@ using Planify_BackEnd.Models;
 namespace Planify_BackEnd.Migrations
 {
     [DbContext(typeof(PlanifyContext))]
-    partial class PlanifyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250306225145_UpdateDatabase")]
+    partial class UpdateDatabase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

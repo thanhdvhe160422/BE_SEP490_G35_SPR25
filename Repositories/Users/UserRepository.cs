@@ -20,7 +20,8 @@ public class UserRepository : IUserRepository
         try
         {
             return await _context.Users
-                .Include(r => r.RoleNavigation)
+                .Include(r => r.UserRoles)
+                .ThenInclude(u => u.Role)
                 .Include(c => c.Campus)
                 .FirstOrDefaultAsync(u => u.Email == email && u.Status == 1);
         }
@@ -36,7 +37,7 @@ public class UserRepository : IUserRepository
         try
         {
             return await _context.Users
-                .Include(r => r.RoleNavigation)
+                //.Include(r => r.RoleNavigation)
                 .Include(c => c.Campus)
                 .FirstOrDefaultAsync(u => u.Id == id && u.Status == 1);
         }

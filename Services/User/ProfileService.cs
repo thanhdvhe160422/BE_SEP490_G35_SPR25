@@ -18,12 +18,12 @@ namespace Planify_BackEnd.Services.User
                 ProfileViewModel profileViewModel = new ProfileViewModel
                 {
                     Id = user.Id,
-                    Avatar = user.Avatar,
-                    MediaItemDTO = user.AvatarNavigation==null?null: new DTOs.Medias.MediaItemDTO
-                    {
-                        Id = user.AvatarNavigation.Id,
-                        MediaUrl = user.AvatarNavigation.MediaUrl
-                    },
+                    //Avatar = user.Avatar,
+                    //MediaItemDTO = user.AvatarNavigation==null?null: new DTOs.Medias.MediaItemDTO
+                    //{
+                    //    Id = user.AvatarNavigation.Id,
+                    //    MediaUrl = user.AvatarNavigation.MediaUrl
+                    //},
                     CampusDTO = user.Campus == null ? null : new DTOs.Campus.CampusDTO
                     {
                         Id = user.Campus.Id,
@@ -39,18 +39,18 @@ namespace Planify_BackEnd.Services.User
                     PhoneNumber = user.PhoneNumber,
                     UserName = user.UserName,
                     Password = user.Password,
-                    Role = user.Role,
-                    RoleNavigation = user.RoleNavigation == null ? null : new DTOs.Roles.RoleDTO
-                    {
-                        Id =user.RoleNavigation.Id,
-                        RoleName  = user.RoleNavigation.RoleName
-                    },
-                    Province = user.Province,
-                    ProvinceId = user.ProvinceId,
-                    District = user.District,
-                    DistrictId = user.DistrictId,
-                    Ward = user.Ward,
-                    WardId = user.WardId
+                    //Role = user.Role,
+                    //RoleNavigation = user.RoleNavigation == null ? null : new DTOs.Roles.RoleDTO
+                    //{
+                    //    Id =user.RoleNavigation.Id,
+                    //    RoleName  = user.RoleNavigation.RoleName
+                    //},
+                    //Province = user.Province,
+                    //ProvinceId = user.ProvinceId,
+                    //District = user.District,
+                    //DistrictId = user.DistrictId,
+                    //Ward = user.Ward,
+                    //WardId = user.WardId
                 };
                 return profileViewModel;
             }catch(Exception ex)

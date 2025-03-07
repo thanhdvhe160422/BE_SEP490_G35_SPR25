@@ -12,6 +12,6 @@
 
         public DateTime? TimeOutProject { get; set; }
 
-        public int? Role { get; set; }
+        public int Role { get; set; }
     }
 }

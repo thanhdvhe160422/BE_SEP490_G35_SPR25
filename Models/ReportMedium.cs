@@ -7,9 +7,11 @@ public partial class ReportMedium
 {
     public int Id { get; set; }
 
-    public int? ReportId { get; set; }
+    public int ReportId { get; set; }
 
-    public string? MediaUrl { get; set; }
+    public int MediaId { get; set; }
 
-    public virtual Report? Report { get; set; }
+    public virtual Medium Media { get; set; } = null!;
+
+    public virtual Report Report { get; set; } = null!;
 }

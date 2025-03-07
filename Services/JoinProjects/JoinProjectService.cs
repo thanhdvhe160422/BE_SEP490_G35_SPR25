@@ -23,7 +23,7 @@ namespace Planify_BackEnd.Services.JoinProjects
                 Id = j.Id,
                 EventId = j.EventId,
                 UserId = j.UserId,
-                Role = j.Role,
+                //Role = j.Role,
             }).ToList();
             return joinedProjectDTOs;
             

@@ -14,12 +14,12 @@ namespace Planify_BackEnd.Repositories.User
         public Models.User GetUserProfileById(Guid id)
         {
             return _context.Users
-                .Include(u=>u.AvatarNavigation)
+                //.Include(u=>u.AvatarNavigation)
                 .Include(u=>u.Campus)
-                .Include(u=>u.Province)
-                .Include(u=>u.District)
-                .Include(u=>u.Ward)
-                .Include(u=>u.RoleNavigation)
+                //.Include(u=>u.Province)
+                //.Include(u=>u.District)
+                //.Include(u=>u.Ward)
+                //.Include(u=>u.RoleNavigation)
                 .FirstOrDefault(u => u.Id.Equals(id));
         }
     }

@@ -9,7 +9,7 @@ public partial class Campus
 
     public string CampusName { get; set; } = null!;
 
-    public int? Status { get; set; }
+    public int Status { get; set; }
 
     public virtual ICollection<CategoryEvent> CategoryEvents { get; set; } = new List<CategoryEvent>();
 

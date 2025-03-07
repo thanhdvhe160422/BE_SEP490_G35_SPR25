@@ -52,5 +52,14 @@ namespace Planify_BackEnd.Controllers
 
             return StatusCode(response.Status, response);
         }
+
+        [HttpPost("get-event-detail")]
+        [Authorize(Roles = "Event Organizer")]
+        public async Task<IActionResult> GetEventDetail(int eventId)
+        {
+            var response = await _eventService.GetEventDetailAsync(eventId);
+
+            return StatusCode(response.Status, response);
+        }
     }
 }

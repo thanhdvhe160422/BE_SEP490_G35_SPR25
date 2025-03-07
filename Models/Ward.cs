@@ -9,11 +9,9 @@ public partial class Ward
 
     public string WardName { get; set; } = null!;
 
-    public int? DistrictId { get; set; }
+    public int DistrictId { get; set; }
 
-    public int? Status { get; set; }
+    public virtual ICollection<Address> Addresses { get; set; } = new List<Address>();
 
-    public virtual District? District { get; set; }
-
-    public virtual ICollection<User> Users { get; set; } = new List<User>();
+    public virtual District District { get; set; } = null!;
 }

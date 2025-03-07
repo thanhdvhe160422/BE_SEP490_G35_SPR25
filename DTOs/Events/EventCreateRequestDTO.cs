@@ -15,13 +15,7 @@ namespace Planify_BackEnd.DTOs.Events
         [Required]
         public DateTime EndTime { get; set; }
 
-        public decimal? AmountBudget { get; set; }
-
-        public bool IsPublic { get; set; } = false;
-
-        public DateTime? TimePublic { get; set; }
-
-        public int? Status { get; set; } = 0;
+        public decimal AmountBudget { get; set; }
 
         [Required]
         public int CategoryEventId { get; set; }
@@ -30,7 +24,7 @@ namespace Planify_BackEnd.DTOs.Events
 
         public Guid CreateBy { get; set; }
 
-        public List<GroupCreateDTO> Groups { get; set; } = new();
+        public List<GroupCreateDTO>? Groups { get; set; } = new();
 
         public List<string>? EventMediaUrls { get; set; }
 

@@ -8,5 +8,7 @@ namespace Planify_BackEnd.Services.Events
     {
         Task<IEnumerable<EventGetListResponseDTO>> GetAllEvent(int page, int pageSize);
         Task<ResponseDTO> CreateEventAsync(EventCreateRequestDTO eventDTO, Guid organizerId);
+
+        Task<ResponseDTO> GetEventDetailAsync(int eventId);
     }
 }

@@ -1,4 +1,5 @@
-﻿using Planify_BackEnd.DTOs;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Campus;
 using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.Models;
@@ -36,9 +37,7 @@ public class EventService : IEventService
             Placed = e.Placed,
             CreateBy = e.CreateBy,
             CreatedAt = e.CreatedAt,
-            EndOfEvent = e.EndOfEvent,
             ManagerId = e.ManagerId,
-            TimeOfEvent = e.TimeOfEvent
 
         }).ToList();
         
@@ -59,15 +58,16 @@ public class EventService : IEventService
                 return new ResponseDTO(400, "Start time must be earlier than end time.", null);
             }
 
-            if (eventDTO.TimePublic.HasValue && eventDTO.TimePublic < DateTime.Now)
-            {
-                return new ResponseDTO(400, "Public time must be later than current time.", null);
-            }
-
             var campusIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("campusId")?.Value;
             if (string.IsNullOrEmpty(campusIdClaim))
             {
                 return new ResponseDTO(400, "Invalid campus ID.", null);
+            }
+
+            var category = await _eventRepository.GetCategoryEventAsync(eventDTO.CategoryEventId, int.Parse(campusIdClaim));
+            if (category == null)
+            {
+                return new ResponseDTO(400, "Category is not existed.", null);
             }
 
             var newEvent = new Event
@@ -77,8 +77,8 @@ public class EventService : IEventService
                 StartTime = eventDTO.StartTime,
                 EndTime = eventDTO.EndTime,
                 AmountBudget = eventDTO.AmountBudget,
-                IsPublic = eventDTO.IsPublic ? 1 : 0,
-                TimePublic = eventDTO.TimePublic,
+                IsPublic = 0,
+                TimePublic = null,
                 Status =  0,
                 CampusId = int.Parse(campusIdClaim),
                 CategoryEventId = eventDTO.CategoryEventId,
@@ -89,51 +89,74 @@ public class EventService : IEventService
 
             await _eventRepository.CreateEventAsync(newEvent);
 
-            foreach (var group in eventDTO.Groups)
+            if (eventDTO.Groups != null && eventDTO.Groups.Count > 0)
             {
-                var newGroup = new Group
+                foreach (var group in eventDTO.Groups)
                 {
-                    EventId = newEvent.Id,
-                    GroupName = group.GroupName,
-                    CreateBy = organizerId,
-                };
-                await _groupRepository.CreateGroupAsync(newGroup);
-
-                foreach (var implementerId in group.ImplementerIds)
-                {
-                    var joinGroup = new JoinGroup
+                    var newGroup = new Group
                     {
-                        GroupId = newGroup.Id,
-                        ImplementerId = implementerId,
-                        TimeJoin = DateTime.UtcNow,
-                        Status = 1,
+                        EventId = newEvent.Id,
+                        GroupName = group.GroupName,
+                        CreateBy = organizerId,
                     };
-                    await _groupRepository.AddImplementerToGroupAsync(joinGroup);
+                    await _groupRepository.CreateGroupAsync(newGroup);
+
+                    foreach (var implementerId in group.ImplementerIds)
+                    {
+                        var joinGroup = new JoinGroup
+                        {
+                            GroupId = newGroup.Id,
+                            ImplementerId = implementerId,
+                            TimeJoin = DateTime.UtcNow,
+                            Status = 1,
+                        };
+                        await _groupRepository.AddImplementerToGroupAsync(joinGroup);
+                    }
                 }
             }
-
-            foreach (var image in eventDTO.EventMediaUrls)
+            
+            if (eventDTO.EventMediaUrls != null && eventDTO.EventMediaUrls.Any())
             {
-                var mediaItem = new MediaItem
+                foreach (var image in eventDTO.EventMediaUrls)
                 {
-                    MediaUrl = image
-                };
-                await _eventRepository.CreateMediaItemAsync(mediaItem);
+                    var mediaItem = new Medium
+                    {
+                        MediaUrl = image
+                    };
+                    await _eventRepository.CreateMediaItemAsync(mediaItem);
 
-                var eventMedia = new EventMedium
-                {
-                    EventId = newEvent.Id,
-                    MediaId = mediaItem.Id,
-                    Status = 1
-                };
-                await _eventRepository.AddEventMediaAsync(eventMedia);
-            }         
+                    var eventMedia = new EventMedium
+                    {
+                        EventId = newEvent.Id,
+                        MediaId = mediaItem.Id,
+                        Status = 1
+                    };
+                    await _eventRepository.AddEventMediaAsync(eventMedia);
+                }  
+            }
 
-            return new ResponseDTO(201, "Event creates successfully!", newEvent);
+            return new ResponseDTO(201, "Event creates successfully!", null);
         }
         catch (Exception ex)
         {
             return new ResponseDTO(500, "Error orcurs while creating event!", ex.Message);
+        }
+    }
+
+    public async Task<ResponseDTO> GetEventDetailAsync(int eventId)
+    {
+        try
+        {
+            var eventDetail = await _eventRepository.GetEventDetailAsync(eventId);
+            if (eventDetail == null)
+            {
+                return new ResponseDTO(404, $"Không tìm thấy sự kiện với ID là {eventId}.", eventDetail);
+            }
+            return new ResponseDTO(200, "Get event detail successfully!", eventDetail);
+        }
+        catch (Exception ex)
+        {
+            return new ResponseDTO(500, "Error orcurs while getting event detail!", ex.Message);
         }
     }
 }
