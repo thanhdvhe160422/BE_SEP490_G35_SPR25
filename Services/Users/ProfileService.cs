@@ -1,5 +1,9 @@
-﻿using Planify_BackEnd.DTOs.User;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Planify_BackEnd.DTOs.Medias;
+using Planify_BackEnd.DTOs.User;
+using Planify_BackEnd.DTOs.Users;
 using Planify_BackEnd.Repositories.User;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Planify_BackEnd.Services.User
 {
@@ -18,12 +22,12 @@ namespace Planify_BackEnd.Services.User
                 ProfileViewModel profileViewModel = new ProfileViewModel
                 {
                     Id = user.Id,
-                    //Avatar = user.Avatar,
-                    //MediaItemDTO = user.AvatarNavigation==null?null: new DTOs.Medias.MediaItemDTO
-                    //{
-                    //    Id = user.AvatarNavigation.Id,
-                    //    MediaUrl = user.AvatarNavigation.MediaUrl
-                    //},
+                    AvatarId = user.AvatarId,
+                    Avatar = user.Avatar==null? null: new MediumDTO
+                    {
+                        Id = user.Avatar.Id,
+                        MediaUrl = user.Avatar.MediaUrl
+                    },
                     CampusDTO = user.Campus == null ? null : new DTOs.Campus.CampusDTO
                     {
                         Id = user.Campus.Id,
@@ -39,18 +43,38 @@ namespace Planify_BackEnd.Services.User
                     PhoneNumber = user.PhoneNumber,
                     UserName = user.UserName,
                     Password = user.Password,
-                    //Role = user.Role,
-                    //RoleNavigation = user.RoleNavigation == null ? null : new DTOs.Roles.RoleDTO
-                    //{
-                    //    Id =user.RoleNavigation.Id,
-                    //    RoleName  = user.RoleNavigation.RoleName
-                    //},
-                    //Province = user.Province,
-                    //ProvinceId = user.ProvinceId,
-                    //District = user.District,
-                    //DistrictId = user.DistrictId,
-                    //Ward = user.Ward,
-                    //WardId = user.WardId
+                    AddressId = user.AddressId,
+                    AddressVM = user.Address==null? null: new DTOs.Andress.AddressVM
+                    {
+                        Id=user.Address.Id,
+                        AddressDetail = user.Address.AddressDetail,
+                        WardId = user.Address.WardId,
+                        WardVM = new DTOs.Andress.WardVM
+                        {
+                            WardName = user.Address.Ward.WardName,
+                            DistrictVM = new DTOs.Andress.DistrictVM
+                            {
+                                DistrictName = user.Address.Ward.District.DistrictName,
+                                ProvinceVM = new DTOs.Andress.ProvinceVM
+                                {
+                                    ProvinceName = user.Address.Ward.District.Province.ProvinceName
+                                }
+                            },
+
+                        }
+                    },
+                    UserRoleDTO = user.UserRoles==null?new List<UserRoleDTO>():user.UserRoles.Select(ur=>new UserRoleDTO
+                    {
+                        Id = ur.Id,
+                        RoleId = ur.RoleId,
+                        UserId = ur.UserId,
+                        RoleDTO = new DTOs.Roles.RoleDTO
+                        {
+                            Id = ur.Role.Id,
+                            RoleName = ur.Role.RoleName,
+                        }
+                    }).ToList(),
+                    Status = user.Status
                 };
                 return profileViewModel;
             }catch(Exception ex)

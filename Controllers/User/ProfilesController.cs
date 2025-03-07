@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Planify_BackEnd.Services.User;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Planify_BackEnd.Controllers.User
 {
@@ -15,10 +16,17 @@ namespace Planify_BackEnd.Controllers.User
             _profileService = profileService;
         }
         [HttpGet("{id}")]
-        public IActionResult GetUserProfileById(Guid id)
+        public IActionResult GetUserProfileById(Guid id,string token)
         {
             try
             {
+                //var handle = new JwtSecurityTokenHandler();
+                //var jwtToken = handle.ReadJwtToken(token);
+                //var uid = jwtToken.Claims.FirstOrDefault(c => c.Type == "userId");
+                //if (!uid.Equals(id))
+                //{
+                //    return Unauthorized();
+                //}
                 var response = _profileService.getUserProfileById(id);
                 return Ok(response);
             }
