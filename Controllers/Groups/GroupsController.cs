@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Planify_BackEnd.Services.Groups;
 
@@ -24,6 +25,37 @@ namespace Planify_BackEnd.Controllers.Groups
                 else
                     return BadRequest("Cannot allocate cost to group id " + groupId);
             }catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPut("add-lead-group/{groupId}/{implementerId}")]
+        //[Authorize("Event Organizer")]
+        public IActionResult AddLeadGroup(int groupId,Guid implementerId)
+        {
+            try
+            {
+                if (_groupService.AddLeadGroup(groupId, implementerId))
+                    return Ok();
+                else
+                    return BadRequest("Cannot add lead group!");
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPut("remove-lead-group/{groupId}/{implementerId}")]
+        //[Authorize("Event Organizer")]
+        public IActionResult RemoveLeadGroup(int groupId, Guid implementerId)
+        {
+            try
+            {
+                if (_groupService.RemoveLeadGroup(groupId, implementerId))
+                    return Ok();
+                else
+                    return BadRequest("Cannot remove lead group!");
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
