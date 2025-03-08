@@ -44,6 +44,34 @@ namespace Planify_BackEnd.Repositories.Groups
             _context.JoinGroups.Add(joinGroup);
             await _context.SaveChangesAsync();
         }
-
+        public bool AddLeadGroup(int GroupId, Guid ImplementerId)
+        {
+            try
+            {
+                var joinGroup = _context.JoinGroups.FirstOrDefault(jg => jg.GroupId == GroupId && jg.ImplementerId == ImplementerId);
+                joinGroup.Status = -1;
+                _context.Update(joinGroup);
+                _context.SaveChanges();
+                return true;
+            }catch (Exception ex)
+            {
+                return false;
+            }
+        }
+        public bool RemoveLeadGroup(int GroupId, Guid ImplementerId)
+        {
+            try
+            {
+                var joinGroup = _context.JoinGroups.FirstOrDefault(jg => jg.GroupId == GroupId && jg.ImplementerId == ImplementerId);
+                joinGroup.Status = 1;
+                _context.Update(joinGroup);
+                _context.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Planify_BackEnd.Services.User;
@@ -15,19 +16,17 @@ namespace Planify_BackEnd.Controllers.User
         {
             _profileService = profileService;
         }
-        [HttpGet("{id}")]
-        public IActionResult GetUserProfileById(Guid id,string token)
+        [HttpGet("{userId}")]
+        public IActionResult GetUserProfileById(Guid userId)
         {
             try
             {
-                //var handle = new JwtSecurityTokenHandler();
-                //var jwtToken = handle.ReadJwtToken(token);
-                //var uid = jwtToken.Claims.FirstOrDefault(c => c.Type == "userId");
-                //if (!uid.Equals(id))
+                //var userId = User.Claims.FirstOrDefault(c=>c.Type== JwtRegisteredClaimNames.Sub)?.Value;
+                //if (userId == null)
                 //{
                 //    return Unauthorized();
                 //}
-                var response = _profileService.getUserProfileById(id);
+                var response = _profileService.getUserProfileById(userId);
                 return Ok(response);
             }
             catch (Exception ex)

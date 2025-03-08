@@ -15,6 +15,7 @@ namespace Planify_BackEnd.Services.Groups
             _groupRepository = groupRepository;
             _httpContextAccessor = httpContextAccessor;
         }
+
         public bool AllocateCostToGroup(int groupId, decimal cost)
         {
             try
@@ -57,6 +58,29 @@ namespace Planify_BackEnd.Services.Groups
             catch (Exception ex)
             {
                 return new ResponseDTO(500, "Error orcurs while creating group!", ex.Message);
+            }
+        }
+
+        public bool AddLeadGroup(int GroupId, Guid ImplementerId)
+        {
+            try
+            {
+                return _groupRepository.AddLeadGroup(GroupId, ImplementerId);
+            }catch
+            {
+                return false;
+            }
+        }
+
+        public bool RemoveLeadGroup(int GroupId, Guid ImplementerId)
+        {
+            try
+            {
+                return _groupRepository.RemoveLeadGroup(GroupId, ImplementerId);
+            }
+            catch
+            {
+                return false;
             }
         }
     }
