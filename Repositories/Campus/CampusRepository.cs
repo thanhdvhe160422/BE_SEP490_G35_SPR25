@@ -13,7 +13,9 @@ public class CampusRepository : ICampusRepository
     {
         try
         {
-            return await _context.Campuses.ToListAsync();
+            return await _context.Campuses
+                .Where(c => c.Status == 1)
+                .ToListAsync();
         }
         catch (Exception ex)
         {
