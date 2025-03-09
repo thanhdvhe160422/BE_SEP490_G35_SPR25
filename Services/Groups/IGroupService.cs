@@ -9,5 +9,7 @@ namespace Planify_BackEnd.Services.Groups
     {
         Task<ResponseDTO> CreateGroupAsync(GroupCreateRequestDTO groupDTO, Guid organizerId);
         bool AllocateCostToGroup(int groupId, decimal cost);
+        bool AddLeadGroup(int GroupId, Guid ImplementerId);
+        bool RemoveLeadGroup(int GroupId, Guid ImplementerId);
     }
 }

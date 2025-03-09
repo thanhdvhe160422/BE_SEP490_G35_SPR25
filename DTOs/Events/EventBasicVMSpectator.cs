@@ -15,10 +15,6 @@ namespace Planify_BackEnd.DTOs.Events
 
         public DateTime? EndTime { get; set; }
 
-        public DateTime? TimeOfEvent { get; set; }
-
-        public DateTime? EndOfEvent { get; set; }
-
         public int? IsPublic { get; set; }
 
         public int? Status { get; set; }

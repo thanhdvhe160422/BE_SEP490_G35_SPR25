@@ -7,5 +7,8 @@
         Task<Group> CreateGroupAsync(Group newGroup);
         bool IsGroupExists(int groupId);
         System.Threading.Tasks.Task AddImplementerToGroupAsync(JoinGroup joinGroup);
+        //Because there is no leadgroup column, leader will have status -1
+        bool AddLeadGroup(int GroupId, Guid ImplementerId);
+        bool RemoveLeadGroup(int GroupId, Guid ImplementerId);
     }
 }

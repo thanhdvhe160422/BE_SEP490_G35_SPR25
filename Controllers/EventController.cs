@@ -27,7 +27,7 @@ namespace Planify_BackEnd.Controllers
         /// </summary>
         /// <returns>A list of all events.</returns>
         [HttpGet ("List")]
-        [Authorize(Roles = "Campus Manager")]
+        [Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> GetAllEvents(int page, int pageSize)
         {
             try
@@ -53,8 +53,7 @@ namespace Planify_BackEnd.Controllers
             return StatusCode(response.Status, response);
         }
 
-        [HttpPost("get-event-detail")]
-        [Authorize(Roles = "Event Organizer")]
+        [HttpGet("get-event-detail")]
         public async Task<IActionResult> GetEventDetail(int eventId)
         {
             var response = await _eventService.GetEventDetailAsync(eventId);
