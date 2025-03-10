@@ -24,6 +24,8 @@ using Planify_BackEnd.Services.JoinProjects;
 using Planify_BackEnd.Repositories.JoinGroups;
 using Planify_BackEnd.Services.Campus;
 using Newtonsoft.Json;
+using Planify_BackEnd.Services.Address;
+using Planify_BackEnd.Repositories.Address;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -73,6 +75,7 @@ builder.Services.AddScoped<IProfileService,ProfileService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<IJoinProjectService, JoinProjectService>();
 builder.Services.AddScoped<ICampusService, CampusService>();
+builder.Services.AddScoped<IProvinceService, ProvinceService>();
 // Thêm Repository
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<IEventSpectatorRepository, EventSpectatorRepository>();
@@ -83,6 +86,7 @@ builder.Services.AddScoped<ISubTaskRepository, SubTaskRepository>();
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 builder.Services.AddScoped<IJoinProjectRepository, JoinProjectRepository>();
 builder.Services.AddScoped<ICampusRepository, CampusRepository>();
+builder.Services.AddScoped<IProvinceRepository, ProvinceRepository>();
 // Thêm Authorization
 builder.Services.AddAuthorization();
 
