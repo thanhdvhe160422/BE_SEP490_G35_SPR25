@@ -60,5 +60,59 @@ namespace Planify_BackEnd.Controllers
 
             return StatusCode(response.Status, response);
         }
+        [HttpPut]
+        //[Authorize(Roles = "Event Organizer")]
+        public async Task<IActionResult> UpdateEvent([FromBody] EventDTO eventDTO)
+        {
+            try
+            {
+                var response = await _eventService.UpdateEventAsync(eventDTO);
+                if (response == null)
+                {
+                    return BadRequest("Cannot update event!");
+                }
+                return Ok(response);
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpDelete("{id}")]
+        //[Authorize(Roles = "Event Organizer")]
+        public async Task<IActionResult> DeleteEvent(int id)
+        {
+            try
+            {
+                var e = _eventService.GetEventDetailAsync(id);
+                if (e == null)
+                    return NotFound("Event not exist!");
+                var response = await _eventService.DeleteEventAsync(id);
+                if (response)
+                    return Ok();
+                else
+                    return BadRequest("Cannot delete event!");
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("search")]
+        //[Authorize(Roles = "Event Organizer")]
+        public async Task<IActionResult> SearchEventAsync(int page, int pageSize, string? title, 
+            DateTime? startTime, DateTime? endTime, decimal? minBudget, decimal? maxBudget, 
+            int? isPublic, int? status, int? CategoryEventId, string? placed)
+        {
+            try
+            {
+                var response = await _eventService.SearchEventAsync(page, pageSize, title, startTime, endTime,
+                minBudget, maxBudget, isPublic, status, CategoryEventId, placed);
+                return Ok(response);
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
     }
 }
