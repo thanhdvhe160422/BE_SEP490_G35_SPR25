@@ -80,7 +80,7 @@ namespace Planify_BackEnd.Repositories.Groups
             try
             {
                 _context.Update(group);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return group;
             }catch(Exception ex)
             {
@@ -93,14 +93,14 @@ namespace Planify_BackEnd.Repositories.Groups
         {
             try
             {
-                var group = _context.Groups
+                var group = await _context.Groups
                     .Include(g=>g.JoinGroups)
                     .Include(g=>g.Tasks)
-                    .FirstOrDefault(g=>g.Id == GroupId);
+                    .FirstOrDefaultAsync(g=>g.Id == GroupId);
                 group.JoinGroups = null;
                 group.Tasks = null;
                 _context.Groups.Remove(group); 
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return true;
             }
             catch (Exception ex)
@@ -114,11 +114,11 @@ namespace Planify_BackEnd.Repositories.Groups
         {
             try
             {
-                var group = _context.Groups
+                var group = await _context.Groups
                     .Include(g=>g.CreateByNavigation)
                     .Include(g => g.JoinGroups)
                     .Include(g => g.Tasks)
-                    .FirstOrDefault(g => g.Id == GroupId);
+                    .FirstOrDefaultAsync(g => g.Id == GroupId);
                 return group;
             }
             catch (Exception ex)

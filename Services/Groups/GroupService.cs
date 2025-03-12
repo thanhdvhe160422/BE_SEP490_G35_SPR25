@@ -118,7 +118,7 @@ namespace Planify_BackEnd.Services.Groups
         {
             try
             {
-                _groupRepository.DeleteGroupAsync(GroupId);
+                await _groupRepository.DeleteGroupAsync(GroupId);
                 return true;
             }
             catch (Exception ex)
