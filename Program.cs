@@ -24,6 +24,11 @@ using Planify_BackEnd.Services.JoinProjects;
 using Planify_BackEnd.Repositories.JoinGroups;
 using Planify_BackEnd.Services.Campus;
 using Newtonsoft.Json;
+using Planify_BackEnd.Hub;
+using Planify_BackEnd.Services.EventRequests;
+using Planify_BackEnd.Repositories.SendRequests;
+using Planify_BackEnd.Services.Address;
+using Planify_BackEnd.Repositories.Address;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -73,6 +78,8 @@ builder.Services.AddScoped<IProfileService,ProfileService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<IJoinProjectService, JoinProjectService>();
 builder.Services.AddScoped<ICampusService, CampusService>();
+builder.Services.AddScoped<IProvinceService, ProvinceService>();
+builder.Services.AddScoped<ISendRequestService, SendRequestService>();
 // Thêm Repository
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<IEventSpectatorRepository, EventSpectatorRepository>();
@@ -83,6 +90,8 @@ builder.Services.AddScoped<ISubTaskRepository, SubTaskRepository>();
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 builder.Services.AddScoped<IJoinProjectRepository, JoinProjectRepository>();
 builder.Services.AddScoped<ICampusRepository, CampusRepository>();
+builder.Services.AddScoped<IProvinceRepository, ProvinceRepository>();
+builder.Services.AddScoped<ISendRequestRepository, SendRequestRepository>();
 // Thêm Authorization
 builder.Services.AddAuthorization();
 
@@ -91,6 +100,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles; // Tránh vòng lặp mà không tạo `$id`
 });
 
+builder.Services.AddSignalR();
 
 // Thêm Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -129,6 +139,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowLocalhost", policy =>
     {
         policy.WithOrigins("http://localhost:3000")
+              .AllowCredentials()
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -145,6 +156,8 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = "swagger";
     });
 }
+
+app.MapHub<EventRequestHub>("/eventRequestHub");
 
 app.UseCors("AllowLocalhost");
 app.UseHttpsRedirection();
