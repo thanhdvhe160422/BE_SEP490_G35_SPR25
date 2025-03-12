@@ -1,8 +1,12 @@
-﻿using Planify_BackEnd.DTOs;
+﻿using Microsoft.Extensions.Hosting;
+using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Groups;
+using Planify_BackEnd.DTOs.Implementers;
+using Planify_BackEnd.DTOs.Tasks;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories;
 using Planify_BackEnd.Repositories.Groups;
+using System.Text.RegularExpressions;
 
 namespace Planify_BackEnd.Services.Groups
 {
@@ -37,7 +41,7 @@ namespace Planify_BackEnd.Services.Groups
                     return new ResponseDTO(400, "Name of group is required.", null);
                 }
 
-                var newGroup = new Group
+                var newGroup = new Models.Group
                 {
                     GroupName = groupDTO.GroupName,
                     CreateBy = organizerId,
@@ -81,6 +85,103 @@ namespace Planify_BackEnd.Services.Groups
             catch
             {
                 return false;
+            }
+        }
+
+        public async Task<GroupDTO> UpdateGroupAsync(GroupDTO group)
+        {
+            try
+            {
+                Models.Group newGroup = new Models.Group
+                {
+                    Id = group.Id,
+                    AmountBudget = group.AmountBudget,
+                    CreateBy = group.CreateBy,
+                    EventId = group.EventId,
+                    GroupName = group.GroupName,
+                };
+                newGroup = await _groupRepository.UpdateGroupAsync(newGroup);
+                if (group==null||group.Id==0)
+                {
+                    throw new Exception();
+                }
+                return group;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("group service - update group: " + ex.Message);
+                return new GroupDTO();
+            }
+        }
+
+        public async Task<bool> DeleteGroupAsync(int GroupId)
+        {
+            try
+            {
+                _groupRepository.DeleteGroupAsync(GroupId);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("group service - delete group: " + ex.Message);
+                return false;
+            }
+        }
+
+        public async Task<GroupVM> GetGroupByIdAsync(int GroupId)
+        {
+            try
+            {
+                Models.Group group = await _groupRepository.GetGroupByIdAsync(GroupId);
+                GroupVM groupVm = new GroupVM
+                {
+                    Id = group.Id,
+                    AmountBudget = group.AmountBudget,
+                    CreateBy = group.CreateBy,
+                    EventId = group.EventId,
+                    GroupName = group.GroupName,
+                    CreateByNavigation = new DTOs.Users.UserNameVM
+                    {
+                        Id = group.CreateByNavigation.Id,
+                        Email = group.CreateByNavigation.Email,
+                        FirstName = group.CreateByNavigation.FirstName,
+                        LastName = group.CreateByNavigation.LastName,
+                    },
+                    JoinGroups = group.JoinGroups.Select(jg => new JoinGroupVM
+                    {
+                        Id = jg.Id,
+                        ImplementerId = jg.ImplementerId,
+                        Status = jg.Status,
+                        TimeJoin = jg.TimeJoin,
+                        TimeOut = jg.TimeOut,
+                        Implementer = new DTOs.Users.UserNameVM
+                        {
+                            Id = jg.Implementer.Id,
+                            Email = jg.Implementer.Email,
+                            FirstName = jg.Implementer.FirstName,
+                            LastName = jg.Implementer.LastName,
+
+                        }
+                    }).ToList(),
+                    Tasks = group.Tasks.Select(jg => new TaskSearchResponeDTO
+                    {
+                        AmountBudget = jg.AmountBudget,
+                        Deadline = jg.Deadline,
+                        GroupId = jg.GroupId,
+                        Id = jg.Id,
+                        Progress = jg.Progress,
+                        StartTime = jg.StartTime,
+                        Status = jg.Status,
+                        TaskDescription = jg.TaskDescription,
+                        TaskName = jg.TaskName
+                    }).ToList(),
+                };
+                return groupVm;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("group service - get group by id: " + ex.Message);
+                return new GroupVM();
             }
         }
     }

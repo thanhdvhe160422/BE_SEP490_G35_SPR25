@@ -27,7 +27,7 @@ namespace Planify_BackEnd.Controllers
         /// </summary>
         /// <returns>A list of all events.</returns>
         [HttpGet ("List")]
-        [Authorize(Roles = "Event Organizer")]
+        //[Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> GetAllEvents(int page, int pageSize)
         {
             try
@@ -60,14 +60,18 @@ namespace Planify_BackEnd.Controllers
 
             return StatusCode(response.Status, response);
         }
-        [HttpPut]
+        [HttpPut("{id}")]
         //[Authorize(Roles = "Event Organizer")]
-        public async Task<IActionResult> UpdateEvent([FromBody] EventDTO eventDTO)
+        public async Task<IActionResult> UpdateEvent(int id,[FromBody] EventDTO eventDTO)
         {
             try
             {
+                if (id != eventDTO.Id)
+                {
+                    return BadRequest("Not allow update id");
+                }
                 var response = await _eventService.UpdateEventAsync(eventDTO);
-                if (response == null)
+                if (response == null || response.Id == 0)
                 {
                     return BadRequest("Cannot update event!");
                 }
@@ -83,9 +87,6 @@ namespace Planify_BackEnd.Controllers
         {
             try
             {
-                var e = _eventService.GetEventDetailAsync(id);
-                if (e == null)
-                    return NotFound("Event not exist!");
                 var response = await _eventService.DeleteEventAsync(id);
                 if (response)
                     return Ok();

@@ -1,4 +1,5 @@
-﻿using Planify_BackEnd.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Planify_BackEnd.Models;
 namespace Planify_BackEnd.Repositories.Groups
 {
     public class GroupRepository : IGroupRepository
@@ -71,6 +72,59 @@ namespace Planify_BackEnd.Repositories.Groups
             catch (Exception ex)
             {
                 return false;
+            }
+        }
+
+        public async Task<Group> UpdateGroupAsync(Group group)
+        {
+            try
+            {
+                _context.Update(group);
+                _context.SaveChanges();
+                return group;
+            }catch(Exception ex)
+            {
+                Console.WriteLine("group repository - update group: "+ ex.Message);
+                return new Group();
+            }
+        }
+
+        public async Task<bool> DeleteGroupAsync(int GroupId)
+        {
+            try
+            {
+                var group = _context.Groups
+                    .Include(g=>g.JoinGroups)
+                    .Include(g=>g.Tasks)
+                    .FirstOrDefault(g=>g.Id == GroupId);
+                group.JoinGroups = null;
+                group.Tasks = null;
+                _context.Groups.Remove(group); 
+                _context.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("group repository - delete group: " + ex.Message);
+                return false;
+            }
+        }
+
+        public async Task<Group> GetGroupByIdAsync(int GroupId)
+        {
+            try
+            {
+                var group = _context.Groups
+                    .Include(g=>g.CreateByNavigation)
+                    .Include(g => g.JoinGroups)
+                    .Include(g => g.Tasks)
+                    .FirstOrDefault(g => g.Id == GroupId);
+                return group;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("group repository - get group detail : " + ex.Message);
+                return new Group();
             }
         }
     }

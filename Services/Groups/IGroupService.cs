@@ -11,5 +11,8 @@ namespace Planify_BackEnd.Services.Groups
         bool AllocateCostToGroup(int groupId, decimal cost);
         bool AddLeadGroup(int GroupId, Guid ImplementerId);
         bool RemoveLeadGroup(int GroupId, Guid ImplementerId);
+        Task<GroupDTO> UpdateGroupAsync(GroupDTO group);
+        Task<bool> DeleteGroupAsync(int GroupId);
+        Task<GroupVM> GetGroupByIdAsync(int GroupId);
     }
 }

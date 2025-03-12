@@ -156,8 +156,20 @@ public class EventRepository : IEventRepository
     {
         try
         {
-            var e = _context.Events.FirstOrDefaultAsync(e => e.Id == eventId);
-            _context.Remove(e);
+            //var ev = await _context.Events
+            //    .Include(e=>e.JoinProjects)
+            //    .Include(e=>e.EventMedia).ThenInclude(em=>em.Media)
+            //    .Include(e=>e.Groups)
+            //    .Include(e=>e.SendRequests)
+            //    .FirstOrDefaultAsync(e => e.Id == eventId);
+            //ev.JoinProjects = null;
+            //ev.EventMedia = null;
+            //ev.Groups = null;
+            //ev.SendRequests = null;
+            //_context.Events.Remove(ev!);
+            var ev = await _context.Events.FirstOrDefaultAsync(e => e.Id == eventId);
+            ev.Status = 0;
+            await _context.SaveChangesAsync();
             return true;
         }catch(Exception ex)
         {
