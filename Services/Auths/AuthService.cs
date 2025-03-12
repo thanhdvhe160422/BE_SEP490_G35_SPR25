@@ -9,6 +9,7 @@ using Google.Apis.Auth;
 using Planify_BackEnd.DTOs.Login;
 using Planify_BackEnd.Services.Auths;
 using Planify_BackEnd.DTOs;
+using Newtonsoft.Json.Linq;
 
 public class AuthService : IAuthService
 {
@@ -72,23 +73,39 @@ public class AuthService : IAuthService
 
     private string GenerateJwtToken(User user)
     {
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+        var jwtKey = _configuration["Jwt:Key"];
+        if (string.IsNullOrEmpty(jwtKey))
+        {
+            throw new Exception("JWT Key is not configured.");
+        }
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+
+        var issuer = _configuration["Jwt:Issuer"];
+        var audience = _configuration["Jwt:Audience"];
+        var expirationMinutes = _configuration["Jwt:AccessTokenExpirationMinutes"];
+
+        if (string.IsNullOrEmpty(issuer) || string.IsNullOrEmpty(audience) || string.IsNullOrEmpty(expirationMinutes))
+        {
+            throw new Exception("JWT configuration is incomplete.");
+        }
+
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+        var roleName = user.UserRoles?.FirstOrDefault()?.Role?.RoleName ?? "User";
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim(ClaimTypes.Role, user.UserRoles?.FirstOrDefault()?.Role?.RoleName),
-            new Claim("campusId", user.CampusId.ToString()),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
+        new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+        new Claim(JwtRegisteredClaimNames.Email, user.Email),
+        new Claim(ClaimTypes.Role, roleName),
+        new Claim("campusId", user.CampusId.ToString()),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+    };
 
         var token = new JwtSecurityToken(
-            issuer: _configuration["Jwt:Issuer"],
-            audience: _configuration["Jwt:Audience"],
+            issuer: issuer,
+            audience: audience,
             claims: claims,
-            expires: DateTime.Now.AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpirationMinutes"])),
+            expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(expirationMinutes)),
             signingCredentials: creds
         );
 
@@ -105,30 +122,53 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponseDTO> RefreshToken(string refreshToken, string accessToken)
     {
-        if (string.IsNullOrEmpty(refreshToken))
+        // Giải mã refreshToken
+        string decodedRefreshToken = System.Web.HttpUtility.UrlDecode(refreshToken);
+
+        if (string.IsNullOrEmpty(decodedRefreshToken))
         {
             throw new Exception("Invalid refresh token.");
         }
-
-        var handler = new JwtSecurityTokenHandler();
-        var token = handler.ReadJwtToken(accessToken);
-
-        var expClaim = token.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Exp)?.Value;
-        if (expClaim == null)
+        if (string.IsNullOrEmpty(accessToken))
         {
             throw new Exception("Invalid access token.");
         }
 
-        var expiryDate = DateTimeOffset.FromUnixTimeSeconds(long.Parse(expClaim)).UtcDateTime;
+        JwtSecurityToken token;
+        try
+        {
+            var handler = new JwtSecurityTokenHandler();
+            token = handler.ReadJwtToken(accessToken);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to read access token: {ex.Message}");
+        }
 
-        if (expiryDate > DateTime.Now)
+        var expClaim = token.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Exp)?.Value;
+        if (string.IsNullOrEmpty(expClaim))
+        {
+            throw new Exception("Access token does not contain expiration claim.");
+        }
+
+        if (!long.TryParse(expClaim, out long expUnixTime))
+        {
+            throw new Exception("Invalid expiration claim format.");
+        }
+        var expiryDate = DateTimeOffset.FromUnixTimeSeconds(expUnixTime).UtcDateTime;
+
+        if (expiryDate > DateTime.UtcNow)
         {
             throw new Exception("Access token is still valid.");
         }
 
-        var userId = token.Claims.First(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
+        var userIdClaim = token.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value;
+        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out Guid userId))
+        {
+            throw new Exception("Invalid user ID in access token.");
+        }
 
-        var user = await _userRepository.GetUserByIdAsync(Guid.Parse(userId));
+        var user = await _userRepository.GetUserByIdAsync(userId);
         if (user == null)
         {
             throw new Exception("User not found.");
@@ -138,9 +178,9 @@ public class AuthService : IAuthService
         var newRefreshToken = GenerateRefreshToken();
 
         return new AuthResponseDTO
-        {
+        {        
             UserId = user.Id,
-            FullName = user.FirstName + " " + user.LastName,
+            FullName = $"{user.FirstName} {user.LastName}",
             Email = user.Email,
             Campus = user.Campus.CampusName,
             Role = user.UserRoles?.FirstOrDefault()?.Role?.RoleName,
@@ -148,5 +188,4 @@ public class AuthService : IAuthService
             RefreshToken = newRefreshToken
         };
     }
-
 }
