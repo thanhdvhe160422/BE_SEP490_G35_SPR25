@@ -45,6 +45,50 @@ namespace Planify_BackEnd.Repositories.Tasks
             }
         
         }
+        public async Task<bool> DeleteTaskAsync(int taskId)
+        {
+            try
+            {
+                var task = await _context.Tasks.FindAsync(taskId);
+                if (task == null)
+                {
+                    return false;
+                }
+
+                _context.Tasks.Remove(task);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An unexpected error occurred.", ex);
+            }
+        }
+        public async Task<Models.Task?> UpdateTaskAsync(int taskId, Models.Task updatedTask)
+        {
+            try
+            {
+                var existingTask = await _context.Tasks.FindAsync(taskId);
+                if (existingTask == null)
+                {
+                    return null;
+                }
+
+                existingTask.TaskName = updatedTask.TaskName;
+                existingTask.TaskDescription = updatedTask.TaskDescription;
+                existingTask.StartTime = updatedTask.StartTime;
+                existingTask.Deadline = updatedTask.Deadline;
+                existingTask.Status = updatedTask.Status;
+
+                _context.Tasks.Update(existingTask);
+                await _context.SaveChangesAsync();
+                return existingTask;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An unexpected error occurred.", ex);
+            }
+        }
         public bool IsTaskExists(int taskId)
         {
             return _context.Tasks.Any(g => g.Id == taskId);

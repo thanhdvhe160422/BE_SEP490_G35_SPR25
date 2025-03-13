@@ -91,7 +91,54 @@ namespace Planify_BackEnd.Services.Tasks
                 return new List<TaskSearchResponeDTO>();
             }
         }
-       
+        public async Task<ResponseDTO> UpdateTaskAsync(int taskId, TaskUpdateRequestDTO taskDTO)
+        {
+            try
+            {
+                var existingTask = await _taskRepository.UpdateTaskAsync(taskId, new TaskModel
+                {
+                    TaskName = taskDTO.TaskName,
+                    TaskDescription = taskDTO.TaskDescription,
+                    StartTime = taskDTO.StartTime,
+                    Deadline = taskDTO.Deadline,
+                    AmountBudget = taskDTO.AmountBudget,
+                    //GroupId = taskDTO.GroupId,
+                    Progress = taskDTO.Progress,
+                    Status = taskDTO.Status
+                });
+
+                if (existingTask == null)
+                {
+                    return new ResponseDTO(404, "Task not found.", null);
+                }
+
+                return new ResponseDTO(200, "Task updated successfully!", existingTask);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseDTO(500, "Error occurs while updating task!", ex.Message);
+            }
+        }
+
+        public async Task<ResponseDTO> DeleteTaskAsync(int taskId)
+        {
+            try
+            {
+                var isDeleted = await _taskRepository.DeleteTaskAsync(taskId);
+                if (!isDeleted)
+                {
+                    return new ResponseDTO(404, "Task not found or already deleted.", null);
+                }
+
+                return new ResponseDTO(200, "Task deleted successfully!", null);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseDTO(500, "Error occurs while deleting task!", ex.Message);
+            }
+        }
+
+
 
     }
 }

@@ -23,6 +23,7 @@ namespace Planify_BackEnd.Controllers
         public async Task<IActionResult> CreateTask([FromBody] TaskCreateRequestDTO taskDTO)
         {
             var organizerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value); 
+
             var response = await _taskService.CreateTaskAsync(taskDTO, organizerId);
 
             return StatusCode(response.Status, response);
@@ -41,5 +42,21 @@ namespace Planify_BackEnd.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPut("update/{taskId}")]
+        [Authorize(Roles = "Event Organizer")]
+        public async Task<IActionResult> UpdateTask(int taskId, [FromBody] TaskUpdateRequestDTO taskDTO)
+        {
+            var response = await _taskService.UpdateTaskAsync(taskId, taskDTO);
+            return StatusCode(response.Status, response);
+        }
+
+        [HttpDelete("delete/{taskId}")]
+        [Authorize(Roles = "Event Organizer")]
+        public async Task<IActionResult> DeleteTask(int taskId)
+        {
+            var response = await _taskService.DeleteTaskAsync(taskId);
+            return StatusCode(response.Status, response);
+        }
+
     }
 }
