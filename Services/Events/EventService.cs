@@ -6,6 +6,7 @@ using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories;
 using Planify_BackEnd.Repositories.Groups;
 using Planify_BackEnd.Services.Events;
+using static Planify_BackEnd.DTOs.Events.EventDetailResponseDTO;
 
 public class EventService : IEventService
 {
@@ -157,6 +158,113 @@ public class EventService : IEventService
         catch (Exception ex)
         {
             return new ResponseDTO(500, "Error orcurs while getting event detail!", ex.Message);
+        }
+    }
+
+    public async Task<EventDetailDto> UpdateEventAsync(EventDTO e)
+    {
+        try
+        {
+            Event updateEvent = new Event
+            {
+                Id = e.Id,
+                AmountBudget = e.AmountBudget,
+                CampusId = e.CampusId,
+                CategoryEventId = e.CategoryEventId,
+                CreateBy = e.CreateBy,
+                CreatedAt = e.CreatedAt,
+                StartTime = e.StartTime,
+                EndTime = e.EndTime,
+                EventDescription = e.EventDescription,
+                EventTitle = e.EventTitle,
+                IsPublic = e.IsPublic,
+                ManagerId = e.ManagerId,
+                Placed = e.Placed,
+                Status = e.Status,
+                TimePublic = e.TimePublic,
+                UpdateBy = e.UpdateBy,
+                UpdatedAt = DateTime.Now
+            };
+            Event updatedEvent = await _eventRepository.UpdateEventAsync(updateEvent);
+            EventDetailDto eventDetailResponseDTO = new EventDetailDto
+            {
+                Id = updatedEvent.Id,
+                EventTitle = updatedEvent.EventTitle,
+                EventDescription = updatedEvent.EventDescription,
+                StartTime = updatedEvent.StartTime,
+                EndTime = updatedEvent.EndTime,
+                AmountBudget = updatedEvent.AmountBudget,
+                IsPublic = updatedEvent.IsPublic,
+                TimePublic = e.TimePublic,
+                Status = updatedEvent.Status,
+                Placed = updatedEvent.Placed,
+                CreatedAt = updatedEvent.CreatedAt,
+                CampusName = updatedEvent.Campus.CampusName,
+                CategoryEventName = updatedEvent.CategoryEvent.CategoryEventName,
+                CreatedBy = new UserDto
+                {
+                    Id = updatedEvent.CreateByNavigation.Id,
+                    FirstName = updatedEvent.CreateByNavigation.FirstName,
+                    LastName = updatedEvent.CreateByNavigation.LastName,
+                    Email = updatedEvent.CreateByNavigation.Email
+                },
+                EventMedia = updatedEvent.EventMedia.Select(em => new EventMediaDto
+                {
+                    Id = em.Id,
+                    MediaUrl = em.Media.MediaUrl
+                }).ToList()
+            };
+            return eventDetailResponseDTO;
+        }catch(Exception ex)
+        {
+            Console.WriteLine("event service - update event: " + ex.Message);
+            return new EventDetailDto();
+        }
+    }
+
+    public async Task<bool> DeleteEventAsync(int eventId)
+    {
+        try
+        {
+            return await _eventRepository.DeleteEventAsync(eventId);
+        }catch(Exception ex)
+        {
+            Console.WriteLine("event service - delete event: " + ex.Message);
+            return false;
+        }
+    }
+
+    public async Task<IEnumerable<EventGetListResponseDTO>> SearchEventAsync(int page, int pageSize, string? title, DateTime? startTime, DateTime? endTime, decimal? minBudget, decimal? maxBudget, int? isPublic, int? status, int? CategoryEventId, string? placed)
+    {
+        try
+        {
+            var events = await _eventRepository.SearchEventAsync(page,pageSize,title,startTime,endTime,
+                minBudget,maxBudget,isPublic,status,CategoryEventId,placed);
+            var eventDTOs = events.Select(e => new EventGetListResponseDTO
+            {
+                Id = e.Id,
+                EventTitle = e.EventTitle,
+                EventDescription = e.EventDescription,
+                StartTime = e.StartTime,
+                EndTime = e.EndTime,
+                AmountBudget = e.AmountBudget,
+                IsPublic = e.IsPublic,
+                TimePublic = e.TimePublic,
+                Status = e.Status,
+                CampusId = e.CampusId,
+                CategoryEventId = e.CategoryEventId,
+                Placed = e.Placed,
+                CreateBy = e.CreateBy,
+                CreatedAt = e.CreatedAt,
+                ManagerId = e.ManagerId,
+
+            }).ToList();
+
+            return eventDTOs;
+        }catch(Exception ex)
+        {
+            Console.WriteLine("event service - search event: " + ex.Message);
+            return new List<EventGetListResponseDTO>();
         }
     }
 }

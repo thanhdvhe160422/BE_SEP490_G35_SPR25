@@ -34,6 +34,9 @@ namespace Planify_BackEnd.DTOs.User
         public int CampusId { get; set; }
 
         public int Status { get; set; }
+
+        public bool Gender { get; set; }
+
         public AddressVM? AddressVM { get; set; }
 
         public MediumDTO? Avatar { get; set; }

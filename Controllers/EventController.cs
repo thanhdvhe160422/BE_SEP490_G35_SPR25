@@ -27,7 +27,7 @@ namespace Planify_BackEnd.Controllers
         /// </summary>
         /// <returns>A list of all events.</returns>
         [HttpGet ("List")]
-        [Authorize(Roles = "Event Organizer")]
+        //[Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> GetAllEvents(int page, int pageSize)
         {
             try
@@ -60,5 +60,60 @@ namespace Planify_BackEnd.Controllers
 
             return StatusCode(response.Status, response);
         }
+        [HttpPut("{id}")]
+        //[Authorize(Roles = "Event Organizer")]
+        public async Task<IActionResult> UpdateEvent(int id,[FromBody] EventDTO eventDTO)
+        {
+            try
+            {
+                if (id != eventDTO.Id)
+                {
+                    return BadRequest("Not allow update id");
+                }
+                var response = await _eventService.UpdateEventAsync(eventDTO);
+                if (response == null || response.Id == 0)
+                {
+                    return BadRequest("Cannot update event!");
+                }
+                return Ok(response);
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpDelete("{id}")]
+        //[Authorize(Roles = "Event Organizer")]
+        public async Task<IActionResult> DeleteEvent(int id)
+        {
+            try
+            {
+                var response = await _eventService.DeleteEventAsync(id);
+                if (response)
+                    return Ok();
+                else
+                    return BadRequest("Cannot delete event!");
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("search")]
+        //[Authorize(Roles = "Event Organizer")]
+        public async Task<IActionResult> SearchEventAsync(int page, int pageSize, string? title, 
+            DateTime? startTime, DateTime? endTime, decimal? minBudget, decimal? maxBudget, 
+            int? isPublic, int? status, int? CategoryEventId, string? placed)
+        {
+            try
+            {
+                var response = await _eventService.SearchEventAsync(page, pageSize, title, startTime, endTime,
+                minBudget, maxBudget, isPublic, status, CategoryEventId, placed);
+                return Ok(response);
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
     }
 }

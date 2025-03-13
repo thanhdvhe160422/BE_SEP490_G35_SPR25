@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Planify_BackEnd.DTOs.Categories;
 using Planify_BackEnd.Models;
 
 namespace Planify_BackEnd.Repositories.Categories
@@ -20,5 +21,20 @@ namespace Planify_BackEnd.Repositories.Categories
                 throw new Exception("An unexpected error occurred.", ex);
             }
         }
+
+        public IEnumerable<CategoryEvent> GetCategoryByCampusId(int campusId)
+        {
+            try
+            {
+                var list = _context.CategoryEvents.Where(c=>c.CampusId==campusId&&c.Status==1).ToList();
+                return list;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("category repository - get by campus id: " + ex.Message);
+                return new List<CategoryEvent>();
+            }
+        }
+        
     }
 }

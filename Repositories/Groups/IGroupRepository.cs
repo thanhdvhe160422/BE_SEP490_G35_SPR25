@@ -10,5 +10,8 @@
         //Because there is no leadgroup column, leader will have status -1
         bool AddLeadGroup(int GroupId, Guid ImplementerId);
         bool RemoveLeadGroup(int GroupId, Guid ImplementerId);
+        Task<Group> UpdateGroupAsync(Group group);
+        Task<bool> DeleteGroupAsync(int GroupId);
+        Task<Group> GetGroupByIdAsync(int GroupId);
     }
 }

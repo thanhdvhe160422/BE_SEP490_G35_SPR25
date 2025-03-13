@@ -1,4 +1,5 @@
-﻿using Planify_BackEnd.Models;
+﻿using Planify_BackEnd.DTOs.Events;
+using Planify_BackEnd.Models;
 using static Planify_BackEnd.DTOs.Events.EventDetailResponseDTO;
 
 namespace Planify_BackEnd.Repositories
@@ -12,5 +13,15 @@ namespace Planify_BackEnd.Repositories
         System.Threading.Tasks.Task AddEventMediaAsync(EventMedium eventMedia);
         Task<CategoryEvent> GetCategoryEventAsync(int categoryId, int campusId);
         Task<EventDetailDto?> GetEventDetailAsync(int eventId);
+        Task<Event> UpdateEventAsync(Event e);
+        Task<bool> DeleteEventAsync(int eventId);
+        Task<IEnumerable<Event>>SearchEventAsync(int page,int pageSize, 
+            string? title, 
+            DateTime? startTime, DateTime? endTime,
+            decimal? minBudget, decimal? maxBudget,
+            int? isPublic,
+            int? status,
+            int? CategoryEventId,
+            string? placed);
     }
 }

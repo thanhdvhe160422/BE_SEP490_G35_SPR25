@@ -43,6 +43,7 @@ namespace Planify_BackEnd.Services.User
                     PhoneNumber = user.PhoneNumber,
                     UserName = user.UserName,
                     Password = user.Password,
+                    Gender = user.Gender,
                     AddressId = user.AddressId,
                     AddressVM = user.Address==null? null: new DTOs.Andress.AddressVM
                     {
