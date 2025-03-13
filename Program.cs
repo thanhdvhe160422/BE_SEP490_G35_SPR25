@@ -29,6 +29,7 @@ using Planify_BackEnd.Services.EventRequests;
 using Planify_BackEnd.Repositories.SendRequests;
 using Planify_BackEnd.Services.Address;
 using Planify_BackEnd.Repositories.Address;
+using Planify_BackEnd.Services.GoogleDrive;
 using Planify_BackEnd.Repositories.Categories;
 using Planify_BackEnd.Services.Categories;
 
@@ -83,6 +84,7 @@ builder.Services.AddScoped<ICampusService, CampusService>();
 builder.Services.AddScoped<IProvinceService, ProvinceService>();
 builder.Services.AddScoped<ISendRequestService, SendRequestService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<GoogleDriveService>();
 // Thêm Repository
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<IEventSpectatorRepository, EventSpectatorRepository>();
