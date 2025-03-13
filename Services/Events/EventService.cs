@@ -6,17 +6,20 @@ using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories;
 using Planify_BackEnd.Repositories.Groups;
 using Planify_BackEnd.Services.Events;
+using Planify_BackEnd.Services.GoogleDrive;
 
 public class EventService : IEventService
 {
     private readonly IEventRepository _eventRepository;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IGroupRepository _groupRepository;
-    public EventService(IEventRepository eventRepository, IHttpContextAccessor httpContextAccessor, IGroupRepository groupRepository)
+    private readonly GoogleDriveService _googleDriveService;
+    public EventService(IEventRepository eventRepository, IHttpContextAccessor httpContextAccessor, IGroupRepository groupRepository, GoogleDriveService googleDriveService)
     {
         _eventRepository = eventRepository;
         _groupRepository = groupRepository;
         _httpContextAccessor = httpContextAccessor;
+        _googleDriveService = googleDriveService;
     }
     public async Task<IEnumerable<EventGetListResponseDTO>> GetAllEvent(int page, int pageSize)
     {
@@ -114,15 +117,16 @@ public class EventService : IEventService
                     }
                 }
             }
-            
-            if (eventDTO.EventMediaUrls != null && eventDTO.EventMediaUrls.Any())
+
+            if (eventDTO.EventMediaFiles != null && eventDTO.EventMediaFiles.Any())
             {
-                foreach (var image in eventDTO.EventMediaUrls)
+                var uploadTasks = eventDTO.EventMediaFiles.Select(async file =>
                 {
-                    var mediaItem = new Medium
-                    {
-                        MediaUrl = image
-                    };
+                    using var stream = file.OpenReadStream();
+                    string contentType = file.ContentType; // Lấy loại file (image/jpeg, image/png,...)
+                    string driveUrl = await _googleDriveService.UploadFileAsync(stream, file.FileName, contentType);
+
+                    var mediaItem = new Medium { MediaUrl = driveUrl };
                     await _eventRepository.CreateMediaItemAsync(mediaItem);
 
                     var eventMedia = new EventMedium
@@ -132,7 +136,9 @@ public class EventService : IEventService
                         Status = 1
                     };
                     await _eventRepository.AddEventMediaAsync(eventMedia);
-                }  
+                });
+
+                await System.Threading.Tasks.Task.WhenAll(uploadTasks); // Chạy tất cả các task upload cùng lúc
             }
 
             return new ResponseDTO(201, "Event creates successfully!", null);

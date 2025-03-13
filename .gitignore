@@ -276,3 +276,4 @@ __pycache__/
 obj/Debug/net8.0/Planify_BackEnd.GeneratedMSBuildEditorConfig.editorconfig
 obj/Debug/net8.0/Planify_BackEnd.genruntimeconfig.cache
 obj/Debug/net8.0/apphost.exe
+/credentials.json
