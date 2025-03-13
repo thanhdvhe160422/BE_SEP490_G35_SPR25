@@ -4,9 +4,12 @@ namespace Planify_BackEnd.Repositories.Tasks
     public interface ITaskRepository
     {
         Task<TaskModel> CreateTaskAsync(TaskModel newTask);
-        List<TaskModel> SearchTaskOrderByStartDate(int page, int pageSize, string? name, DateTime startDate, DateTime endDate);
+        Task<List<Models.Task>> SearchTaskOrderByStartDateAsync(int page, int pageSize, string? name, DateTime startDate, DateTime endDate);
+
         Task<Models.Task?> UpdateTaskAsync(int taskId, Models.Task updatedTask);
         Task<bool> DeleteTaskAsync(int taskId);
+        Task<List<Models.Task>> GetAllTasksAsync();
+
         bool IsTaskExists(int taskId);
     }
 }
