@@ -23,7 +23,7 @@ namespace Planify_BackEnd.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("list")]
-        [Authorize(Roles = "Event Organizer")]
+        [Authorize(Roles = "Implementer")]
         public async Task<IActionResult> GetAllTasks()
         {
             try
