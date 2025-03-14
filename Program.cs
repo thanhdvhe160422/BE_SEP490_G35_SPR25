@@ -29,9 +29,8 @@ using Planify_BackEnd.Services.EventRequests;
 using Planify_BackEnd.Repositories.SendRequests;
 using Planify_BackEnd.Services.Address;
 using Planify_BackEnd.Repositories.Address;
+using Planify_BackEnd.Services.Users;
 using Planify_BackEnd.Services.GoogleDrive;
-using Planify_BackEnd.Repositories.Categories;
-using Planify_BackEnd.Services.Categories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -83,7 +82,7 @@ builder.Services.AddScoped<IJoinProjectService, JoinProjectService>();
 builder.Services.AddScoped<ICampusService, CampusService>();
 builder.Services.AddScoped<IProvinceService, ProvinceService>();
 builder.Services.AddScoped<ISendRequestService, SendRequestService>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IUserservice, UserService>();
 builder.Services.AddScoped<GoogleDriveService>();
 // Thêm Repository
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
@@ -97,7 +96,6 @@ builder.Services.AddScoped<IJoinProjectRepository, JoinProjectRepository>();
 builder.Services.AddScoped<ICampusRepository, CampusRepository>();
 builder.Services.AddScoped<IProvinceRepository, ProvinceRepository>();
 builder.Services.AddScoped<ISendRequestRepository, SendRequestRepository>();
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 // Thêm Authorization
 builder.Services.AddAuthorization();
 
