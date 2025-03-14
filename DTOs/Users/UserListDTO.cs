@@ -27,6 +27,6 @@
         public int CampusId { get; set; }
 
         public int Status { get; set; }
-        public Boolean Gender { get; set; }
+        public bool Gender { get; set; }
     }
 }
