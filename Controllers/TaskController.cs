@@ -69,7 +69,6 @@ namespace Planify_BackEnd.Controllers
         public async Task<IActionResult> CreateTask([FromBody] TaskCreateRequestDTO taskDTO)
         {
             var organizerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value); 
-
             var response = await _taskService.CreateTaskAsync(taskDTO, organizerId);
 
             return StatusCode(response.Status, response);
