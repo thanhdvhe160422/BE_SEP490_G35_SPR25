@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Planify_BackEnd.Services.JoinProjects;
@@ -24,6 +25,25 @@ namespace Planify_BackEnd.Controllers
                 return Ok(response);
             }
             catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpDelete("{eventId}/{userId}")]
+        [Authorize(Roles = "Event Organizer")]
+        public async Task<IActionResult> DeleteImplementerFromEvent(int eventId, Guid userId)
+        {
+            try
+            {
+                if (await _joinProjectService.DeleteImplementerFromEvent(userId, eventId))
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest("Cannot remove implementer from event!");
+                }
+            }catch(Exception ex)
             {
                 return BadRequest(ex.Message);
             }
