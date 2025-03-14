@@ -66,11 +66,12 @@ namespace Planify_BackEnd.Repositories.Tasks
             try
             {
                 var task = await _context.Tasks.FindAsync(taskId);
+                var subTasks = await _context.SubTasks.Where(e => e.TaskId == taskId).ToListAsync();
                 if (task == null)
                 {
                     return false;
                 }
-
+                _context.SubTasks.RemoveRange(subTasks);
                 _context.Tasks.Remove(task);
                 await _context.SaveChangesAsync();
                 return true;

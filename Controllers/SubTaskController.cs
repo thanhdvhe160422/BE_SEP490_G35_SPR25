@@ -51,7 +51,7 @@ namespace Planify_BackEnd.Controllers
         /// <param name="subTaskDTO"></param>
         /// <returns></returns>
         [HttpPost("create")]
-        [Authorize(Roles = "Implementer")]
+        //[Authorize(Roles = "Implementer")]
         public async Task<IActionResult> CreateSubTask([FromBody] SubTaskCreateRequestDTO subTaskDTO)
         {
             var implementerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
