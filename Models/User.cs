@@ -32,6 +32,8 @@ public partial class User
     public int Status { get; set; }
     public Boolean Gender { get; set; }
 
+    public bool Gender { get; set; }
+
     public virtual Address? Address { get; set; }
 
     public virtual Medium? Avatar { get; set; }

@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
+using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories;
 using static Planify_BackEnd.DTOs.Events.EventDetailResponseDTO;
@@ -128,6 +129,90 @@ public class EventRepository : IEventRepository
         catch (Exception ex)
         {
             throw new Exception("An unexpected error occurred.", ex);
+        }
+    }
+
+    public async Task<Event> UpdateEventAsync(Event e)
+    {
+        try
+        {
+            _context.Events.Update(e);
+            _context.SaveChangesAsync();
+            var updatedEvent = _context.Events
+                .Include(ue=>ue.Campus)
+                .Include(ue=>ue.CategoryEvent)
+                .Include(ue=>ue.CreateByNavigation)
+                .Include(ue=>ue.EventMedia).ThenInclude(em=>em.Media)
+                .FirstOrDefault(ue => ue.Id == e.Id);
+            return updatedEvent;
+        }catch(Exception ex)
+        {
+            Console.WriteLine("event repository - update event: " + ex.Message);
+            return new Event();
+        }
+    }
+
+    public async Task<bool> DeleteEventAsync(int eventId)
+    {
+        try
+        {
+            //var ev = await _context.Events
+            //    .Include(e=>e.JoinProjects)
+            //    .Include(e=>e.EventMedia).ThenInclude(em=>em.Media)
+            //    .Include(e=>e.Groups)
+            //    .Include(e=>e.SendRequests)
+            //    .FirstOrDefaultAsync(e => e.Id == eventId);
+            //ev.JoinProjects = null;
+            //ev.EventMedia = null;
+            //ev.Groups = null;
+            //ev.SendRequests = null;
+            //_context.Events.Remove(ev!);
+            var ev = await _context.Events.FirstOrDefaultAsync(e => e.Id == eventId);
+            ev.Status = 0;
+            await _context.SaveChangesAsync();
+            return true;
+        }catch(Exception ex)
+        {
+            Console.WriteLine("event repository - delete event: "+ex.Message);
+            return false;
+        }
+    }
+
+    public async Task<IEnumerable<Event>> SearchEventAsync(int page, int pageSize, string? title, 
+        DateTime? startTime, DateTime? endTime, decimal? minBudget, decimal? maxBudget, int? isPublic, 
+        int? status, int? CategoryEventId, string? placed)
+    {
+        try
+        {
+            var query = _context.Events.AsQueryable();
+            if (!string.IsNullOrEmpty(title))
+                query = query.Where(e => e.EventTitle.Contains(title));
+            if (!string.IsNullOrEmpty(placed))
+                query = query.Where(e => e.Placed.Contains(placed));
+            if (startTime.HasValue)
+                query = query.Where(e => e.StartTime >= startTime);
+            if (endTime.HasValue)
+                query = query.Where(e => e.EndTime <= endTime);
+            if (minBudget.HasValue)
+                query = query.Where(e => e.AmountBudget >= minBudget);
+            if (maxBudget.HasValue)
+                query = query.Where(e => e.AmountBudget <= maxBudget);
+            if (isPublic.HasValue)
+                query = query.Where(e => e.IsPublic == isPublic);
+            if (status.HasValue)
+                query = query.Where(e => e.Status == status);
+            if (CategoryEventId.HasValue)
+                query = query.Where(e => e.CategoryEventId == CategoryEventId); 
+            var paginatedResult = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+            return paginatedResult;
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine("event repository - search event: " + ex.Message);
+            return new List<Event>();
         }
     }
 }
