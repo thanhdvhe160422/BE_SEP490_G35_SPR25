@@ -30,12 +30,6 @@ namespace Planify_BackEnd.DTOs.Events
 
         public string Placed { get; set; }
 
-        public DateTime CreatedAt { get; set; }
-
-        public Guid CreateBy { get; set; }
-
-        public DateTime? UpdatedAt { get; set; }
-
         public Guid? UpdateBy { get; set; }
     }
 }

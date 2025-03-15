@@ -91,7 +91,17 @@ namespace Planify_BackEnd.Services.Tasks
                 return new List<TaskSearchResponeDTO>();
             }
         }
-       
 
+        public bool UpdateActualTaskAmount(int taskId, decimal amount)
+        {
+            try
+            {
+                return _taskRepository.UpdateActualTaskAmount(taskId, amount);
+            }catch(Exception ex)
+            {
+                Console.WriteLine("task - update actual task amount" + ex.Message);
+                return false;
+            }
+        }
     }
 }

@@ -24,5 +24,23 @@ namespace Planify_BackEnd.Controllers
             var response = await _subTaskService.CreateSubTaskAsync(subTaskDTO, implementerId);
             return StatusCode(response.Status, response);
         }
+        [HttpPut("{subTaskId}/amount")]
+        //[Authorize(Roles = "Implementer")]
+        public IActionResult UpdateActualSubTaskAmount(int subTaskId, [FromBody] decimal amount)
+        {
+            try
+            {
+                var response = _subTaskService.UpdateActualSubTaskAmount(subTaskId, amount);
+                if (!response)
+                {
+                    return BadRequest("Cannot update subtask amount!");
+                }
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

@@ -31,6 +31,8 @@ using Planify_BackEnd.Services.Address;
 using Planify_BackEnd.Repositories.Address;
 using Planify_BackEnd.Repositories.Categories;
 using Planify_BackEnd.Services.Categories;
+using Planify_BackEnd.Services.Reports;
+using Planify_BackEnd.Repositories.Reports;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -83,6 +85,7 @@ builder.Services.AddScoped<ICampusService, CampusService>();
 builder.Services.AddScoped<IProvinceService, ProvinceService>();
 builder.Services.AddScoped<ISendRequestService, SendRequestService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IReportService,ReportService>();
 // Thêm Repository
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<IEventSpectatorRepository, EventSpectatorRepository>();
@@ -96,6 +99,7 @@ builder.Services.AddScoped<ICampusRepository, CampusRepository>();
 builder.Services.AddScoped<IProvinceRepository, ProvinceRepository>();
 builder.Services.AddScoped<ISendRequestRepository, SendRequestRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IReportRepository, ReportRepository>();
 // Thêm Authorization
 builder.Services.AddAuthorization();
 

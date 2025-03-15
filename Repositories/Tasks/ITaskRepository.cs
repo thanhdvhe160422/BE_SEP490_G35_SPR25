@@ -6,5 +6,6 @@ namespace Planify_BackEnd.Repositories.Tasks
         Task<TaskModel> CreateTaskAsync(TaskModel newTask);
         List<TaskModel> SearchTaskOrderByStartDate(int page, int pageSize, string? name, DateTime startDate, DateTime endDate);
         bool IsTaskExists(int taskId);
+        bool UpdateActualTaskAmount(int taskId, decimal amount);
     }
 }

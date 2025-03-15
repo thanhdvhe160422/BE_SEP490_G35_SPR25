@@ -29,8 +29,8 @@ namespace Planify_BackEnd.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpDelete("{eventId}/{userId}")]
-        [Authorize(Roles = "Event Organizer")]
+        [HttpPut("delete-from-project/{eventId}/{userId}")]
+        //[Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> DeleteImplementerFromEvent(int eventId, Guid userId)
         {
             try

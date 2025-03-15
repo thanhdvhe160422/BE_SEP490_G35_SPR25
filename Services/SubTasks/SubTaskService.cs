@@ -63,5 +63,17 @@ namespace Planify_BackEnd.Services.SubTasks
                 return new ResponseDTO(500, "Error orcurs while creating sub-task!", ex.Message);
             }
         }
+
+        public bool UpdateActualSubTaskAmount(int subTaskId, decimal amount)
+        {
+            try
+            {
+                return _subTaskRepository.UpdateActualSubTaskAmount(subTaskId, amount);
+            }catch(Exception ex)
+            {
+                Console.WriteLine("subtask service - update actual subtask amount: " + ex.Message);
+                return false;
+            }
+        }
     }
 }

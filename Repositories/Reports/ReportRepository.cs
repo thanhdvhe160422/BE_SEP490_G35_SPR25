@@ -10,20 +10,21 @@ namespace Planify_BackEnd.Repositories.Reports
         {
             _context = context;
         }
-        public async Task<IEnumerable<Report>> GetReportsByReceivedUser(int receivedUserId)
+        public async Task<IEnumerable<Report>> GetReportsByReceivedUser(Guid receivedUserId)
         {
             try
             {
-                var list = await _context.Reports
+                var list = _context.Reports
                     .Include(r => r.SendFromNavigation)
                     .Include(r => r.SendToNavigation)
                     .Include(r => r.Task)
                     .Include(r => r.ReportMedia).ThenInclude(rm => rm.Media)
-                    .ToListAsync();
+                    .Where(r=>r.SendTo==receivedUserId)
+                    .ToList();
                 return list;
             }catch(Exception ex)
             {
-                return Enumerable.Empty<Report>();
+                return new List<Report>();
             }
         }
     }

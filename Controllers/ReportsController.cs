@@ -16,12 +16,12 @@ namespace Planify_BackEnd.Controllers
         }
         [HttpGet("{receviedUserId}")]
         //[Authorize(Roles = "Event Organizer")]
-        public async Task<IActionResult> GetReportsByReceviedUserId(int receviedUserId)
+        public async Task<IActionResult> GetReportsByReceviedUserId(Guid receviedUserId)
         {
             try
             {
                 var response = _reportService.GetReportsByReceivedUser(receviedUserId);
-                return Ok(response);
+                return Ok(response.Result);
             }catch(Exception ex)
             {
                 return BadRequest(ex.Message);

@@ -136,8 +136,24 @@ public class EventRepository : IEventRepository
     {
         try
         {
-            _context.Events.Update(e);
-            _context.SaveChangesAsync();
+            var updateEvent = await _context.Events.FirstOrDefaultAsync(ev=>ev.Id==e.Id);
+            updateEvent.Id = e.Id;
+            updateEvent.AmountBudget = e.AmountBudget;
+            updateEvent.CampusId = e.CampusId;
+            updateEvent.CategoryEventId = e.CategoryEventId;
+            updateEvent.StartTime = e.StartTime;
+            updateEvent.EndTime = e.EndTime;
+            updateEvent.EventDescription = e.EventDescription;
+            updateEvent.EventTitle = e.EventTitle;
+            updateEvent.IsPublic = e.IsPublic;
+            updateEvent.ManagerId = e.ManagerId;
+            updateEvent.Placed = e.Placed;
+            updateEvent.Status = e.Status;
+            updateEvent.TimePublic = e.TimePublic;
+            updateEvent.UpdateBy = e.UpdateBy;
+            updateEvent.UpdatedAt = DateTime.Now;
+            _context.Events.Update(updateEvent);
+            await _context.SaveChangesAsync();
             var updatedEvent = _context.Events
                 .Include(ue=>ue.Campus)
                 .Include(ue=>ue.CategoryEvent)

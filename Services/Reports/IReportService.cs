@@ -4,6 +4,6 @@ namespace Planify_BackEnd.Services.Reports
 {
     public interface IReportService
     {
-        Task<IEnumerable<ReportVM>> GetReportsByReceivedUser(int receivedUserId);
+        Task<IEnumerable<ReportVM>> GetReportsByReceivedUser(Guid receivedUserId);
     }
 }

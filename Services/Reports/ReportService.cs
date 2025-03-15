@@ -12,7 +12,7 @@ namespace Planify_BackEnd.Services.Reports
         {
             _reportRepository = reportRepository;
         }
-        public async Task<IEnumerable<ReportVM>> GetReportsByReceivedUser(int receivedUserId)
+        public async Task<IEnumerable<ReportVM>> GetReportsByReceivedUser(Guid receivedUserId)
         {
             try
             {

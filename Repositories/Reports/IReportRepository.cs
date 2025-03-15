@@ -4,7 +4,7 @@ namespace Planify_BackEnd.Repositories.Reports
 {
     public interface IReportRepository
     {
-        Task<IEnumerable<Report>> GetReportsByReceivedUser(int receivedUserId);
+        Task<IEnumerable<Report>> GetReportsByReceivedUser(Guid receivedUserId);
 
     }
 }

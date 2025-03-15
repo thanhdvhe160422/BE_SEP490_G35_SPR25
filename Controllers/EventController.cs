@@ -81,7 +81,7 @@ namespace Planify_BackEnd.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpDelete("{id}")]
+        [HttpPut("delete/{id}")]
         //[Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> DeleteEvent(int id)
         {
