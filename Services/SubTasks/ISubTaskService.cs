@@ -8,5 +8,9 @@ namespace Planify_BackEnd.Services.SubTasks
     {
         Task<ResponseDTO> CreateSubTaskAsync(SubTaskCreateRequestDTO subTaskDTO, Guid implementerId);
         bool UpdateActualSubTaskAmount(int subTaskId, decimal amount);
+        Task<ResponseDTO> UpdateSubTaskAsync(int subTaskId, SubTaskUpdateRequestDTO subTaskDTO);
+        Task<ResponseDTO> DeleteSubTaskAsync(int subTaskId);
+        Task<ResponseDTO> GetSubTaskByIdAsync(int subTaskId);
+        Task<ResponseDTO> GetSubTasksByTaskIdAsync(int taskId);
     }
 }

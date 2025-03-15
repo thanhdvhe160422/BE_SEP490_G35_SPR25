@@ -66,11 +66,11 @@ namespace Planify_BackEnd.Services.Tasks
                 return new ResponseDTO(500, "Error orcurs while creating task!", ex.Message);
             }
         }
-        public List<TaskSearchResponeDTO> SearchTaskOrderByStartDate(int page, int pageSize, string? name, DateTime startDate, DateTime endDate)
+        public async Task<List<TaskSearchResponeDTO>> SearchTaskOrderByStartDateAsync(int page, int pageSize, string? name, DateTime startDate, DateTime endDate)
         {
             try
             {
-                List<TaskModel> tasks = _taskRepository.SearchTaskOrderByStartDate(page, pageSize, name, startDate, endDate);
+                var tasks = await _taskRepository.SearchTaskOrderByStartDateAsync(page, pageSize, name, startDate, endDate);
 
                 return tasks.Select(item => new TaskSearchResponeDTO
                 {
@@ -79,7 +79,7 @@ namespace Planify_BackEnd.Services.Tasks
                     TaskDescription = item.TaskDescription,
                     StartTime = item.StartTime,
                     Deadline = item.Deadline,
-                    GroupId = item.GroupId, 
+                    GroupId = item.GroupId,
                     AmountBudget = item.AmountBudget,
                     Progress = item.Progress,
                     Status = item.Status
@@ -87,10 +87,85 @@ namespace Planify_BackEnd.Services.Tasks
             }
             catch (Exception ex)
             {
-                Console.WriteLine("task - searchTask: " + ex.Message);
+                Console.WriteLine("task - SearchTaskOrderByStartDateAsync: " + ex.Message);
                 return new List<TaskSearchResponeDTO>();
             }
         }
+
+        public async Task<List<TaskSearchResponeDTO>> GetAllTasksAsync()
+        {
+            try
+            {
+                var tasks = await _taskRepository.GetAllTasksAsync();
+                return tasks.Select(item => new TaskSearchResponeDTO
+                {
+                    Id = item.Id,
+                    TaskName = item.TaskName,
+                    TaskDescription = item.TaskDescription,
+                    StartTime = item.StartTime,
+                    Deadline = item.Deadline,
+                    GroupId = item.GroupId,
+                    AmountBudget = item.AmountBudget,
+                    Progress = item.Progress,
+                    Status = item.Status
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("task - GetAllTasksAsync: " + ex.Message);
+                return new List<TaskSearchResponeDTO>();
+            }
+        }
+
+
+        public async Task<ResponseDTO> UpdateTaskAsync(int taskId, TaskUpdateRequestDTO taskDTO)
+        {
+            try
+            {
+                var existingTask = await _taskRepository.UpdateTaskAsync(taskId, new TaskModel
+                {
+                    TaskName = taskDTO.TaskName,
+                    TaskDescription = taskDTO.TaskDescription,
+                    StartTime = taskDTO.StartTime,
+                    Deadline = taskDTO.Deadline,
+                    AmountBudget = taskDTO.AmountBudget,
+                    //GroupId = taskDTO.GroupId,
+                    Progress = taskDTO.Progress,
+                    Status = taskDTO.Status
+                });
+
+                if (existingTask == null)
+                {
+                    return new ResponseDTO(404, "Task not found.", null);
+                }
+
+                return new ResponseDTO(200, "Task updated successfully!", existingTask);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseDTO(500, "Error occurs while updating task!", ex.Message);
+            }
+        }
+
+        public async Task<ResponseDTO> DeleteTaskAsync(int taskId)
+        {
+            try
+            {
+                var isDeleted = await _taskRepository.DeleteTaskAsync(taskId);
+                if (!isDeleted)
+                {
+                    return new ResponseDTO(404, "Task not found or already deleted.", null);
+                }
+
+                return new ResponseDTO(200, "Task deleted successfully!", null);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseDTO(500, "Error occurs while deleting task!", ex.Message);
+            }
+        }
+
+
 
         public bool UpdateActualTaskAmount(int taskId, decimal amount)
         {

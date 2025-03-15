@@ -31,7 +31,6 @@ public class UserRepository : IUserRepository
             return null;
         }
     }
-
     public async Task<User> GetUserByIdAsync(Guid id)
     {
         try
@@ -46,5 +45,30 @@ public class UserRepository : IUserRepository
             Console.WriteLine($"Error in GetUserByIdAsync: {ex.Message}");
             return null;
         }
+    }
+    /// <summary>
+    /// get list implementer of a project by EventId
+    /// </summary>
+    /// <param name="eventId"></param>
+    /// <param name="page"></param>
+    /// <param name="pageSize"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
+    public async Task<IEnumerable<User>> GetListImplementer(int eventId, int page, int pageSize)
+    {
+        try
+        {
+            return await _context.JoinProjects
+                      .Where(jg => jg.EventId == eventId)
+                      .Select(jg => jg.User)
+                      .Distinct()
+                      .Skip((page - 1) * pageSize).Take(pageSize)
+                      .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+
     }
 }

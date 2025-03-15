@@ -6,27 +6,25 @@ namespace Planify_BackEnd.DTOs.Events
     {
         [Required]
         public string EventTitle { get; set; } = null!;
-
-        public string? EventDescription { get; set; }
+        [Required]
+        public string EventDescription { get; set; }
 
         [Required]
         public DateTime StartTime { get; set; }
 
         [Required]
         public DateTime EndTime { get; set; }
-
+        [Required]
         public decimal AmountBudget { get; set; }
 
         [Required]
         public int CategoryEventId { get; set; }
-
-        public string? Placed { get; set; }
-
-        public Guid CreateBy { get; set; }
+        [Required]
+        public string Placed { get; set; }
 
         public List<GroupCreateDTO>? Groups { get; set; } = new();
 
-        public List<string>? EventMediaUrls { get; set; }
+        public List<IFormFile>? EventMediaFiles { get; set; }
 
         public EventCreateRequestDTO() { }
     }

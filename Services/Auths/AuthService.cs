@@ -91,7 +91,7 @@ public class AuthService : IAuthService
 
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var roleName = user.UserRoles?.FirstOrDefault()?.Role?.RoleName ?? "User";
+        var roleName = user.UserRoles?.FirstOrDefault()?.Role?.RoleName;
         var claims = new[]
         {
         new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),

@@ -27,7 +27,7 @@ namespace Planify_BackEnd.Controllers
         /// </summary>
         /// <returns>A list of all events.</returns>
         [HttpGet ("List")]
-        //[Authorize(Roles = "Event Organizer")]
+        [Authorize(Roles = "Event Organizer, Campus Manager")]
         public async Task<IActionResult> GetAllEvents(int page, int pageSize)
         {
             try
@@ -43,8 +43,8 @@ namespace Planify_BackEnd.Controllers
         }
 
         [HttpPost("create")]
-        [Authorize(Roles = "Event Organizer")]
-        public async Task<IActionResult> CreateEvent([FromBody] EventCreateRequestDTO eventDTO)
+        [Authorize(Roles = "Event Organizer, Campus Manager")]
+        public async Task<IActionResult> CreateEvent([FromForm] EventCreateRequestDTO eventDTO)
         {
             var organizerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
@@ -54,6 +54,7 @@ namespace Planify_BackEnd.Controllers
         }
 
         [HttpGet("get-event-detail")]
+        [Authorize(Roles = "Event Organizer, Campus Manager")]
         public async Task<IActionResult> GetEventDetail(int eventId)
         {
             var response = await _eventService.GetEventDetailAsync(eventId);

@@ -33,6 +33,8 @@ using Planify_BackEnd.Repositories.Categories;
 using Planify_BackEnd.Services.Categories;
 using Planify_BackEnd.Services.Reports;
 using Planify_BackEnd.Repositories.Reports;
+using Planify_BackEnd.Services.Users;
+using Planify_BackEnd.Services.GoogleDrive;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -86,6 +88,8 @@ builder.Services.AddScoped<IProvinceService, ProvinceService>();
 builder.Services.AddScoped<ISendRequestService, SendRequestService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IUserservice, UserService>();
+builder.Services.AddScoped<GoogleDriveService>();
 // Thêm Repository
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<IEventSpectatorRepository, EventSpectatorRepository>();

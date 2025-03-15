@@ -6,5 +6,9 @@ namespace Planify_BackEnd.Repositories
     {
         Task<SubTask> CreateSubTaskAsync(SubTask newSubTask);
         bool UpdateActualSubTaskAmount(int subTaskId, decimal amount);
+        Task<SubTask?> UpdateSubTaskAsync(int subTaskId, SubTask updatedSubTask);
+        Task<bool> DeleteSubTaskAsync(int subTaskId);
+        Task<SubTask?> GetSubTaskByIdAsync(int subTaskId);
+        Task<List<SubTask>> GetSubTasksByTaskIdAsync(int taskId);
     }
 }
