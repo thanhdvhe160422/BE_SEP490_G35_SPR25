@@ -59,6 +59,23 @@ namespace Planify_BackEnd.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPut("{taskId}/amount")]
+        //[Authorize(Roles = "Implementer")]
+        public IActionResult UpdateActualTaskAmount(int taskId, [FromBody] decimal amount)
+        {
+            try
+            {
+                var response = _taskService.UpdateActualTaskAmount(taskId, amount);
+                if (!response)
+                {
+                    return BadRequest("Cannot update task amount!");
+                }
+                return Ok();
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         /// <summary>
         /// Create a new task
         /// </summary>

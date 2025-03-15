@@ -30,6 +30,21 @@ public class SubTaskRepository : ISubTaskRepository
             throw new Exception("An unexpected error occurred.", ex);
         }
     }
+    public bool UpdateActualSubTaskAmount(int subTaskId, decimal amount)
+    {
+        try
+        {
+            var task = _context.SubTasks.FirstOrDefault(st => st.Id == subTaskId);
+            task.AmountBudget = amount;
+            _context.Update(task);
+            _context.SaveChanges();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
     /// <summary>
     /// Update a subtask
     /// </summary>

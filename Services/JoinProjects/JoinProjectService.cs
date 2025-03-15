@@ -28,6 +28,17 @@ namespace Planify_BackEnd.Services.JoinProjects
             return joinedProjectDTOs;
             
         }
+        public async Task<bool> DeleteImplementerFromEvent(Guid userId, int eventId)
+        {
+            try
+            {
+                return await _joinProjectRepository.DeleteImplementerFromEvent(userId, eventId);
+            }catch (Exception ex)
+            {
+                Console.WriteLine("join project service - delete implementer from event: " + ex.Message);
+                return false;
+            }
+        }
     }
 
    

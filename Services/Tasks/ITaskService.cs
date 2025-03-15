@@ -7,10 +7,13 @@ namespace Planify_BackEnd.Services.Tasks
     public interface ITaskService
     {
         Task<ResponseDTO> CreateTaskAsync(TaskCreateRequestDTO taskDTO, Guid organizerId);
+        List<TaskSearchResponeDTO> SearchTaskOrderByStartDate(int page, int pageSize, string? name, DateTime startDate, DateTime deadline);
+        bool UpdateActualTaskAmount(int taskId, decimal amount);
         Task<List<TaskSearchResponeDTO>> SearchTaskOrderByStartDateAsync(int page, int pageSize, string? name, DateTime startDate, DateTime endDate);
 
         Task<ResponseDTO> UpdateTaskAsync(int taskId, TaskUpdateRequestDTO taskDTO);
         Task<ResponseDTO> DeleteTaskAsync(int taskId);
         Task<List<TaskSearchResponeDTO>> GetAllTasksAsync();
+
     }
 }

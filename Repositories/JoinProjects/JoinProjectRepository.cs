@@ -25,7 +25,22 @@ namespace Planify_BackEnd.Repositories.JoinGroups
             catch (Exception ex) {
                 throw new Exception(ex.Message);
             }
-           
+
+        }
+
+        public async Task<bool> DeleteImplementerFromEvent(Guid userId, int eventId)
+        {
+            try
+            {
+                var joinProject = _context.JoinProjects.FirstOrDefault(jp => jp.UserId == userId && jp.EventId == eventId);
+                joinProject.TimeOutProject = DateTime.Now;
+                _context.JoinProjects.Update(joinProject);
+                await _context.SaveChangesAsync();
+                return true;
+            }catch
+            {
+                return false;
+            }
         }
        
     }

@@ -116,7 +116,7 @@ namespace Planify_BackEnd.Repositories.Groups
             {
                 var group = await _context.Groups
                     .Include(g=>g.CreateByNavigation)
-                    .Include(g => g.JoinGroups)
+                    .Include(g => g.JoinGroups).ThenInclude(jg=>jg.Implementer)
                     .Include(g => g.Tasks)
                     .FirstOrDefaultAsync(g => g.Id == GroupId);
                 return group;

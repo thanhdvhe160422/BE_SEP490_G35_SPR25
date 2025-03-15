@@ -110,5 +110,21 @@ namespace Planify_BackEnd.Repositories.Tasks
         {
             return _context.Tasks.Any(g => g.Id == taskId);
         }
+
+        public bool UpdateActualTaskAmount(int taskId, decimal amount)
+        {
+            try
+            {
+                var task = _context.Tasks.FirstOrDefault(t => t.Id == taskId);
+                task.AmountBudget = amount;
+                _context.Update(task);
+                _context.SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }
