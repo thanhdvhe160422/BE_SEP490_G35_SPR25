@@ -17,7 +17,7 @@ namespace Planify_BackEnd.Controllers.Groups
             _groupService = groupService;
         }
         [HttpPut("allocate-cost/{groupId}/{cost}")]
-        //[Authorize(Roles = "Event Organizer")]
+        [Authorize(Roles = "Event Organizer")]
         public IActionResult AllocateCostToGroup(int groupId, decimal cost)
         {
             try
@@ -33,7 +33,7 @@ namespace Planify_BackEnd.Controllers.Groups
             }
         }
         [HttpPut("add-lead-group/{groupId}/{implementerId}")]
-        //[Authorize(Roles = "Event Organizer")]
+        [Authorize(Roles = "Event Organizer")]
         public IActionResult AddLeadGroup(int groupId,Guid implementerId)
         {
             try
@@ -48,7 +48,7 @@ namespace Planify_BackEnd.Controllers.Groups
             }
         }
         [HttpPut("remove-lead-group/{groupId}/{implementerId}")]
-        //[Authorize(Roles = "Event Organizer")]
+        [Authorize(Roles = "Event Organizer")]
         public IActionResult RemoveLeadGroup(int groupId, Guid implementerId)
         {
             try
@@ -64,7 +64,7 @@ namespace Planify_BackEnd.Controllers.Groups
             }
         }
         [HttpPut]
-        //[Authorize(Roles = "Event Organizer")]
+        [Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> UpdateGroup(GroupDTO groupDto)
         {
             try
@@ -81,12 +81,16 @@ namespace Planify_BackEnd.Controllers.Groups
             }
         }
         [HttpGet("{id}")]
-        //[Authorize(Roles = "Event Organizer")]
-        public async Task<IActionResult> DeleteGroup(int id)
+        [Authorize(Roles = "Event Organizer")]
+        public async Task<IActionResult> GetGroupById(int id)
         {
             try
             {
                 var response = await _groupService.GetGroupByIdAsync(id);
+                if (response == null || response.Id == null)
+                {
+                    return NotFound("Cannot found any group with id: "+id);
+                }
                 return Ok(response);
             }
             catch (Exception ex)
@@ -95,8 +99,8 @@ namespace Planify_BackEnd.Controllers.Groups
             }
         }
         [HttpDelete("{id}")]
-        //[Authorize(Roles = "Event Organizer")]
-        public async Task<IActionResult> GetGroupById(int id)
+        [Authorize(Roles = "Event Organizer")]
+        public async Task<IActionResult> DeleteGroup(int id)
         {
             try
             {

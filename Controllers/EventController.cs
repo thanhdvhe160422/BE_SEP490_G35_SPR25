@@ -7,6 +7,7 @@ using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Services.Events;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace Planify_BackEnd.Controllers
@@ -27,7 +28,7 @@ namespace Planify_BackEnd.Controllers
         /// </summary>
         /// <returns>A list of all events.</returns>
         [HttpGet ("List")]
-        [Authorize(Roles = "Event Organizer, Campus Manager")]
+        //[Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> GetAllEvents(int page, int pageSize)
         {
             try
@@ -44,11 +45,20 @@ namespace Planify_BackEnd.Controllers
 
         [HttpPost("create")]
         [Authorize(Roles = "Event Organizer, Campus Manager")]
-        public async Task<IActionResult> CreateEvent([FromForm] EventCreateRequestDTO eventDTO)
+        public async Task<IActionResult> CreateEvent([FromBody] EventCreateRequestDTO eventDTO)
         {
             var organizerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
             var response = await _eventService.CreateEventAsync(eventDTO, organizerId);
+
+            return StatusCode(response.Status, response);
+        }
+
+        [HttpPost("upload-image")]
+        [Authorize(Roles = "Event Organizer, Campus Manager")]
+        public async Task<IActionResult> UploadImage([FromForm] UploadImageRequestDTO imageDTO)
+        {
+            var response = await _eventService.UploadImageAsync(imageDTO);
 
             return StatusCode(response.Status, response);
         }
@@ -62,7 +72,7 @@ namespace Planify_BackEnd.Controllers
             return StatusCode(response.Status, response);
         }
         [HttpPut("{id}")]
-        //[Authorize(Roles = "Event Organizer")]
+        [Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> UpdateEvent(int id,[FromBody] EventDTO eventDTO)
         {
             try
@@ -71,6 +81,13 @@ namespace Planify_BackEnd.Controllers
                 {
                     return BadRequest("Not allow update id");
                 }
+                //var getDetail = await _eventService.GetEventDetailAsync(id);
+                //Event eventDetails = getDetail.Result as Event;
+                //var userId = User.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value;
+                //if (!userId.Equals(eventDetails.ManagerId))
+                //{
+                //    return Unauthorized();
+                //}
                 var response = await _eventService.UpdateEventAsync(eventDTO);
                 if (response == null || response.Id == 0)
                 {
@@ -83,7 +100,7 @@ namespace Planify_BackEnd.Controllers
             }
         }
         [HttpPut("delete/{id}")]
-        //[Authorize(Roles = "Event Organizer")]
+        [Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> DeleteEvent(int id)
         {
             try
@@ -99,7 +116,7 @@ namespace Planify_BackEnd.Controllers
             }
         }
         [HttpGet("search")]
-        //[Authorize(Roles = "Event Organizer")]
+        [Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> SearchEventAsync(int page, int pageSize, string? title, 
             DateTime? startTime, DateTime? endTime, decimal? minBudget, decimal? maxBudget, 
             int? isPublic, int? status, int? CategoryEventId, string? placed)
@@ -114,7 +131,6 @@ namespace Planify_BackEnd.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
 
     }
 }

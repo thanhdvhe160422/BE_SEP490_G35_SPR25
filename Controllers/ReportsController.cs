@@ -15,7 +15,7 @@ namespace Planify_BackEnd.Controllers
             _reportService = reportService;
         }
         [HttpGet("{receviedUserId}")]
-        //[Authorize(Roles = "Event Organizer")]
+        [Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> GetReportsByReceviedUserId(Guid receviedUserId)
         {
             try

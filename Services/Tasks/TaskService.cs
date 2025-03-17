@@ -1,11 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Planify_BackEnd.DTOs;
+using Planify_BackEnd.DTOs.SubTasks;
 using Planify_BackEnd.DTOs.Tasks;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories.Groups;
 using Planify_BackEnd.Repositories.Tasks;
 using TaskModel = Planify_BackEnd.Models.Task;
+using Planify_BackEnd.DTOs.Groups;
 namespace Planify_BackEnd.Services.Tasks
 {
     public class TaskService : ITaskService
@@ -92,11 +94,11 @@ namespace Planify_BackEnd.Services.Tasks
             }
         }
 
-        public async Task<List<TaskSearchResponeDTO>> GetAllTasksAsync()
+        public async Task<List<TaskSearchResponeDTO>> GetAllTasksAsync(int groupId)
         {
             try
             {
-                var tasks = await _taskRepository.GetAllTasksAsync();
+                var tasks = await _taskRepository.GetAllTasksAsync(groupId);
                 return tasks.Select(item => new TaskSearchResponeDTO
                 {
                     Id = item.Id,
@@ -206,6 +208,64 @@ namespace Planify_BackEnd.Services.Tasks
             {
                 Console.WriteLine("task - update actual task amount" + ex.Message);
                 return false;
+            }
+        }
+
+        public TaskDetailVM GetTaskById(int taskId)
+        {
+            try
+            {
+                var task = _taskRepository.GetTaskById(taskId);
+                TaskDetailVM taskDetailVM = new TaskDetailVM
+                {
+                    Id = task.Id,
+                    TaskName = task.TaskName,
+                    TaskDescription = task.TaskDescription,
+                    AmountBudget = task.AmountBudget,
+                    CreateBy = task.CreateBy,
+                    CreateByNavigation = task.CreateByNavigation == null ? new DTOs.Users.UserNameVM() : new DTOs.Users.UserNameVM
+                    {
+                        Id = task.CreateByNavigation.Id,
+                        Email = task.CreateByNavigation.Email,
+                        FirstName = task.CreateByNavigation.FirstName,
+                        LastName = task.CreateByNavigation.LastName
+                    },
+                    CreateDate = task.CreateDate,
+                    Deadline = task.Deadline,
+                    GroupId = task.GroupId,
+                    Group = task.Group == null ? new GroupNameVM() : new GroupNameVM
+                    {
+                        Id = task.Group.Id,
+                        GroupName = task.Group.GroupName
+                    },
+                    Progress = task.Progress,
+                    StartTime = task.StartTime,
+                    Status = task.Status,
+                    SubTasks = task.SubTasks == null ? new List<SubTaskVM>() : task.SubTasks.Select(st => new SubTaskVM
+                    {
+                        Id = st.Id,
+                        SubTaskName = st.SubTaskName,
+                        SubTaskDescription = st.SubTaskDescription,
+                        AmountBudget = st.AmountBudget,
+                        StartTime = st.StartTime,
+                        Deadline = st.Deadline,
+                        Status = st.Status,
+                        TaskId = st.TaskId,
+                        CreateBy = st.CreateBy,
+                        CreateByNavigation = st.CreateByNavigation == null ? null : new DTOs.Users.UserNameVM
+                        {
+                            Id = st.CreateByNavigation.Id,
+                            Email = st.CreateByNavigation.Email,
+                            FirstName = st.CreateByNavigation.FirstName,
+                            LastName = st.CreateByNavigation.LastName
+                        }
+                    }).ToList(),
+                };
+                return taskDetailVM;
+            }
+            catch
+            {
+                return new TaskDetailVM();
             }
         }
     }

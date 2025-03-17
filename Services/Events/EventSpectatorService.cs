@@ -1,4 +1,5 @@
 ﻿using Planify_BackEnd.DTOs.Events;
+using Planify_BackEnd.DTOs.Medias;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories.Events;
 
@@ -23,14 +24,14 @@ namespace Planify_BackEnd.Services.Events
                     EventTitle = e.EventTitle,
                     EventDescription = e.EventDescription,
                     CampusId = e.CampusId,
-                    CampusDTO = e.Campus == null ? null : new DTOs.Campus.CampusDTO
+                    CampusDTO = e.Campus == null ? new DTOs.Campus.CampusDTO() : new DTOs.Campus.CampusDTO
                     {
                         Id = e.Campus.Id,
                         CampusName = e.Campus.CampusName
                     },
                     Status = e.Status,
                     CategoryEventId = e.CategoryEventId,
-                    CategoryViewModel = e.CategoryEvent == null ? null : new DTOs.Categories.CategoryViewModel
+                    CategoryViewModel = e.CategoryEvent == null ? new DTOs.Categories.CategoryViewModel() : new DTOs.Categories.CategoryViewModel
                     {
                         Id = e.CategoryEvent.Id,
                         CategoryEventName = e.CategoryEvent.CategoryEventName
@@ -41,7 +42,7 @@ namespace Planify_BackEnd.Services.Events
                     StartTime = e.StartTime,
                     EndTime = e.EndTime,
                     TimePublic = e.TimePublic,
-                    EventMedias = e.EventMedia == null ? null : e.EventMedia.Select(em => new DTOs.Medias.EventMediumViewMediaModel
+                    EventMedias = e.EventMedia == null ? new List<EventMediumViewMediaModel>() : e.EventMedia.Select(em => new DTOs.Medias.EventMediumViewMediaModel
                     {
                         Id = em.Id,
                         EventId = em.EventId,

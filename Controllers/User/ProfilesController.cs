@@ -27,6 +27,10 @@ namespace Planify_BackEnd.Controllers.User
                 //    return Unauthorized();
                 //}
                 var response = _profileService.getUserProfileById(userId);
+                if (response == null||response.Id==null)
+                {
+                    return NotFound("Cannot found any user with id: " + userId);
+                }
                 return Ok(response);
             }
             catch (Exception ex)

@@ -22,13 +22,17 @@ namespace Planify_BackEnd.Controllers
         /// Get all tasks
         /// </summary>
         /// <returns></returns>
-        [HttpGet("list")]
-        [Authorize(Roles = "Implementer")]
-        public async Task<IActionResult> GetAllTasks()
+        [HttpGet("list/{groupId}")]
+        [Authorize(Roles = "Event Organizer, Implementer")]
+        public async Task<IActionResult> GetAllTasks(int groupId)
         {
             try
             {
-                var response = await _taskService.GetAllTasksAsync();
+                var response = await _taskService.GetAllTasksAsync(groupId);
+                if (response == null || response.Count() == 0)
+                {
+                    return NotFound("Cannot found any task");
+                }
                 return Ok(response);
             }
             catch (Exception ex)
@@ -52,6 +56,10 @@ namespace Planify_BackEnd.Controllers
             try
             {
                 var response = await _taskService.SearchTaskOrderByStartDateAsync(page, pageSize, name, startDate, endDate);
+                if (response == null || response.Count() == 0)
+                {
+                    return NotFound("Cannot found any task");
+                }
                 return Ok(response);
             }
             catch (Exception ex)
@@ -60,7 +68,7 @@ namespace Planify_BackEnd.Controllers
             }
         }
         [HttpPut("{taskId}/amount")]
-        //[Authorize(Roles = "Implementer")]
+        [Authorize(Roles = "Event Organizer, Implementer")]
         public IActionResult UpdateActualTaskAmount(int taskId, [FromBody] decimal amount)
         {
             try
@@ -71,7 +79,7 @@ namespace Planify_BackEnd.Controllers
                     return BadRequest("Cannot update task amount!");
                 }
                 return Ok();
-            }catch(Exception ex)
+            } catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -85,11 +93,11 @@ namespace Planify_BackEnd.Controllers
         [Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> CreateTask([FromBody] TaskCreateRequestDTO taskDTO)
         {
-            var organizerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value); 
+            var organizerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             var response = await _taskService.CreateTaskAsync(taskDTO, organizerId);
 
             return StatusCode(response.Status, response);
-        } 
+        }
         /// <summary>
         /// Update a task
         /// </summary>
@@ -115,25 +123,22 @@ namespace Planify_BackEnd.Controllers
             var response = await _taskService.DeleteTaskAsync(taskId);
             return StatusCode(response.Status, response);
         }
-        /// <summary>
-        /// Get task by id
-        /// </summary>
-        /// <param name="taskId"></param>
-        /// <returns></returns>
         [HttpGet("{taskId}")]
-        //[Authorize(Roles = "Event Organizer")]
-        public async Task<IActionResult> GetTaskById(int taskId)
+        [Authorize(Roles = "Event Organizer, Implementer")]
+        public IActionResult GetTask(int taskId)
         {
             try
             {
-                var response = await _taskService.GetTaskByIdAsync(taskId);
-                return StatusCode(response.Status, response);
-            }
-            catch (Exception ex)
+                var response = _taskService.GetTaskById(taskId);
+                if (response== null || response.Id == null)
+                {
+                    return NotFound("Cannot found any task with id: "+taskId);
+                }
+                return Ok(response);
+            }catch(Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
-
     }
 }

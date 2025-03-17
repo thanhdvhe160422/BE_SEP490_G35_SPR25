@@ -12,7 +12,8 @@ namespace Planify_BackEnd.Services.Tasks
         Task<ResponseDTO> GetTaskByIdAsync(int taskId);
         Task<ResponseDTO> UpdateTaskAsync(int taskId, TaskUpdateRequestDTO taskDTO);
         Task<ResponseDTO> DeleteTaskAsync(int taskId);
-        Task<List<TaskSearchResponeDTO>> GetAllTasksAsync();
+        Task<List<TaskSearchResponeDTO>> GetAllTasksAsync(int groupId);
+        public TaskDetailVM GetTaskById(int taskId);
 
     }
 }
