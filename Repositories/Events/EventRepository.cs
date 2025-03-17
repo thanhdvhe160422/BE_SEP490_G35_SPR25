@@ -20,7 +20,8 @@ public class EventRepository : IEventRepository
         try
         {
             return await _context.Events
-                 .Skip((page - 1) * pageSize).Take(pageSize)
+                .Where(e => e.Status != -1)
+                .Skip((page - 1) * pageSize).Take(pageSize)
                 .ToListAsync();
         }
         catch (Exception ex)
@@ -184,7 +185,7 @@ public class EventRepository : IEventRepository
             //ev.SendRequests = null;
             //_context.Events.Remove(ev!);
             var ev = await _context.Events.FirstOrDefaultAsync(e => e.Id == eventId);
-            ev.Status = 0;
+            ev.Status = -1;
             await _context.SaveChangesAsync();
             return true;
         }catch(Exception ex)

@@ -7,6 +7,7 @@ using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Services.Events;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace Planify_BackEnd.Controllers
@@ -71,7 +72,7 @@ namespace Planify_BackEnd.Controllers
             return StatusCode(response.Status, response);
         }
         [HttpPut("{id}")]
-        //[Authorize(Roles = "Event Organizer")]
+        [Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> UpdateEvent(int id,[FromBody] EventDTO eventDTO)
         {
             try
@@ -80,6 +81,13 @@ namespace Planify_BackEnd.Controllers
                 {
                     return BadRequest("Not allow update id");
                 }
+                //var getDetail = await _eventService.GetEventDetailAsync(id);
+                //Event eventDetails = getDetail.Result as Event;
+                //var userId = User.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value;
+                //if (!userId.Equals(eventDetails.ManagerId))
+                //{
+                //    return Unauthorized();
+                //}
                 var response = await _eventService.UpdateEventAsync(eventDTO);
                 if (response == null || response.Id == 0)
                 {
@@ -92,7 +100,7 @@ namespace Planify_BackEnd.Controllers
             }
         }
         [HttpPut("delete/{id}")]
-        //[Authorize(Roles = "Event Organizer")]
+        [Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> DeleteEvent(int id)
         {
             try
@@ -108,7 +116,7 @@ namespace Planify_BackEnd.Controllers
             }
         }
         [HttpGet("search")]
-        //[Authorize(Roles = "Event Organizer")]
+        [Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> SearchEventAsync(int page, int pageSize, string? title, 
             DateTime? startTime, DateTime? endTime, decimal? minBudget, decimal? maxBudget, 
             int? isPublic, int? status, int? CategoryEventId, string? placed)
