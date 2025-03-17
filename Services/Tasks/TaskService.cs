@@ -239,5 +239,16 @@ namespace Planify_BackEnd.Services.Tasks
                 return new TaskDetailVM();
             }
         }
+
+        public async Task<bool> changeStatus(int taskId, int status)
+        {
+            try
+            {
+                return await _taskRepository.changeStatus(taskId, status);
+            }catch(Exception ex)
+            {
+                return false;
+            }
+        }
     }
 }

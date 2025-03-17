@@ -184,5 +184,16 @@ namespace Planify_BackEnd.Services.Groups
                 return new GroupVM();
             }
         }
+
+        public async Task<bool> CheckLeadGroup(Guid userId, int groupId)
+        {
+            try
+            {
+                return await _groupRepository.CheckLeadGroup(userId, groupId);
+            }catch(Exception ex)
+            {
+                return false;
+            }
+        }
     }
 }

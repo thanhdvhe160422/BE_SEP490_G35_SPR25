@@ -36,7 +36,7 @@ namespace Planify_BackEnd.Controllers.Events
             try
             {
                 var response = _service.GetEventById(id);
-                if (response== null || response.Id == null)
+                if (response== null || response.Id == 0)
                 {
                     return NotFound("Cannot fount event with id: "+id);
                 }

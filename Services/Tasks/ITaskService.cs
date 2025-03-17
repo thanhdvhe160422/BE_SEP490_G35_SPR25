@@ -13,6 +13,6 @@ namespace Planify_BackEnd.Services.Tasks
         Task<ResponseDTO> DeleteTaskAsync(int taskId);
         Task<List<TaskSearchResponeDTO>> GetAllTasksAsync(int groupId);
         public TaskDetailVM GetTaskById(int taskId);
-
+        Task<bool> changeStatus(int taskId, int status);
     }
 }

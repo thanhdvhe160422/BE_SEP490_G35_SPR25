@@ -87,7 +87,7 @@ namespace Planify_BackEnd.Controllers.Groups
             try
             {
                 var response = await _groupService.GetGroupByIdAsync(id);
-                if (response == null || response.Id == null)
+                if (response == null || response.Id == 0)
                 {
                     return NotFound("Cannot found any group with id: "+id);
                 }
