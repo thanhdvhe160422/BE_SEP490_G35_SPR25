@@ -44,11 +44,20 @@ namespace Planify_BackEnd.Controllers
 
         [HttpPost("create")]
         [Authorize(Roles = "Event Organizer, Campus Manager")]
-        public async Task<IActionResult> CreateEvent([FromForm] EventCreateRequestDTO eventDTO)
+        public async Task<IActionResult> CreateEvent([FromBody] EventCreateRequestDTO eventDTO)
         {
             var organizerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
             var response = await _eventService.CreateEventAsync(eventDTO, organizerId);
+
+            return StatusCode(response.Status, response);
+        }
+
+        [HttpPost("upload-image")]
+        [Authorize(Roles = "Event Organizer, Campus Manager")]
+        public async Task<IActionResult> UploadImage([FromForm] UploadImageRequestDTO imageDTO)
+        {
+            var response = await _eventService.UploadImageAsync(imageDTO);
 
             return StatusCode(response.Status, response);
         }
@@ -114,7 +123,6 @@ namespace Planify_BackEnd.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
 
     }
 }

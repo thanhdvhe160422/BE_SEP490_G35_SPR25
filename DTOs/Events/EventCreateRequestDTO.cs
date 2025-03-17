@@ -24,8 +24,6 @@ namespace Planify_BackEnd.DTOs.Events
 
         public List<GroupCreateDTO>? Groups { get; set; } = new();
 
-        public List<IFormFile>? EventMediaFiles { get; set; }
-
         public EventCreateRequestDTO() { }
     }
 
@@ -33,8 +31,6 @@ namespace Planify_BackEnd.DTOs.Events
     {
         [Required]
         public string GroupName { get; set; } = null!;
-        public Guid CreateBy { get; set; }
-        public int EventId { get; set; }
         public List<Guid> ImplementerIds { get; set; } = new();
     }
 }
