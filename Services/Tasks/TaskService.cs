@@ -179,6 +179,62 @@ namespace Planify_BackEnd.Services.Tasks
             }
         }
 
-    
+        public TaskDetailVM GetTaskById(int taskId)
+        {
+            try
+            {
+                var task = _taskRepository.GetTaskById(taskId);
+                TaskDetailVM taskDetailVM = new TaskDetailVM
+                {
+                    Id = task.Id,
+                    TaskName = task.TaskName,
+                    TaskDescription = task.TaskDescription,
+                    AmountBudget = task.AmountBudget,
+                    CreateBy = task.CreateBy,
+                    CreateByNavigation = task.CreateByNavigation == null ? null : new DTOs.Users.UserNameVM
+                    {
+                        Id = task.CreateByNavigation.Id,
+                        Email = task.CreateByNavigation.Email,
+                        FirstName = task.CreateByNavigation.FirstName,
+                        LastName = task.CreateByNavigation.LastName
+                    },
+                    CreateDate = task.CreateDate,
+                    Deadline = task.Deadline,
+                    GroupId = task.GroupId,
+                    Group = task.Group == null ? null : new DTOs.Groups.GroupNameVM
+                    {
+                        Id = task.Group.Id,
+                        GroupName = task.Group.GroupName
+                    },
+                    Progress = task.Progress,
+                    StartTime = task.StartTime,
+                    Status = task.Status,
+                    SubTasks = task.SubTasks == null ? null : task.SubTasks.Select(st => new DTOs.SubTasks.SubTaskVM
+                    {
+                        Id = st.Id,
+                        SubTaskName = st.SubTaskName,
+                        SubTaskDescription = st.SubTaskDescription,
+                        AmountBudget = st.AmountBudget,
+                        StartTime = st.StartTime,
+                        Deadline = st.Deadline,
+                        Status = st.Status,
+                        TaskId = st.TaskId,
+                        CreateBy = st.CreateBy,
+                        CreateByNavigation = st.CreateByNavigation == null ? null : new DTOs.Users.UserNameVM
+                        {
+                            Id = st.CreateByNavigation.Id,
+                            Email = st.CreateByNavigation.Email,
+                            FirstName = st.CreateByNavigation.FirstName,
+                            LastName = st.CreateByNavigation.LastName
+                        }
+                    }).ToList(),
+                };
+                return taskDetailVM;
+            }
+            catch
+            {
+                return new TaskDetailVM();
+            }
+        }
     }
 }

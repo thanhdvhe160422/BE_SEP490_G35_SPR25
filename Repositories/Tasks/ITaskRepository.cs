@@ -12,5 +12,6 @@ namespace Planify_BackEnd.Repositories.Tasks
 
         bool IsTaskExists(int taskId);
         bool UpdateActualTaskAmount(int taskId, decimal amount);
+        public Models.Task GetTaskById(int taskId);
     }
 }
