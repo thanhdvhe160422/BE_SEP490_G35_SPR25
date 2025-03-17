@@ -35,6 +35,7 @@ using Planify_BackEnd.Services.Reports;
 using Planify_BackEnd.Repositories.Reports;
 using Planify_BackEnd.Services.Users;
 using Planify_BackEnd.Services.GoogleDrive;
+using Planify_BackEnd.Services.JoinGroups;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -90,6 +91,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IUserservice, UserService>();
 builder.Services.AddScoped<GoogleDriveService>();
+builder.Services.AddScoped<IJoinGroupService, JoinGroupService>();
 // Thêm Repository
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<IEventSpectatorRepository, EventSpectatorRepository>();
@@ -102,6 +104,7 @@ builder.Services.AddScoped<IJoinProjectRepository, JoinProjectRepository>();
 builder.Services.AddScoped<ICampusRepository, CampusRepository>();
 builder.Services.AddScoped<IProvinceRepository, ProvinceRepository>();
 builder.Services.AddScoped<ISendRequestRepository, SendRequestRepository>();
+builder.Services.AddScoped<IJoinGroupRepository, JoinGroupRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
 // Thêm Authorization

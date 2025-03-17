@@ -28,7 +28,7 @@ namespace Planify_BackEnd.Controllers
         /// </summary>
         /// <returns>A list of all events.</returns>
         [HttpGet ("List")]
-        [Authorize(Roles = "Event Organizer, Campus Manager")]
+        //[Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> GetAllEvents(int page, int pageSize)
         {
             try
@@ -45,11 +45,20 @@ namespace Planify_BackEnd.Controllers
 
         [HttpPost("create")]
         [Authorize(Roles = "Event Organizer, Campus Manager")]
-        public async Task<IActionResult> CreateEvent([FromForm] EventCreateRequestDTO eventDTO)
+        public async Task<IActionResult> CreateEvent([FromBody] EventCreateRequestDTO eventDTO)
         {
             var organizerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
             var response = await _eventService.CreateEventAsync(eventDTO, organizerId);
+
+            return StatusCode(response.Status, response);
+        }
+
+        [HttpPost("upload-image")]
+        [Authorize(Roles = "Event Organizer, Campus Manager")]
+        public async Task<IActionResult> UploadImage([FromForm] UploadImageRequestDTO imageDTO)
+        {
+            var response = await _eventService.UploadImageAsync(imageDTO);
 
             return StatusCode(response.Status, response);
         }
@@ -122,7 +131,6 @@ namespace Planify_BackEnd.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
 
     }
 }

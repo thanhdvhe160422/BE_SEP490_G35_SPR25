@@ -9,7 +9,7 @@ namespace Planify_BackEnd.Services.Events
     {
         Task<IEnumerable<EventGetListResponseDTO>> GetAllEvent(int page, int pageSize);
         Task<ResponseDTO> CreateEventAsync(EventCreateRequestDTO eventDTO, Guid organizerId);
-
+        Task<ResponseDTO> UploadImageAsync(UploadImageRequestDTO imageDTO);
         Task<ResponseDTO> GetEventDetailAsync(int eventId);
         Task<EventDetailDto> UpdateEventAsync(EventDTO e);
         Task<bool> DeleteEventAsync(int eventId);
