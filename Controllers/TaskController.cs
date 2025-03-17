@@ -115,6 +115,25 @@ namespace Planify_BackEnd.Controllers
             var response = await _taskService.DeleteTaskAsync(taskId);
             return StatusCode(response.Status, response);
         }
+        /// <summary>
+        /// Get task by id
+        /// </summary>
+        /// <param name="taskId"></param>
+        /// <returns></returns>
+        [HttpGet("{taskId}")]
+        //[Authorize(Roles = "Event Organizer")]
+        public async Task<IActionResult> GetTaskById(int taskId)
+        {
+            try
+            {
+                var response = await _taskService.GetTaskByIdAsync(taskId);
+                return StatusCode(response.Status, response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
     }
 }
