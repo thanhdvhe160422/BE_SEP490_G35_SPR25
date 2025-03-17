@@ -60,7 +60,7 @@ namespace Planify_BackEnd.Controllers
             }
         }
         [HttpPut("{taskId}/amount")]
-        //[Authorize(Roles = "Implementer")]
+        [Authorize(Roles = "Implementer")]
         public IActionResult UpdateActualTaskAmount(int taskId, [FromBody] decimal amount)
         {
             try

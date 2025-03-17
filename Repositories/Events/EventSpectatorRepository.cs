@@ -27,6 +27,7 @@ namespace Planify_BackEnd.Repositories.Events
                 .Include(e=>e.CategoryEvent)
                 .Include(e=>e.EventMedia) .ThenInclude(em=>em.Media)
                 .OrderBy(e=>e.StartTime)
+                .Where(e=>e.IsPublic==1)
                 .Skip((page-1)*pageSize).Take(pageSize).ToList();
         }
 

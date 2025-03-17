@@ -15,7 +15,7 @@ namespace Planify_BackEnd.Controllers.User
             _userService = userService;
         }
         [HttpGet("getListImplementer/{eventId}")]
-        //[Authorize(Roles = "Event Organizer")]
+        [Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> GetListImplementer(int eventId, int page, int pageSize)
         {
           
