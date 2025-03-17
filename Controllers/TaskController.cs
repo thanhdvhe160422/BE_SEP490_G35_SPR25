@@ -22,13 +22,13 @@ namespace Planify_BackEnd.Controllers
         /// Get all tasks
         /// </summary>
         /// <returns></returns>
-        [HttpGet("list")]
+        [HttpGet("list/{groupId}")]
         [Authorize(Roles = "Implementer")]
-        public async Task<IActionResult> GetAllTasks()
+        public async Task<IActionResult> GetAllTasks(int groupId)
         {
             try
             {
-                var response = await _taskService.GetAllTasksAsync();
+                var response = await _taskService.GetAllTasksAsync(groupId);
                 return Ok(response);
             }
             catch (Exception ex)
