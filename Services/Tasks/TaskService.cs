@@ -92,11 +92,11 @@ namespace Planify_BackEnd.Services.Tasks
             }
         }
 
-        public async Task<List<TaskSearchResponeDTO>> GetAllTasksAsync()
+        public async Task<List<TaskSearchResponeDTO>> GetAllTasksAsync(int groupId)
         {
             try
             {
-                var tasks = await _taskRepository.GetAllTasksAsync();
+                var tasks = await _taskRepository.GetAllTasksAsync(groupId);
                 return tasks.Select(item => new TaskSearchResponeDTO
                 {
                     Id = item.Id,

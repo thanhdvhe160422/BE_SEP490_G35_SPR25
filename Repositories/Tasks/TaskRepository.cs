@@ -48,11 +48,11 @@ namespace Planify_BackEnd.Repositories.Tasks
             }
         }
 
-        public async Task<List<Models.Task>> GetAllTasksAsync()
+        public async Task<List<Models.Task>> GetAllTasksAsync(int groupId)
         {
             try
             {
-                return await _context.Tasks.ToListAsync();
+                return await _context.Tasks.Where(t=>t.GroupId==groupId).ToListAsync();
             }
             catch (Exception ex)
             {
