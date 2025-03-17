@@ -27,7 +27,7 @@ namespace Planify_BackEnd.Controllers
         /// </summary>
         /// <returns>A list of all events.</returns>
         [HttpGet ("List")]
-        [Authorize(Roles = "Event Organizer, Campus Manager")]
+        //[Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> GetAllEvents(int page, int pageSize)
         {
             try
