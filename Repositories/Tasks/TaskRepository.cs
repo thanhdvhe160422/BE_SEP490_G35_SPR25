@@ -126,5 +126,20 @@ namespace Planify_BackEnd.Repositories.Tasks
                 return false;
             }
         }
+        public Models.Task GetTaskById(int taskId)
+        {
+            try
+            {
+                return _context.Tasks
+                    .Include(t=>t.CreateByNavigation)
+                    .Include(t=>t.Group)
+                    .Include(t=>t.SubTasks).ThenInclude(st=>st.CreateByNavigation)
+                    .FirstOrDefault(t => t.Id == taskId);
+            }
+            catch
+            {
+                return new Models.Task();
+            }
+        }
     }
 }
