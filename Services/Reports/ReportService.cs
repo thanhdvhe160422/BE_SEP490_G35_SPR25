@@ -22,7 +22,7 @@ namespace Planify_BackEnd.Services.Reports
                     Id = report.Id,
                     Reason = report.Reason,
                     SendFrom = report.SendFrom,
-                    SendFromNavigation = report.SendFromNavigation == null ? null : new UserNameVM
+                    SendFromNavigation = report.SendFromNavigation == null ? new UserNameVM() : new UserNameVM
                     {
                         Id = report.SendFromNavigation.Id,
                         Email = report.SendFromNavigation.Email,
@@ -30,7 +30,7 @@ namespace Planify_BackEnd.Services.Reports
                         LastName = report.SendFromNavigation.LastName,
                     },
                     SendTo = report.SendTo,
-                    SendToNavigation = report.SendToNavigation == null ? null : new UserNameVM
+                    SendToNavigation = report.SendToNavigation == null ? new UserNameVM() : new UserNameVM
                     {
                         Id = report.SendToNavigation.Id,
                         Email = report.SendToNavigation.Email,
@@ -52,7 +52,7 @@ namespace Planify_BackEnd.Services.Reports
                         Status = report.Task.Status,
                         GroupId = report.Task.GroupId
                     },
-                    ReportMedia = report.ReportMedia == null ? null : report.ReportMedia.Select(rm => new ReportMediumVM
+                    ReportMedia = report.ReportMedia == null ? new List<ReportMediumVM>() : report.ReportMedia.Select(rm => new ReportMediumVM
                     {
                         Id = rm.Id,
                         MediumDTO = new DTOs.Medias.MediumDTO

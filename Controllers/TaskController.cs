@@ -29,6 +29,10 @@ namespace Planify_BackEnd.Controllers
             try
             {
                 var response = await _taskService.GetAllTasksAsync(groupId);
+                if (response == null || response.Count() == 0)
+                {
+                    return NotFound("Cannot found any task");
+                }
                 return Ok(response);
             }
             catch (Exception ex)
@@ -52,6 +56,10 @@ namespace Planify_BackEnd.Controllers
             try
             {
                 var response = await _taskService.SearchTaskOrderByStartDateAsync(page, pageSize, name, startDate, endDate);
+                if (response == null || response.Count() == 0)
+                {
+                    return NotFound("Cannot found any task");
+                }
                 return Ok(response);
             }
             catch (Exception ex)
