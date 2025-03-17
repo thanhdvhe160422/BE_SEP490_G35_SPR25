@@ -106,6 +106,23 @@ namespace Planify_BackEnd.Repositories.Tasks
                 throw new Exception("An unexpected error occurred.", ex);
             }
         }
+        public async Task<Models.Task?> GetTaskByIdAsync(int taskId)
+        {
+            try
+            {
+                var task = await _context.Tasks.FindAsync(taskId);
+                if (task == null)
+                {
+                    return null;
+                }
+                return task; 
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An unexpected error occurred while retrieving the task.", ex);
+            }
+        }
+
         public bool IsTaskExists(int taskId)
         {
             return _context.Tasks.Any(g => g.Id == taskId);
