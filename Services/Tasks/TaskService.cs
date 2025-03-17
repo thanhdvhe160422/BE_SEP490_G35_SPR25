@@ -167,36 +167,7 @@ namespace Planify_BackEnd.Services.Tasks
             }
         }
 
-        public async Task<ResponseDTO> GetTaskByIdAsync(int taskId)
-        {
-            try
-            {
-                var task = await _taskRepository.GetTaskByIdAsync(taskId);
-                if (task == null)
-                {
-                    return new ResponseDTO(404, "Task not found.", null);
-                }
-
-                var taskDTO = new TaskSearchResponeDTO
-                {
-                    Id = task.Id,
-                    TaskName = task.TaskName,
-                    TaskDescription = task.TaskDescription,
-                    StartTime = task.StartTime,
-                    Deadline = task.Deadline,
-                    GroupId = task.GroupId,
-                    AmountBudget = task.AmountBudget,
-                    Progress = task.Progress,
-                    Status = task.Status
-                };
-
-                return new ResponseDTO(200, "Task retrieved successfully!", taskDTO);
-            }
-            catch (Exception ex)
-            {
-                return new ResponseDTO(500, "Error occurs while retrieving task!", ex.Message);
-            }
-        }
+       
 
 
         public bool UpdateActualTaskAmount(int taskId, decimal amount)
