@@ -157,7 +157,7 @@ namespace Planify_BackEnd.Controllers
                 Guid userId = Guid.Parse(userIdClaim.Value);
 
                 var task = _taskService.GetTaskById(taskId);
-                if (task == null || task.Id == 0)
+                if (task == null || task.Id==null || task.Id == 0)
                     return NotFound("Cannot found any task with id: " + taskId);
                 var checkLead = await _groupService.CheckLeadGroup(userId, task.GroupId);
                 if (!checkLead)

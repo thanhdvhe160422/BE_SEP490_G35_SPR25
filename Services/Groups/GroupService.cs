@@ -147,7 +147,7 @@ namespace Planify_BackEnd.Services.Groups
                         FirstName = group.CreateByNavigation.FirstName,
                         LastName = group.CreateByNavigation.LastName,
                     },
-                    JoinGroups = group.JoinGroups==null? null : group.JoinGroups.Select(jg => new JoinGroupVM
+                    JoinGroups = group.JoinGroups==null? new List<JoinGroupVM>() : group.JoinGroups.Select(jg => new JoinGroupVM
                     {
                         Id = jg.Id,
                         ImplementerId = jg.ImplementerId,
@@ -163,7 +163,7 @@ namespace Planify_BackEnd.Services.Groups
 
                         }
                     }).ToList(),
-                    Tasks = group.Tasks == null ? null : group.Tasks.Select(jg => new TaskSearchResponeDTO
+                    Tasks = group.Tasks == null ? new List<TaskSearchResponeDTO>() : group.Tasks.Select(jg => new TaskSearchResponeDTO
                     {
                         AmountBudget = jg.AmountBudget,
                         Deadline = jg.Deadline,
