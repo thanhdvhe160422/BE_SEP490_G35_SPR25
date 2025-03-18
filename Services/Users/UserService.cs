@@ -35,5 +35,10 @@ namespace Planify_BackEnd.Services.Users
             }).ToList();
             return userDTOs;
         }
+
+        public async Task<List<Models.User>> GetUserByNameOrEmailAsync(string input, int campusId)
+        {
+            return await _userRepository.GetUserByNameOrEmail(input, campusId);
+        }
     }
 }

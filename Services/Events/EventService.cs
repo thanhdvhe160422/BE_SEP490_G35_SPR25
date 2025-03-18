@@ -8,6 +8,7 @@ using Planify_BackEnd.Repositories.Groups;
 using Planify_BackEnd.Services.Events;
 using static Planify_BackEnd.DTOs.Events.EventDetailResponseDTO;
 using Planify_BackEnd.Services.GoogleDrive;
+using Planify_BackEnd.Repositories.JoinGroups;
 
 public class EventService : IEventService
 {
@@ -15,12 +16,14 @@ public class EventService : IEventService
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IGroupRepository _groupRepository;
     private readonly GoogleDriveService _googleDriveService;
-    public EventService(IEventRepository eventRepository, IHttpContextAccessor httpContextAccessor, IGroupRepository groupRepository, GoogleDriveService googleDriveService)
+    private readonly IJoinProjectRepository _joinProjectRepository;
+    public EventService(IEventRepository eventRepository, IHttpContextAccessor httpContextAccessor, IGroupRepository groupRepository, GoogleDriveService googleDriveService, IJoinProjectRepository joinProjectRepository)
     {
         _eventRepository = eventRepository;
         _groupRepository = groupRepository;
         _httpContextAccessor = httpContextAccessor;
         _googleDriveService = googleDriveService;
+        _joinProjectRepository = joinProjectRepository;
     }
     public async Task<IEnumerable<EventGetListResponseDTO>> GetAllEvent(int page, int pageSize)
     {
@@ -114,7 +117,12 @@ public class EventService : IEventService
                             TimeJoin = DateTime.UtcNow,
                             Status = 1,
                         };
-                        await _groupRepository.AddImplementerToGroupAsync(joinGroup);
+                        bool result = await _groupRepository.AddImplementerToGroupAsync(joinGroup);
+                        if (result)
+                        {
+                            await _joinProjectRepository.AddImplementerToProject(implementerId, newEvent.Id);
+                            await _joinProjectRepository.AddRoleImplementer(implementerId);
+                        }
                     }
                 }
             }
