@@ -207,7 +207,8 @@ namespace Planify_BackEnd.Services.Tasks
                     Group = task.Group == null ? new GroupNameVM() : new GroupNameVM
                     {
                         Id = task.Group.Id,
-                        GroupName = task.Group.GroupName
+                        GroupName = task.Group.GroupName,
+                        EventName = task.Group.Event.EventTitle
                     },
                     Progress = task.Progress,
                     StartTime = task.StartTime,
@@ -223,7 +224,7 @@ namespace Planify_BackEnd.Services.Tasks
                         Status = st.Status,
                         TaskId = st.TaskId,
                         CreateBy = st.CreateBy,
-                        CreateByNavigation = st.CreateByNavigation == null ? null : new DTOs.Users.UserNameVM
+                        CreateByNavigation = st.CreateByNavigation == null ? new DTOs.Users.UserNameVM() : new DTOs.Users.UserNameVM
                         {
                             Id = st.CreateByNavigation.Id,
                             Email = st.CreateByNavigation.Email,
@@ -245,7 +246,7 @@ namespace Planify_BackEnd.Services.Tasks
             try
             {
                 return await _taskRepository.changeStatus(taskId, status);
-            }catch(Exception ex)
+            }catch
             {
                 return false;
             }
