@@ -101,7 +101,7 @@ namespace Planify_BackEnd.Services.Groups
                     GroupName = group.GroupName,
                 };
                 newGroup = await _groupRepository.UpdateGroupAsync(newGroup);
-                if (group==null||group.Id==0)
+                if (newGroup == null|| newGroup.Id==0)
                 {
                     throw new Exception();
                 }
