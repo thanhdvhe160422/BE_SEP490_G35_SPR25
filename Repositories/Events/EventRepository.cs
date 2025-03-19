@@ -15,13 +15,16 @@ public class EventRepository : IEventRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<Event>> GetAllEvent(int page, int pageSize)
+    public async Task<IEnumerable<Event>> GetAllEventAsync(int page, int pageSize)
     {
         try
         {
             return await _context.Events
                 .Where(e => e.Status != -1)
-                .Skip((page - 1) * pageSize).Take(pageSize)
+                .Include(e => e.EventMedia) 
+                .ThenInclude(em => em.Media) 
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
         }
         catch (Exception ex)
@@ -29,6 +32,7 @@ public class EventRepository : IEventRepository
             throw new Exception(ex.Message);
         }
     }
+
 
     public async Task<Event> CreateEventAsync(Event newEvent)
     {
