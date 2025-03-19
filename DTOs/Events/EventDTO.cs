@@ -22,9 +22,9 @@ namespace Planify_BackEnd.DTOs.Events
 
         public int Status { get; set; }
 
-        public string CampusId { get; set; }
+        public string CampusName { get; set; }
 
-        public string CategoryEventId { get; set; }
+        public string CategoryEventName { get; set; }
 
         public string Placed { get; set; }
 

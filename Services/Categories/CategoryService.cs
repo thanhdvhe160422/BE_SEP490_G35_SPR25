@@ -30,5 +30,25 @@ namespace Planify_BackEnd.Services.Categories
                 return new List<CategoryViewModel>();
             }
         }
+
+        public async Task<CategoryViewModel> GetCategoryByName(string categoryName, int campusId)
+        {
+            try
+            {
+                var category = await _categoryRepository.GetCategoryByName(categoryName, campusId);
+                CategoryViewModel categoryVM = new CategoryViewModel
+                {
+                    Id = category.Id,
+                    CampusId = category.CampusId,
+                    CategoryEventName = category.CategoryEventName,
+                    Status = category.Status,
+                };
+                return categoryVM;
+            }
+            catch
+            {
+                return new CategoryViewModel();
+            }
+        }
     }
 }

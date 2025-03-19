@@ -35,6 +35,21 @@ namespace Planify_BackEnd.Repositories.Categories
                 return new List<CategoryEvent>();
             }
         }
-        
+
+        public async Task<CategoryEvent> GetCategoryByName(string categoryName, int campusId)
+        {
+            try
+            {
+                var category = await _context.CategoryEvents
+                    .FirstOrDefaultAsync(c => c.CategoryEventName.Contains(categoryName) 
+                    && c.CampusId == campusId
+                    && c.Status == 1);
+                return category;
+            }
+            catch
+            {
+                return new CategoryEvent();
+            }
+        }
     }
 }
