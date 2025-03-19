@@ -25,9 +25,9 @@ public class EventService : IEventService
         _googleDriveService = googleDriveService;
         _joinProjectRepository = joinProjectRepository;
     }
-    public async Task<IEnumerable<EventGetListResponseDTO>> GetAllEvent(int page, int pageSize)
+    public async Task<IEnumerable<EventGetListResponseDTO>> GetAllEventAsync(int page, int pageSize)
     {
-        var events =  await _eventRepository.GetAllEvent( page,  pageSize);
+        var events = await _eventRepository.GetAllEventAsync(page, pageSize);
         var eventDTOs = events.Select(e => new EventGetListResponseDTO
         {
             Id = e.Id,
@@ -45,11 +45,24 @@ public class EventService : IEventService
             CreateBy = e.CreateBy,
             CreatedAt = e.CreatedAt,
             ManagerId = e.ManagerId,
+            EventMedias = e.EventMedia == null ? null : e.EventMedia.Select(em => new Planify_BackEnd.DTOs.Medias.EventMediumViewMediaModel
+            {
+                Id = em.Id,
+                EventId = em.Id,
+                MediaId = em.Id,
+                Status = em.Status,
+                MediaDTO = new Planify_BackEnd.DTOs.Medias.MediaItemDTO
+                {
+                    Id = em.Media.Id,
+                    MediaUrl = em.Media.MediaUrl
+                },
+            }).ToList()
 
         }).ToList();
-        
-      return eventDTOs;
+
+        return eventDTOs;
     }
+
 
     public async Task<ResponseDTO> CreateEventAsync(EventCreateRequestDTO eventDTO, Guid organizerId)
     {

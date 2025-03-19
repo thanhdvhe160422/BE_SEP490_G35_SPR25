@@ -150,6 +150,34 @@ namespace Planify_BackEnd.Services.SubTasks
             }
         }
         /// <summary>
+        /// update sub-task status
+        /// </summary>
+        /// <param name="subTaskId"></param>
+        /// <param name="newStatus"></param>
+        /// <returns></returns>
+        public async Task<ResponseDTO> UpdateSubTaskStatusAsync(int subTaskId, int newStatus)
+        {
+            try
+            {
+                var existingSubTask = await _subTaskRepository.GetSubTaskByIdAsync(subTaskId);
+                if (existingSubTask == null)
+                {
+                    return new ResponseDTO(404, "Sub-task not found.", null);
+                }
+
+                existingSubTask.Status = newStatus;
+
+                var updatedSubTask = await _subTaskRepository.UpdateSubTaskAsync(subTaskId, existingSubTask);
+
+                return new ResponseDTO(200, "Sub-task status updated successfully!", updatedSubTask);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseDTO(500, "Error occurs while updating sub-task status!", ex.Message);
+            }
+        }
+
+        /// <summary>
         /// Delete sub-task
         /// </summary>
         /// <param name="subTaskId"></param>

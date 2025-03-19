@@ -47,7 +47,7 @@ namespace Planify_BackEnd.Services.Tasks
                     AmountBudget = taskDTO.AmountBudget,
                     GroupId = taskDTO.GroupId,
                     Progress = taskDTO.Progress,
-                    Status = 0,
+                    Status = 1,
                     CreateBy = organizerId,
                     CreateDate = DateTime.UtcNow
                 };

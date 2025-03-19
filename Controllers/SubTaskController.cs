@@ -23,7 +23,7 @@ namespace Planify_BackEnd.Controllers
         /// <param name="subTaskId"></param>
         /// <returns></returns>
         [HttpGet("{subTaskId}")]
-        [Authorize(Roles = "Implementer, Event Organizer")]
+        //[Authorize(Roles = "Implementer, Event Organizer")]
         public async Task<IActionResult> GetSubTaskById(int subTaskId)
         {
             var response = await _subTaskService.GetSubTaskByIdAsync(subTaskId);
@@ -39,7 +39,7 @@ namespace Planify_BackEnd.Controllers
         /// <param name="taskId"></param>
         /// <returns></returns>
         [HttpGet("get-by-task/{taskId}")]
-        [Authorize(Roles = "Implementer, Event Organizer")]
+        //[Authorize(Roles = "Implementer, Event Organizer")]
         public async Task<IActionResult> GetSubTasksByTaskId(int taskId)
         {
             var response = await _subTaskService.GetSubTasksByTaskIdAsync(taskId);
@@ -56,6 +56,20 @@ namespace Planify_BackEnd.Controllers
         {
             var implementerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             var response = await _subTaskService.CreateSubTaskAsync(subTaskDTO, implementerId);
+            return StatusCode(response.Status, response);
+        }
+        /// <summary>
+        /// update sub-task status
+        /// </summary>
+        /// <param name="subTaskId"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPut("update-status/{subTaskId}")]
+        //[Authorize(Roles = "Implementer")]
+        public async Task<IActionResult> UpdateSubTaskStatus(int subTaskId, [FromBody] SubTaskUpdateStatusDTO request)
+        {
+
+            var response = await _subTaskService.UpdateSubTaskStatusAsync(subTaskId, request.Status);
             return StatusCode(response.Status, response);
         }
 
@@ -78,7 +92,7 @@ namespace Planify_BackEnd.Controllers
         /// <param name="subTaskId"></param>
         /// <returns></returns>
         [HttpDelete("delete/{subTaskId}")]
-        [Authorize(Roles = "Implementer")]
+        //[Authorize(Roles = "Implementer")]
         public async Task<IActionResult> DeleteSubTask(int subTaskId)
         {
             var response = await _subTaskService.DeleteSubTaskAsync(subTaskId);
