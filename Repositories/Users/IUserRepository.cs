@@ -5,4 +5,5 @@ public interface IUserRepository
     Task<User> GetUserByEmailAsync(string email);
     Task<User> GetUserByIdAsync(Guid id);
     Task<IEnumerable<User>> GetListImplementer(int eventId, int page, int pageSize);
+    Task<List<User>> GetUserByNameOrEmail(string input, int campusId);
 }

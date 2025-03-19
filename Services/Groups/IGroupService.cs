@@ -14,5 +14,6 @@ namespace Planify_BackEnd.Services.Groups
         Task<GroupDTO> UpdateGroupAsync(GroupDTO group);
         Task<bool> DeleteGroupAsync(int GroupId);
         Task<GroupVM> GetGroupByIdAsync(int GroupId);
+        Task<bool> CheckLeadGroup(Guid userId, int groupId);
     }
 }

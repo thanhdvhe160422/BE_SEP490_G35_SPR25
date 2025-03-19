@@ -101,7 +101,7 @@ namespace Planify_BackEnd.Services.Groups
                     GroupName = group.GroupName,
                 };
                 newGroup = await _groupRepository.UpdateGroupAsync(newGroup);
-                if (group==null||group.Id==0)
+                if (newGroup == null|| newGroup.Id==0)
                 {
                     throw new Exception();
                 }
@@ -147,7 +147,7 @@ namespace Planify_BackEnd.Services.Groups
                         FirstName = group.CreateByNavigation.FirstName,
                         LastName = group.CreateByNavigation.LastName,
                     },
-                    JoinGroups = group.JoinGroups==null? null : group.JoinGroups.Select(jg => new JoinGroupVM
+                    JoinGroups = group.JoinGroups==null? new List<JoinGroupVM>() : group.JoinGroups.Select(jg => new JoinGroupVM
                     {
                         Id = jg.Id,
                         ImplementerId = jg.ImplementerId,
@@ -163,7 +163,7 @@ namespace Planify_BackEnd.Services.Groups
 
                         }
                     }).ToList(),
-                    Tasks = group.Tasks == null ? null : group.Tasks.Select(jg => new TaskSearchResponeDTO
+                    Tasks = group.Tasks == null ? new List<TaskSearchResponeDTO>() : group.Tasks.Select(jg => new TaskSearchResponeDTO
                     {
                         AmountBudget = jg.AmountBudget,
                         Deadline = jg.Deadline,
@@ -182,6 +182,17 @@ namespace Planify_BackEnd.Services.Groups
             {
                 Console.WriteLine("group service - get group by id: " + ex.Message);
                 return new GroupVM();
+            }
+        }
+
+        public async Task<bool> CheckLeadGroup(Guid userId, int groupId)
+        {
+            try
+            {
+                return await _groupRepository.CheckLeadGroup(userId, groupId);
+            }catch(Exception ex)
+            {
+                return false;
             }
         }
     }

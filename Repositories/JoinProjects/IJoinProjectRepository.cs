@@ -6,5 +6,9 @@ namespace Planify_BackEnd.Repositories.JoinGroups
     {
         Task<IEnumerable<JoinProject>> GetAllJoinedProjects(Guid userId, int page, int pageSize);
         Task<bool> DeleteImplementerFromEvent(Guid userId, int eventId);
+        Task<bool> AddImplementersToProject(List<Guid> implementerIds, int eventId);
+        Task<bool> AddImplementerToProject(Guid implementerId, int eventId);
+        Task<bool> AddRoleImplementer(Guid implementerId);
+        Task<bool> AddRoleImplementers(List<Guid> implementerIds);
     }
 }

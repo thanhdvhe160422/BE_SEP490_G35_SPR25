@@ -70,7 +70,7 @@ namespace Planify_BackEnd.Controllers.Groups
             try
             {
                 var response = await _groupService.UpdateGroupAsync(groupDto);
-                if (response == null || response.Id == 0)
+                if (response == null || response.Id == null|| response.Id == 0)
                 {
                     return BadRequest("Cannot update group!");
                 }
@@ -87,7 +87,7 @@ namespace Planify_BackEnd.Controllers.Groups
             try
             {
                 var response = await _groupService.GetGroupByIdAsync(id);
-                if (response == null || response.Id == null)
+                if (response == null || response.Id == 0)
                 {
                     return NotFound("Cannot found any group with id: "+id);
                 }

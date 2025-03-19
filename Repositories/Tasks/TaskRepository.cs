@@ -149,13 +149,28 @@ namespace Planify_BackEnd.Repositories.Tasks
             {
                 return _context.Tasks
                     .Include(t=>t.CreateByNavigation)
-                    .Include(t=>t.Group)
+                    .Include(t=>t.Group).ThenInclude(g=>g.Event)
                     .Include(t=>t.SubTasks).ThenInclude(st=>st.CreateByNavigation)
                     .FirstOrDefault(t => t.Id == taskId);
             }
             catch
             {
                 return new Models.Task();
+            }
+        }
+
+        public async Task<bool> changeStatus(int taskId, int status)
+        {
+            try
+            {
+                var task = _context.Tasks.FirstOrDefault(t => t.Id == taskId);
+                task.Status = status;
+                _context.Update(task);
+                await _context.SaveChangesAsync();
+                return true;
+            }catch(Exception ex)
+            {
+                return false;
             }
         }
     }

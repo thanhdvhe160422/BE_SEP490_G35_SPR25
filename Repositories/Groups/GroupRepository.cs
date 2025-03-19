@@ -40,10 +40,19 @@ namespace Planify_BackEnd.Repositories.Groups
         {
             return _context.Groups.Any(g => g.Id == groupId);
         }
-        public async System.Threading.Tasks.Task AddImplementerToGroupAsync(JoinGroup joinGroup)
+        public async System.Threading.Tasks.Task<bool> AddImplementerToGroupAsync(JoinGroup joinGroup)
         {
-            _context.JoinGroups.Add(joinGroup);
-            await _context.SaveChangesAsync();
+            bool exists = await _context.JoinGroups
+                            .AnyAsync(jg => jg.GroupId == joinGroup.GroupId && jg.ImplementerId == joinGroup.ImplementerId);          
+            if (!exists)
+            {
+                _context.JoinGroups.Add(joinGroup);
+                await _context.SaveChangesAsync();
+                return true;
+            } else
+            {
+                return false;
+            }
         }
         public bool AddLeadGroup(int GroupId, Guid ImplementerId)
         {
@@ -125,6 +134,20 @@ namespace Planify_BackEnd.Repositories.Groups
             {
                 Console.WriteLine("group repository - get group detail : " + ex.Message);
                 return new Group();
+            }
+        }
+
+        public async Task<bool> CheckLeadGroup(Guid userId, int groupId)
+        {
+            try
+            {
+                var userJoin = await _context.JoinGroups.FirstOrDefaultAsync(jg => jg.GroupId==groupId);
+                if (userJoin.Status == -1)
+                    return true;
+                return false;
+            }catch (Exception ex)
+            {
+                return false;
             }
         }
     }
