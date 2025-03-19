@@ -6,6 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.Models;
+using Planify_BackEnd.Repositories.Categories;
+using Planify_BackEnd.Services.Campus;
+using Planify_BackEnd.Services.Categories;
 using Planify_BackEnd.Services.Events;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -17,10 +20,14 @@ namespace Planify_BackEnd.Controllers
     public class EventsController : ControllerBase
     {
         private readonly IEventService _eventService;
+        private readonly ICategoryService _categoryService;
+        private readonly ICampusService _campusService;
 
-        public EventsController(IEventService eventService)
+        public EventsController(IEventService eventService, ICampusService campusService, ICategoryService categoryService)
         {
             _eventService = eventService;
+            _campusService = campusService;
+            _categoryService = categoryService;
         }
 
         /// <summary>
@@ -88,6 +95,10 @@ namespace Planify_BackEnd.Controllers
                 //{
                 //    return Unauthorized();
                 //}
+                var campus = await _campusService.GetCampusByName(eventDTO.CampusName);
+                if (campus == null || campus.Id == 0) return NotFound("Cannot found any campus with name: " + eventDTO.CampusName);
+                var category = await _categoryService.GetCategoryByName(eventDTO.CategoryEventName, campus.Id);
+                if (category == null || category.Id == 0) return NotFound("Cannot found any category with name: " + eventDTO.CategoryEventName + ", campus: " + eventDTO.CampusName);
                 var response = await _eventService.UpdateEventAsync(eventDTO);
                 if (response == null || response.Id == 0)
                 {

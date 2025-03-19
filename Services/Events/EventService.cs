@@ -9,6 +9,7 @@ using Planify_BackEnd.Services.Events;
 using static Planify_BackEnd.DTOs.Events.EventDetailResponseDTO;
 using Planify_BackEnd.Services.GoogleDrive;
 using Planify_BackEnd.Repositories.JoinGroups;
+using Planify_BackEnd.Repositories.Categories;
 
 public class EventService : IEventService
 {
@@ -17,13 +18,17 @@ public class EventService : IEventService
     private readonly IGroupRepository _groupRepository;
     private readonly GoogleDriveService _googleDriveService;
     private readonly IJoinProjectRepository _joinProjectRepository;
-    public EventService(IEventRepository eventRepository, IHttpContextAccessor httpContextAccessor, IGroupRepository groupRepository, GoogleDriveService googleDriveService, IJoinProjectRepository joinProjectRepository)
+    private readonly ICampusRepository _campusRepository;
+    private readonly ICategoryRepository _categoryRepository;
+    public EventService(IEventRepository eventRepository, IHttpContextAccessor httpContextAccessor, IGroupRepository groupRepository, GoogleDriveService googleDriveService, IJoinProjectRepository joinProjectRepository, ICampusRepository campusRepository, ICategoryRepository categoryRepository)
     {
         _eventRepository = eventRepository;
         _groupRepository = groupRepository;
         _httpContextAccessor = httpContextAccessor;
         _googleDriveService = googleDriveService;
         _joinProjectRepository = joinProjectRepository;
+        _campusRepository = campusRepository;
+        _categoryRepository = categoryRepository;
     }
     public async Task<IEnumerable<EventGetListResponseDTO>> GetAllEventAsync(int page, int pageSize)
     {
@@ -201,18 +206,19 @@ public class EventService : IEventService
     {
         try
         {
+            var campus = await _campusRepository.GetCampusByName(e.CampusName);
+            var category = await _categoryRepository.GetCategoryByName(e.CategoryEventName, campus.Id);
             Event updateEvent = new Event
             {
                 Id = e.Id,
                 AmountBudget = e.AmountBudget,
-                CampusId = e.CampusId,
-                CategoryEventId = e.CategoryEventId,
+                CampusId = campus.Id,
+                CategoryEventId = category.Id,
                 StartTime = e.StartTime,
                 EndTime = e.EndTime,
                 EventDescription = e.EventDescription,
                 EventTitle = e.EventTitle,
                 IsPublic = e.IsPublic,
-                ManagerId = e.ManagerId,
                 Placed = e.Placed,
                 Status = e.Status,
                 TimePublic = e.TimePublic,
