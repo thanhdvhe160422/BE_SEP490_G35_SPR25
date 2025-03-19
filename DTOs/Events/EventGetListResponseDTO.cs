@@ -40,6 +40,6 @@ namespace Planify_BackEnd.DTOs.Events
 
         public string? Placed { get; set; }
 
-        public List<string> MediaUrls { get; set; }
+        public ICollection<EventMediumViewMediaModel> EventMedias { get; set; } = new List<EventMediumViewMediaModel>();
     }
 }
