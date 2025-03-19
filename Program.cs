@@ -109,7 +109,17 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
 // Thêm Authorization
 builder.Services.AddAuthorization();
-
+// Chỉ khởi tạo Google Drive Service khi có file credentials.json
+var googleDriveCredentialsPath = builder.Configuration["GoogleDrive:CredentialsPath"];
+if (!string.IsNullOrEmpty(googleDriveCredentialsPath) && File.Exists(googleDriveCredentialsPath))
+{
+    builder.Services.AddScoped<GoogleDriveService>();
+}
+else
+{
+    Console.WriteLine("⚠️ Google Drive credentials.json not found. Google Drive service will be unavailable.");
+}
+// Cấu hình JSON tránh lỗi vòng lặp
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles; // Tránh vòng lặp mà không tạo `$id`
