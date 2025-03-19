@@ -125,6 +125,8 @@ namespace Planify_BackEnd.Controllers
             {
                 var response = await _eventService.SearchEventAsync(page, pageSize, title, startTime, endTime,
                 minBudget, maxBudget, isPublic, status, CategoryEventId, placed);
+                if (response == null || response.Count() == 0)
+                    return NotFound("Not found any event");
                 return Ok(response);
             }catch(Exception ex)
             {

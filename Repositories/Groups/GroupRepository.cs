@@ -127,5 +127,19 @@ namespace Planify_BackEnd.Repositories.Groups
                 return new Group();
             }
         }
+
+        public async Task<bool> CheckLeadGroup(Guid userId, int groupId)
+        {
+            try
+            {
+                var userJoin = await _context.JoinGroups.FirstOrDefaultAsync(jg => jg.GroupId==groupId);
+                if (userJoin.Status == -1)
+                    return true;
+                return false;
+            }catch (Exception ex)
+            {
+                return false;
+            }
+        }
     }
 }

@@ -9,11 +9,10 @@ namespace Planify_BackEnd.Services.Tasks
         Task<ResponseDTO> CreateTaskAsync(TaskCreateRequestDTO taskDTO, Guid organizerId);
         bool UpdateActualTaskAmount(int taskId, decimal amount);
         Task<List<TaskSearchResponeDTO>> SearchTaskOrderByStartDateAsync(int page, int pageSize, string? name, DateTime startDate, DateTime endDate);
-
         Task<ResponseDTO> UpdateTaskAsync(int taskId, TaskUpdateRequestDTO taskDTO);
         Task<ResponseDTO> DeleteTaskAsync(int taskId);
         Task<List<TaskSearchResponeDTO>> GetAllTasksAsync(int groupId);
         public TaskDetailVM GetTaskById(int taskId);
-
+        Task<bool> changeStatus(int taskId, int status);
     }
 }

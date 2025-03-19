@@ -82,11 +82,15 @@ namespace Planify_BackEnd.Controllers.Groups
         }
         [HttpGet("{id}")]
         [Authorize(Roles = "Event Organizer")]
-        public async Task<IActionResult> DeleteGroup(int id)
+        public async Task<IActionResult> GetGroupById(int id)
         {
             try
             {
                 var response = await _groupService.GetGroupByIdAsync(id);
+                if (response == null || response.Id == 0)
+                {
+                    return NotFound("Cannot found any group with id: "+id);
+                }
                 return Ok(response);
             }
             catch (Exception ex)
@@ -96,7 +100,7 @@ namespace Planify_BackEnd.Controllers.Groups
         }
         [HttpDelete("{id}")]
         [Authorize(Roles = "Event Organizer")]
-        public async Task<IActionResult> GetGroupById(int id)
+        public async Task<IActionResult> DeleteGroup(int id)
         {
             try
             {
