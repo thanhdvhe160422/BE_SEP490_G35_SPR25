@@ -149,7 +149,7 @@ namespace Planify_BackEnd.Repositories.Tasks
             {
                 return _context.Tasks
                     .Include(t=>t.CreateByNavigation)
-                    .Include(t=>t.Group)
+                    .Include(t=>t.Group).ThenInclude(g=>g.Event)
                     .Include(t=>t.SubTasks).ThenInclude(st=>st.CreateByNavigation)
                     .FirstOrDefault(t => t.Id == taskId);
             }

@@ -8,25 +8,25 @@ namespace Planify_BackEnd.Services.JoinGroups
     public class JoinGroupService : IJoinGroupService
     {
         private readonly IJoinGroupRepository _joinGroupRepository;
+        private readonly IJoinProjectRepository _joinProjectRepository;
 
-        public JoinGroupService(IJoinGroupRepository joinGroupRepository)
+        public JoinGroupService(IJoinGroupRepository joinGroupRepository, IJoinProjectRepository joinProjectRepository)
         {
             _joinGroupRepository = joinGroupRepository;
+            _joinProjectRepository = joinProjectRepository;
         }
 
         public async Task<ResponseDTO> AddImplementersToGroup(JoinGroupRequestDTO request)
         {
-            // Kiểm tra Group có tồn tại không
             var group = await _joinGroupRepository.GetGroupById(request.GroupId);
             if (group == null)
                 return new ResponseDTO(400, "Group không tồn tại!", null);
 
-            var failedImplementers = new List<Guid>(); // Danh sách các implementer không thể thêm vào
-            var successfulImplementers = new List<Guid>(); // Danh sách các implementer đã thêm thành công
+            var failedImplementers = new List<Guid>();
+            var successfulImplementers = new List<Guid>();
 
             foreach (var implementerId in request.ImplementerIds)
             {
-                // Kiểm tra Implementer có trong Project không
                 bool isInProject = await _joinGroupRepository.IsUserInProject(implementerId, group.EventId);
                 if (!isInProject)
                 {
@@ -34,7 +34,6 @@ namespace Planify_BackEnd.Services.JoinGroups
                     continue;
                 }
 
-                // Kiểm tra Implementer đã ở trong Group chưa
                 bool isInGroup = await _joinGroupRepository.IsImplementerInGroup(implementerId, request.GroupId);
                 if (isInGroup)
                 {
@@ -42,22 +41,21 @@ namespace Planify_BackEnd.Services.JoinGroups
                     continue;
                 }
 
-                // Nếu tất cả các điều kiện trên đều thỏa mãn, thêm implementer vào danh sách thành công
                 successfulImplementers.Add(implementerId);
             }
 
-            // Nếu có implementer nào thành công, tiến hành thêm vào Group
             if (successfulImplementers.Count > 0)
             {
                 bool result = await _joinGroupRepository.AddImplementersToGroup(successfulImplementers, request.GroupId);
                 if (result)
                 {
+                    await _joinProjectRepository.AddImplementersToProject(successfulImplementers, group.EventId);
+                    await _joinProjectRepository.AddRoleImplementers(successfulImplementers);
                     var successMessage = $"Đã thêm {successfulImplementers.Count} Implementers vào Group thành công!";
                     return new ResponseDTO(200, successMessage, successfulImplementers);
                 }
             }
 
-            // Nếu không có implementer nào được thêm vào
             if (failedImplementers.Count == request.ImplementerIds.Count)
             {
                 return new ResponseDTO(400, "Tất cả Implementers không thể thêm vào Group!", null);

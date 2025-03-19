@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Planify_BackEnd.Models;
 
 public class UserRepository : IUserRepository
@@ -69,6 +70,26 @@ public class UserRepository : IUserRepository
         {
             throw new Exception(ex.Message);
         }
+    }
 
+    public async Task<List<User>> GetUserByNameOrEmail(string input, int campusId)
+    {
+        try
+        {
+            return await _context.Users
+            .Where(c => (c.FirstName.Contains(input) || c.LastName.Contains(input) || c.Email.Contains(input))
+                        && c.CampusId == campusId
+                        && c.UserRoles.Any(ur => ur.RoleId == 4 || ur.RoleId == 5))
+            .Include(c => c.Campus)
+            .Include(c => c.UserRoles)
+                .ThenInclude(ur => ur.Role)
+            .GroupBy(c => c.Id)
+            .Select(g => g.First())
+            .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
     }
 }
