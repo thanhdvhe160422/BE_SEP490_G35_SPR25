@@ -15,8 +15,6 @@ namespace Planify_BackEnd.DTOs.SubTasks
         public DateTime Deadline { get; set; }
 
         public decimal AmountBudget { get; set; }
-
-        public int? Status { get; set; } = 0;
         [Required]
         public int TaskId { get; set; }
         public Guid ImplementerId { get; set; } // Người tạo subtask
