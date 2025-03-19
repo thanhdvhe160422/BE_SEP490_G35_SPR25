@@ -151,15 +151,21 @@ public class EventService : IEventService
     {
         if (imageDTO.EventMediaFiles != null && imageDTO.EventMediaFiles.Any())
         {
-            var uploadTasks = imageDTO.EventMediaFiles.Select(async file =>
+            foreach (var file in imageDTO.EventMediaFiles)
             {
                 using var stream = file.OpenReadStream();
-                string contentType = file.ContentType; // Lấy loại file (image/jpeg, image/png,...)
-                string driveUrl = await _googleDriveService.UploadFileAsync(stream, file.FileName, contentType);
-
+                string contentType = file.ContentType;
+                string driveUrl;
+                 driveUrl = await _googleDriveService.UploadFileAsync(stream, file.FileName, contentType);
+                if (string.IsNullOrEmpty(driveUrl))
+                {
+                    Console.WriteLine($"❌ Upload thất bại cho file {file.FileName}");
+                    throw new Exception("Upload failed, MediaURL is null or empty.");
+                }
+                Console.WriteLine($"✅ File {file.FileName} đã upload thành công: {driveUrl}");
                 var mediaItem = new Medium { MediaUrl = driveUrl };
                 await _eventRepository.CreateMediaItemAsync(mediaItem);
-
+              
                 var eventMedia = new EventMedium
                 {
                     EventId = imageDTO.EventId,
@@ -167,13 +173,12 @@ public class EventService : IEventService
                     Status = 1
                 };
                 await _eventRepository.AddEventMediaAsync(eventMedia);
-            });
-
-            await System.Threading.Tasks.Task.WhenAll(uploadTasks); // Chạy tất cả các task upload cùng lúc
+            }
         }
 
         return new ResponseDTO(201, "Upload Image successfully!", null);
     }
+
 
     public async Task<ResponseDTO> GetEventDetailAsync(int eventId)
     {
