@@ -6,7 +6,7 @@ namespace Planify_BackEnd.Repositories
 {
     public interface IEventRepository
     {
-        Task<IEnumerable<Event>> GetAllEvent(int page, int pageSize);
+        Task<IEnumerable<Event>> GetAllEventAsync(int page, int pageSize);
         Task<Event> CreateEventAsync(Event newEvent);
 
         System.Threading.Tasks.Task CreateMediaItemAsync(Medium mediaItem);

@@ -109,7 +109,7 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
 // Thêm Authorization
 builder.Services.AddAuthorization();
-
+// Cấu hình JSON tránh lỗi vòng lặp
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles; // Tránh vòng lặp mà không tạo `$id`

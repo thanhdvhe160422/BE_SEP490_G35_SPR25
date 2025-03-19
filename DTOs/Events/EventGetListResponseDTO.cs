@@ -1,4 +1,8 @@
-﻿namespace Planify_BackEnd.DTOs.Events
+﻿using Planify_BackEnd.DTOs.Campus;
+using Planify_BackEnd.DTOs.Categories;
+using Planify_BackEnd.DTOs.Medias;
+
+namespace Planify_BackEnd.DTOs.Events
 {
     public class EventGetListResponseDTO
     {
@@ -35,5 +39,7 @@
         public int? CategoryEventId { get; set; }
 
         public string? Placed { get; set; }
+
+        public List<string> MediaUrls { get; set; }
     }
 }

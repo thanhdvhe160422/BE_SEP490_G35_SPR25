@@ -33,7 +33,7 @@ namespace Planify_BackEnd.Controllers
         {
             try
             {
-                var response = await _eventService.GetAllEvent( page,  pageSize);
+                var response = await _eventService.GetAllEventAsync( page,  pageSize);
                 return Ok(response);
             }
             catch (Exception ex)
