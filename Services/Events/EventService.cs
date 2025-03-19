@@ -45,7 +45,18 @@ public class EventService : IEventService
             CreateBy = e.CreateBy,
             CreatedAt = e.CreatedAt,
             ManagerId = e.ManagerId,
-            MediaUrls = e.EventMedia.Select(em => em.Media.MediaUrl).ToList()
+            EventMedias = e.EventMedia == null ? null : e.EventMedia.Select(em => new Planify_BackEnd.DTOs.Medias.EventMediumViewMediaModel
+            {
+                Id = em.Id,
+                EventId = em.Id,
+                MediaId = em.Id,
+                Status = em.Status,
+                MediaDTO = new Planify_BackEnd.DTOs.Medias.MediaItemDTO
+                {
+                    Id = em.Media.Id,
+                    MediaUrl = em.Media.MediaUrl
+                },
+            }).ToList()
 
         }).ToList();
 
