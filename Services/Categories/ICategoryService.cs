@@ -5,5 +5,6 @@ namespace Planify_BackEnd.Services.Categories
     public interface ICategoryService
     {
         public IEnumerable<CategoryViewModel> GetCategoryByCampusId(int campusId);
+        Task<CategoryViewModel> GetCategoryByName(string categoryName, int campusId);
     }
 }

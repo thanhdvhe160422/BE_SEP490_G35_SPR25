@@ -21,5 +21,23 @@ namespace Planify_BackEnd.Services.Campus
             }).ToList();
             return campusDTOs;
         }
+
+        public async Task<CampusDTO> GetCampusByName(string campusName)
+        {
+            try{
+                var campus = await _campusRepository.GetCampusByName(campusName);
+                CampusDTO campusDTO = new CampusDTO
+                {
+                    Id = campus.Id,
+                    CampusName = campus.CampusName,
+                    Status = campus.Status
+                };
+                return campusDTO;
+            }
+            catch
+            {
+                return new CampusDTO();
+            }
+        }
     }
 }

@@ -23,4 +23,19 @@ public class CampusRepository : ICampusRepository
 
         }
     }
+
+    public async Task<Campus> GetCampusByName(string campusName)
+    {
+        try
+        {
+            var campus = await _context.Campuses
+                .FirstOrDefaultAsync(c => c.CampusName.Contains(campusName)
+                && c.Status == 1);
+            return campus;
+        }
+        catch
+        {
+            return new Campus();
+        }
+    }
 }

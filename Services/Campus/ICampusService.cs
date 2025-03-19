@@ -6,5 +6,6 @@ namespace Planify_BackEnd.Services.Campus
     public interface ICampusService
     {
        Task<IEnumerable<CampusDTO>> GetAllCampus();
+        Task<CampusDTO> GetCampusByName(string campusName);
     }
 }

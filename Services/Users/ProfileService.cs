@@ -84,5 +84,39 @@ namespace Planify_BackEnd.Services.User
                 return new ProfileViewModel();
             }
         }
+
+        public bool UpdateAvatar(Guid id, int avatarId)
+        {
+            try
+            {
+                return _profileRepository.UpdateAvatar(id, avatarId);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public ProfileUpdateModel UpdateProfile(ProfileUpdateModel updateProfile)
+        {
+            try
+            {
+                var p = _profileRepository.UpdateProfile(updateProfile);
+                ProfileUpdateModel profile = new ProfileUpdateModel
+                {
+                    Id = p.Id,
+                    AddressId = p.AddressId,
+                    DateOfBirth = p.DateOfBirth,
+                    FirstName = p.FirstName,
+                    LastName = p.LastName,
+                    Gender = p.Gender,
+                    PhoneNumber = p.PhoneNumber,
+                };
+                return profile;
+            }catch
+            {
+                return new ProfileUpdateModel();
+            }
+        }
     }
 }
