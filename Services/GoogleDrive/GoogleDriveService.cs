@@ -59,10 +59,12 @@ namespace Planify_BackEnd.Services.GoogleDrive
             {
                 if (fileStream == null || fileStream.Length == 0)
                 {
+                    Console.WriteLine("🚨 File stream is empty. Upload aborted.");
                     throw new ArgumentException("File stream cannot be empty.");
                 }
 
                 string uniqueFileName = $"{Guid.NewGuid()}_{fileName}";
+                Console.WriteLine($"📂 Uploading file: {uniqueFileName}");
 
                 var fileMetadata = new Google.Apis.Drive.v3.Data.File
                 {
@@ -72,20 +74,27 @@ namespace Planify_BackEnd.Services.GoogleDrive
 
                 var request = _driveService.Files.Create(fileMetadata, fileStream, contentType);
                 request.Fields = "id";
+
+                Console.WriteLine("🚀 Starting upload...");
                 var uploadProgress = await request.UploadAsync();
 
                 if (uploadProgress.Status == UploadStatus.Failed)
                 {
+                    Console.WriteLine($"❌ Upload failed: {uploadProgress.Exception?.Message}");
                     throw new Exception($"Upload failed: {uploadProgress.Exception?.Message}");
                 }
 
                 var file = request.ResponseBody;
                 if (file == null || string.IsNullOrEmpty(file.Id))
                 {
+                    Console.WriteLine("❌ Upload failed: No file ID returned.");
                     throw new Exception("Upload failed: No file ID returned.");
                 }
 
+                Console.WriteLine($"✅ File uploaded successfully! File ID: {file.Id}");
+
                 // **Gán quyền public**
+                Console.WriteLine("🔓 Setting file permissions...");
                 var permission = new Permission
                 {
                     Type = "anyone",
@@ -93,7 +102,10 @@ namespace Planify_BackEnd.Services.GoogleDrive
                 };
                 await _driveService.Permissions.Create(permission, file.Id).ExecuteAsync();
 
-                return $"https://drive.google.com/uc?id={file.Id}";
+                string fileUrl = $"https://drive.google.com/uc?id={file.Id}";
+                Console.WriteLine($"🌍 Public URL: {fileUrl}");
+
+                return fileUrl;
             }
             catch (Exception ex)
             {
@@ -101,5 +113,6 @@ namespace Planify_BackEnd.Services.GoogleDrive
                 return null;
             }
         }
+
     }
 }
