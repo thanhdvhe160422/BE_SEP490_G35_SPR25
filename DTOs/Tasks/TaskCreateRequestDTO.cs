@@ -22,8 +22,6 @@ namespace Planify_BackEnd.DTOs.Tasks
 
         public double Progress { get; set; }
 
-        public int Status { get; set; } = 0;
-
         public Guid OrganizerId { get; set; } // Nguoi tao tasks
 
         public TaskCreateRequestDTO() { }

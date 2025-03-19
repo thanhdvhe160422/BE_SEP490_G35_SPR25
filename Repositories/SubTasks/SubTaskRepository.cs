@@ -78,6 +78,35 @@ public class SubTaskRepository : ISubTaskRepository
         }
     }
     /// <summary>
+    /// Update subtask status
+    /// </summary>
+    /// <param name="subTaskId"></param>
+    /// <param name="newStatus"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
+    public async Task<bool> UpdateSubTaskStatusAsync(int subTaskId, int newStatus)
+    {
+        try
+        {
+            var existingSubTask = await _context.SubTasks.FindAsync(subTaskId);
+            if (existingSubTask == null)
+            {
+                return false; // Không tìm thấy SubTask
+            }
+
+            existingSubTask.Status = newStatus;
+            _context.SubTasks.Update(existingSubTask);
+            await _context.SaveChangesAsync();
+
+            return true; // Cập nhật thành công
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An unexpected error occurred while updating the subtask status.", ex);
+        }
+    }
+
+    /// <summary>
     /// Delete a subtask
     /// </summary>
     /// <param name="subTaskId"></param>
