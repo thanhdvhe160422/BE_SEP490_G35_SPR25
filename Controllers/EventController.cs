@@ -95,9 +95,9 @@ namespace Planify_BackEnd.Controllers
                 //{
                 //    return Unauthorized();
                 //}
-                var campus = _campusService.GetCampusByName(eventDTO.CampusName);
+                var campus = await _campusService.GetCampusByName(eventDTO.CampusName);
                 if (campus == null || campus.Id == 0) return NotFound("Cannot found any campus with name: " + eventDTO.CampusName);
-                var category = _categoryService.GetCategoryByName(eventDTO.CategoryEventName, campus.Id);
+                var category = await _categoryService.GetCategoryByName(eventDTO.CategoryEventName, campus.Id);
                 if (category == null || category.Id == 0) return NotFound("Cannot found any category with name: " + eventDTO.CategoryEventName + ", campus: " + eventDTO.CampusName);
                 var response = await _eventService.UpdateEventAsync(eventDTO);
                 if (response == null || response.Id == 0)
