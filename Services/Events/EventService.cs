@@ -45,7 +45,7 @@ public class EventService : IEventService
             CreateBy = e.CreateBy,
             CreatedAt = e.CreatedAt,
             ManagerId = e.ManagerId,
-            MediaUrl = e.EventMedia.FirstOrDefault()?.Media?.MediaUrl ?? string.Empty 
+            MediaUrls = e.EventMedia.Select(em => em.Media.MediaUrl).ToList()
 
         }).ToList();
 

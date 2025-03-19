@@ -39,7 +39,7 @@ namespace Planify_BackEnd.DTOs.Events
         public int? CategoryEventId { get; set; }
 
         public string? Placed { get; set; }
-       
-        public string MediaUrl { get; set; } = null!;
+
+        public List<string> MediaUrls { get; set; }
     }
 }
