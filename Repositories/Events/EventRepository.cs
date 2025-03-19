@@ -151,7 +151,6 @@ public class EventRepository : IEventRepository
             updateEvent.EventDescription = e.EventDescription;
             updateEvent.EventTitle = e.EventTitle;
             updateEvent.IsPublic = e.IsPublic;
-            updateEvent.ManagerId = e.ManagerId;
             updateEvent.Placed = e.Placed;
             updateEvent.Status = e.Status;
             updateEvent.TimePublic = e.TimePublic;
