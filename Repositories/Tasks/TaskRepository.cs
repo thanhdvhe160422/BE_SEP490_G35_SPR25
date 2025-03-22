@@ -173,5 +173,21 @@ namespace Planify_BackEnd.Repositories.Tasks
                 return false;
             }
         }
+
+        public async Task<List<Models.Task>> SearchTaskByGroupId(int groupId, DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                return await _context.Tasks
+                    .Where(e => e.StartTime <= endDate &&
+                                e.Deadline >= startDate)
+                    .OrderBy(e => e.StartTime)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

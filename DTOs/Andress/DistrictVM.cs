@@ -8,8 +8,6 @@ namespace Planify_BackEnd.DTOs.Andress
 
         public string DistrictName { get; set; }
 
-        public int ProvinceId { get; set; }
-
         public ProvinceVM ProvinceVM { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Planify_BackEnd.Models;
+﻿using Planify_BackEnd.DTOs.Andress;
+using Planify_BackEnd.Models;
 
 namespace Planify_BackEnd.DTOs.Users
 {
@@ -19,5 +20,6 @@ namespace Planify_BackEnd.DTOs.Users
         public int? AvatarId { get; set; }
 
         public bool Gender { get; set; }
+        public AddressVM addressVM { get; set; }
     }
 }

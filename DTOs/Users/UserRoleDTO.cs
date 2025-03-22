@@ -9,6 +9,6 @@ namespace Planify_BackEnd.DTOs.Users
         public Guid UserId { get; set; }
 
         public int RoleId { get; set; }
-        public RoleDTO RoleDTO { get; set; }
+        public RoleDTO? RoleDTO { get; set; }
     }
 }
