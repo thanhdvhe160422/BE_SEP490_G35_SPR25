@@ -1,4 +1,5 @@
 ﻿using Planify_BackEnd.DTOs.Campus;
+using Planify_BackEnd.DTOs.Roles;
 using Planify_BackEnd.DTOs.Users;
 using Planify_BackEnd.Models;
 using static Planify_BackEnd.DTOs.Events.EventDetailResponseDTO;
@@ -39,6 +40,110 @@ namespace Planify_BackEnd.Services.Users
         public async Task<List<Models.User>> GetUserByNameOrEmailAsync(string input, int campusId)
         {
             return await _userRepository.GetUserByNameOrEmail(input, campusId);
+        }
+        public async Task<UserRoleDTO> AddUserRole(UserRoleDTO roleDTO)
+        {
+            try
+            {
+                UserRole role = new UserRole
+                {
+                    Id = roleDTO.Id,
+                    RoleId = roleDTO.RoleId,
+                    UserId = roleDTO.UserId,
+                };
+                var r = await _userRepository.AddUserRole(role);
+                roleDTO.Id = r.Id;
+                roleDTO.UserId = r.UserId;
+                roleDTO.RoleId = r.RoleId;
+                return roleDTO;
+            }catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<UserListDTO> CreateEventOrganizer(UserDTO userDTO)
+        {
+            try
+            {
+                Models.User user = new Models.User
+                {
+                    Id = Guid.NewGuid(),
+                    CampusId = userDTO.CampusId,
+                    DateOfBirth = userDTO.DateOfBirth,
+                    Email = userDTO.Email,
+                    FirstName = userDTO.FirstName,
+                    LastName = userDTO.LastName,
+                    PhoneNumber = userDTO.PhoneNumber,
+                    Gender = userDTO.Gender,
+                    Status = 1,
+                    CreatedAt = DateTime.Now,
+                };
+                var u = await _userRepository.CreateEventOrganizer(user);
+                UserListDTO userListDTO = new UserListDTO
+                {
+                    Id = u.Id,
+                    AddressId = u.AddressId,
+                    AvatarId = u.AvatarId,
+                    CampusId = u.CampusId,
+                    CreatedAt = u.CreatedAt,
+                    DateOfBirth = u.DateOfBirth,
+                    Email = u.Email,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    Gender = u.Gender,
+                    PhoneNumber = u.PhoneNumber,
+                    Status = u.Status,
+                    UserName = u.UserName,
+                    Password = u.Password,
+                };
+                return userListDTO;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<UserListDTO> UpdateEventOrganizer(UserDTO userDTO)
+        {
+            try
+            {
+                Models.User user = new Models.User
+                {
+                    Id = userDTO.Id,
+                    CampusId = userDTO.CampusId,
+                    DateOfBirth = userDTO.DateOfBirth,
+                    Email = userDTO.Email,
+                    FirstName = userDTO.FirstName,
+                    LastName = userDTO.LastName,
+                    PhoneNumber = userDTO.PhoneNumber,
+                    Gender = userDTO.Gender,
+                };
+                var u = await _userRepository.UpdateEventOrganizer(user);
+                UserListDTO userListDTO = new UserListDTO
+                {
+                    Id = u.Id,
+                    AddressId = u.AddressId,
+                    AvatarId = u.AvatarId,
+                    CampusId = u.CampusId,
+                    CreatedAt = u.CreatedAt,
+                    DateOfBirth = u.DateOfBirth,
+                    Email = u.Email,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    Gender = u.Gender,
+                    PhoneNumber = u.PhoneNumber,
+                    Status = u.Status,
+                    UserName = u.UserName,
+                    Password = u.Password,
+                };
+                return userListDTO;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

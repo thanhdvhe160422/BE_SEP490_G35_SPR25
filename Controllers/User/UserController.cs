@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Planify_BackEnd.DTOs.Users;
 using Planify_BackEnd.Services.Users;
 using System.Security.Claims;
 
@@ -49,6 +50,52 @@ namespace Planify_BackEnd.Controllers.User
             }
 
             return Ok(users);
+        }
+        [HttpPost("event-organizer")]
+        [Authorize(Roles = "Campus Manager")]
+        public async Task<IActionResult> CreateEventOrganizer(UserDTO userDTO)
+        {
+            try
+            {
+                var user = await _userService.CreateEventOrganizer(userDTO);
+                if (user == null || user.FirstName == null)
+                {
+                    return BadRequest("Cannot create event organizer!");
+                }
+                UserRoleDTO roleDTO = new UserRoleDTO
+                {
+                    Id = 0,
+                    RoleId = 3,
+                    UserId = user.Id
+                };
+                var role = await _userService.AddUserRole(roleDTO);
+                if (role == null || role.Id == 0)
+                {
+                    return BadRequest("Cannot add user role!");
+                }
+                return Ok(user);
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPut("event-organizer")]
+        [Authorize(Roles = "Campus Manager")]
+        public async Task<IActionResult> UpdateEventOrganizer(UserDTO userDTO)
+        {
+            try
+            {
+                var user = await _userService.UpdateEventOrganizer(userDTO);
+                if (user == null || user.FirstName == null)
+                {
+                    return BadRequest("Cannot update event organizer!");
+                }
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
