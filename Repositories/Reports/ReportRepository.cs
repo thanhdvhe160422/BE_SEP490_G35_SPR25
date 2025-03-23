@@ -93,6 +93,16 @@ namespace Planify_BackEnd.Repositories.Reports
                 throw;
             }
         }
+        public async System.Threading.Tasks.Task CreateMediaItemAsync(Medium mediaItem)
+        {
+            _context.Media.Add(mediaItem);
+            await _context.SaveChangesAsync();
+        }
+        public async System.Threading.Tasks.Task AddEventMediaAsync(ReportMedium reportMedia)
+        {
+            _context.ReportMedia.Add(reportMedia);
+            await _context.SaveChangesAsync();
+        }
 
     }
 }

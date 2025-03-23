@@ -1,6 +1,6 @@
 ﻿namespace Planify_BackEnd.DTOs.Reports
 {
-    public class ReportDTO
+    public class ReportCreateDTO
     {
         public int Id { get; set; }
 
