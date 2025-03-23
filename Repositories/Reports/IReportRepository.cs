@@ -8,5 +8,7 @@ namespace Planify_BackEnd.Repositories.Reports
         Task<IEnumerable<Report>> GetAllReportsAsync();
         Task<IEnumerable<Report>> GetReportById(int reportId);
         Task<Report> CreateReportAsync(Report report);
+        System.Threading.Tasks.Task CreateMediaItemAsync(Medium mediaItem);
+        System.Threading.Tasks.Task AddEventMediaAsync(ReportMedium reportMedia);
     }
 }

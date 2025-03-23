@@ -1,17 +1,23 @@
 ﻿using Microsoft.Data.SqlClient;
+using Planify_BackEnd.DTOs.Events;
+using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Reports;
 using Planify_BackEnd.DTOs.Users;
 using Planify_BackEnd.Models;
+using Planify_BackEnd.Repositories;
 using Planify_BackEnd.Repositories.Reports;
+using Planify_BackEnd.Services.GoogleDrive;
 
 namespace Planify_BackEnd.Services.Reports
 {
     public class ReportService : IReportService
     {
         private readonly IReportRepository _reportRepository;
-        public ReportService(IReportRepository reportRepository)
+        private readonly GoogleDriveService _googleDriveService;
+        public ReportService(IReportRepository reportRepository, GoogleDriveService googleDriveService)
         {
             _reportRepository = reportRepository;
+            _googleDriveService = googleDriveService;
         }
         public async Task<IEnumerable<ReportVM>> GetAllReportsAsync()
         {
@@ -227,6 +233,39 @@ namespace Planify_BackEnd.Services.Reports
             {
                 return new List<ReportVM>();
             }
+        }
+
+        public async Task<ResponseDTO> UploadImageAsync(UploadReportImageRequestDTO imageDTO)
+        {
+            if (imageDTO.ReportMediaFiles != null && imageDTO.ReportMediaFiles.Any())
+            {
+                foreach (var file in imageDTO.ReportMediaFiles)
+                {
+                    using var stream = file.OpenReadStream();
+                    string contentType = file.ContentType;
+                    string driveUrl;
+                    driveUrl = await _googleDriveService.UploadFileAsync(stream, file.FileName, contentType);
+                    if (string.IsNullOrEmpty(driveUrl))
+                    {
+                        Console.WriteLine($"❌ Upload thất bại cho file {file.FileName}");
+                        throw new Exception("Upload failed, MediaURL is null or empty.");
+                    }
+                    Console.WriteLine($"✅ File {file.FileName} đã upload thành công: {driveUrl}");
+                    var mediaItem = new Medium { MediaUrl = driveUrl };
+                    await _reportRepository.CreateMediaItemAsync(mediaItem);
+
+                    var reportMedia = new ReportMedium
+                    {
+                        ReportId = imageDTO.ReportId,
+                        MediaId = mediaItem.Id
+                
+                    };
+                  
+                    await _reportRepository.AddEventMediaAsync(reportMedia);
+                }
+            }
+
+            return new ResponseDTO(201, "Upload Image successfully!", null);
         }
     }
 }
