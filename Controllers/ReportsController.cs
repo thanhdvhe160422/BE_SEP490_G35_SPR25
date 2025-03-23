@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Planify_BackEnd.DTOs.Reports;
 using Planify_BackEnd.Services.Reports;
 
 namespace Planify_BackEnd.Controllers
@@ -23,6 +25,48 @@ namespace Planify_BackEnd.Controllers
                 var response = _reportService.GetReportsByReceivedUser(receviedUserId);
                 return Ok(response.Result);
             }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("View")]
+        //[Authorize(Roles = "Campus Manager")]
+        public async Task<IActionResult> GetAllReportsAsync()
+        {
+            try
+            {
+                var response = _reportService.GetAllReportsAsync();
+                return Ok(response.Result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("View/{reportId}")]
+        //[Authorize(Roles = "Campus Manager")]
+        public async Task<IActionResult> GetReportById(int reportId)
+        {
+            try
+            {
+                var response = _reportService.GetReportById(reportId);
+                return Ok(response.Result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost("Create")]
+        [Authorize(Roles = "Implementer")]
+        public async Task<IActionResult> CreateReport([FromBody] ReportCreateDTO reportDTO)
+        {
+            try
+            {
+                var response = _reportService.CreateReportAsync(reportDTO);
+                return Ok(response.Result);
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
