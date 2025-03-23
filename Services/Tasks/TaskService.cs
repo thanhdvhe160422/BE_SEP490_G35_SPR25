@@ -251,5 +251,29 @@ namespace Planify_BackEnd.Services.Tasks
                 return false;
             }
         }
+
+        public async Task<List<TaskSearchResponeDTO>> SearchTaskByGroupId(int groupId, DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                var tasks = await _taskRepository.SearchTaskByGroupId(groupId,startDate, endDate);
+                return tasks.Select(item => new TaskSearchResponeDTO
+                {
+                    Id = item.Id,
+                    TaskName = item.TaskName,
+                    TaskDescription = item.TaskDescription,
+                    StartTime = item.StartTime,
+                    Deadline = item.Deadline,
+                    GroupId = item.GroupId,
+                    AmountBudget = item.AmountBudget,
+                    Progress = item.Progress,
+                    Status = item.Status
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+                return new List<TaskSearchResponeDTO>();
+            }
+        }
     }
 }

@@ -28,5 +28,22 @@ namespace Planify_BackEnd.Repositories.Address
             var p = await _context.Wards.Where(w=>w.DistrictId==id).ToListAsync();
             return p;
         }
+
+        public bool UpdateAddress(Models.Address address)
+        {
+            try
+            {
+                var updateAddress = _context.Addresses.FirstOrDefault(a=>a.Id ==address.Id);
+                updateAddress.AddressDetail = address.AddressDetail;
+                updateAddress.WardId = address.WardId;
+                _context.Update(updateAddress);
+                _context.SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }

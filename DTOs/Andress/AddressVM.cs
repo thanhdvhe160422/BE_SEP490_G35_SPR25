@@ -6,8 +6,6 @@ namespace Planify_BackEnd.DTOs.Andress
     {
         public int Id { get; set; }
 
-        public int WardId { get; set; }
-
         public string AddressDetail { get; set; }
 
         public WardVM WardVM { get; set; }

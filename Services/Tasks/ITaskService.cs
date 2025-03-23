@@ -14,5 +14,7 @@ namespace Planify_BackEnd.Services.Tasks
         Task<List<TaskSearchResponeDTO>> GetAllTasksAsync(int groupId);
         public TaskDetailVM GetTaskById(int taskId);
         Task<bool> changeStatus(int taskId, int status);
+        Task<List<TaskSearchResponeDTO>> SearchTaskByGroupId(int groupId, DateTime startDate, DateTime endDate);
+
     }
 }

@@ -2,6 +2,7 @@
 using Planify_BackEnd.DTOs.Medias;
 using Planify_BackEnd.DTOs.User;
 using Planify_BackEnd.DTOs.Users;
+using Planify_BackEnd.Repositories.Address;
 using Planify_BackEnd.Repositories.User;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -10,9 +11,11 @@ namespace Planify_BackEnd.Services.User
     public class ProfileService : IProfileService
     {
         private readonly IProfileRepository _profileRepository;
-        public ProfileService(IProfileRepository profileRepository)
+        private readonly IProvinceRepository _provinceRepository;
+        public ProfileService(IProfileRepository profileRepository,IProvinceRepository provinceRepository)
         {
             _profileRepository = profileRepository;
+            _provinceRepository = provinceRepository;
         }
         public ProfileViewModel getUserProfileById(Guid id)
         {
@@ -49,15 +52,17 @@ namespace Planify_BackEnd.Services.User
                     {
                         Id=user.Address.Id,
                         AddressDetail = user.Address.AddressDetail,
-                        WardId = user.Address.WardId,
                         WardVM = new DTOs.Andress.WardVM
                         {
+                            Id = user.Address.Ward.Id,
                             WardName = user.Address.Ward.WardName,
                             DistrictVM = new DTOs.Andress.DistrictVM
                             {
+                                Id = user.Address.Ward.District.Id,
                                 DistrictName = user.Address.Ward.District.DistrictName,
                                 ProvinceVM = new DTOs.Andress.ProvinceVM
                                 {
+                                    Id = user.Address.Ward.District.Province.Id,
                                     ProvinceName = user.Address.Ward.District.Province.ProvinceName
                                 }
                             },
@@ -101,18 +106,32 @@ namespace Planify_BackEnd.Services.User
         {
             try
             {
-                var p = _profileRepository.UpdateProfile(updateProfile);
-                ProfileUpdateModel profile = new ProfileUpdateModel
+                var p = _profileRepository.GetUserProfileById(updateProfile.Id);
+                bool isUpdateAddressSuccess = false;
+                if (updateProfile.addressVM.WardVM.Id != p.Address.Ward.Id
+                    || !updateProfile.addressVM.AddressDetail.Equals(p.Address.AddressDetail))
                 {
-                    Id = p.Id,
-                    AddressId = p.AddressId,
-                    DateOfBirth = p.DateOfBirth,
-                    FirstName = p.FirstName,
-                    LastName = p.LastName,
-                    Gender = p.Gender,
-                    PhoneNumber = p.PhoneNumber,
+                    Models.Address updateAddress = new Models.Address
+                    {
+                        Id = p.Address.Id,
+                        AddressDetail = updateProfile.addressVM.AddressDetail,
+                        WardId = updateProfile.addressVM.WardVM.Id
+                    };
+                    isUpdateAddressSuccess = _provinceRepository.UpdateAddress(updateAddress);
+                }
+                if (!isUpdateAddressSuccess) throw new Exception();
+                var profile = _profileRepository.UpdateProfile(updateProfile);
+                ProfileUpdateModel updatedprofile = new ProfileUpdateModel
+                {
+                    Id = profile.Id,
+                    AddressId = profile.AddressId,
+                    DateOfBirth = profile.DateOfBirth,
+                    FirstName = profile.FirstName,
+                    LastName = profile.LastName,
+                    Gender = profile.Gender,
+                    PhoneNumber = profile.PhoneNumber,
                 };
-                return profile;
+                return updatedprofile;
             }catch
             {
                 return new ProfileUpdateModel();

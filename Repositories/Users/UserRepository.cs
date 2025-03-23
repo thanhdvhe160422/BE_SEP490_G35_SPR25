@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Planify_BackEnd.Models;
 
 public class UserRepository : IUserRepository
@@ -86,6 +85,56 @@ public class UserRepository : IUserRepository
             .GroupBy(c => c.Id)
             .Select(g => g.First())
             .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+
+    public async Task<User> CreateEventOrganizer(User user)
+    {
+        try
+        {
+            _context.Add(user);
+            await _context.SaveChangesAsync();
+            return user;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+
+    public async Task<User> UpdateEventOrganizer(User user)
+    {
+        try
+        {
+            var updateUser = _context.Users.FirstOrDefault(u => u.Id == user.Id);
+            updateUser.CampusId = user.CampusId;
+            updateUser.DateOfBirth = user.DateOfBirth;
+            updateUser.Email = user.Email;
+            updateUser.FirstName = user.FirstName;
+            updateUser.LastName = user.LastName;
+            updateUser.PhoneNumber = user.PhoneNumber;
+            updateUser.Gender = user.Gender;
+            _context.Update(updateUser);
+            await _context.SaveChangesAsync();
+            return user;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+
+    public async Task<UserRole> AddUserRole(UserRole role)
+    {
+        try
+        {
+            _context.Add(role);
+            await _context.SaveChangesAsync();
+            return role;
         }
         catch (Exception ex)
         {
