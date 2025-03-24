@@ -371,6 +371,11 @@ public partial class PlanifyContext : DbContext
                 .HasForeignKey(d => d.CreateBy)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Task__CreateBy__45BE5BA9");
+
+            entity.HasOne(d => d.Event).WithMany(p => p.Tasks)
+                .HasForeignKey(d => d.EventId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("FK_Task_Event");
         });
 
         modelBuilder.Entity<User>(entity =>

@@ -41,28 +41,31 @@ namespace Planify_BackEnd.Controllers
                         e.CategoryEventId,
                         e.AmountBudget,
                         DurationHours = (e.EndTime - e.StartTime).TotalHours,
-                        Tasks = _dbContext.Tasks.Select(t => new
-                        {
-                            t.TaskName,
-                            t.TaskDescription,
-                            t.StartTime,
-                            t.Deadline,
-                            t.AmountBudget,
-                            t.Progress,
-                            t.Status,
-                            SubTasks = t.SubTasks.Select(st => new
+                        Tasks = _dbContext.Tasks.Where(t => t.EventId == e.Id)
+                            .Select(t => new
                             {
-                                st.SubTaskName,
-                                st.SubTaskDescription,
-                                st.StartTime,
-                                st.Deadline,
-                                st.AmountBudget,
-                                st.Status
+                                t.TaskName,
+                                t.TaskDescription,
+                                t.StartTime,
+                                t.Deadline,
+                                t.AmountBudget,
+                                t.Progress,
+                                t.Status,
+                                SubTasks = _dbContext.SubTasks.Where(st => st.TaskId == t.Id)
+                                    .Select(st => new
+                                    {
+                                        st.SubTaskName,
+                                        st.SubTaskDescription,
+                                        st.StartTime,
+                                        st.Deadline,
+                                        st.AmountBudget,
+                                        st.Status
+                                    }).ToList()
                             }).ToList()
-                        }).ToList()
                     })
                     .Take(5)
                     .ToListAsync();
+
 
                 if (!pastEvents.Any())
                 {

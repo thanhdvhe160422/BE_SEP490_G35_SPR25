@@ -25,7 +25,11 @@ public partial class Task
 
     public int Status { get; set; }
 
+    public int? EventId { get; set; }
+
     public virtual User CreateByNavigation { get; set; } = null!;
+
+    public virtual Event? Event { get; set; }
 
     public virtual ICollection<InvoiceImagesTask> InvoiceImagesTasks { get; set; } = new List<InvoiceImagesTask>();
 

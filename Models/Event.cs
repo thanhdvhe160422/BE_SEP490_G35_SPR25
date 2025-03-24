@@ -53,5 +53,7 @@ public partial class Event
 
     public virtual ICollection<SendRequest> SendRequests { get; set; } = new List<SendRequest>();
 
+    public virtual ICollection<Task> Tasks { get; set; } = new List<Task>();
+
     public virtual User? UpdateByNavigation { get; set; }
 }
