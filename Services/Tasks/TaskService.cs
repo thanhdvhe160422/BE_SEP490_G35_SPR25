@@ -263,7 +263,7 @@ namespace Planify_BackEnd.Services.Tasks
                     TaskDescription = item.TaskDescription,
                     StartTime = item.StartTime,
                     Deadline = item.Deadline,
-                    GroupId = item.GroupId,
+                    //GroupId = item.GroupId,
                     AmountBudget = item.AmountBudget,
                     Progress = item.Progress,
                     Status = item.Status

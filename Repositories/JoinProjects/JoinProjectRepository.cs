@@ -58,7 +58,6 @@ namespace Planify_BackEnd.Repositories.JoinGroups
                     UserId = implementerId,
                     EventId = eventId,
                     TimeJoinProject = DateTime.UtcNow,
-                    RoleId = 1
                 }).ToList();
 
                 _context.JoinProjects.AddRange(joinProjects);
@@ -87,7 +86,6 @@ namespace Planify_BackEnd.Repositories.JoinGroups
                     UserId = implementerId,
                     EventId = eventId,
                     TimeJoinProject = DateTime.UtcNow,
-                    RoleId = 1
                 };
 
                 _context.JoinProjects.AddRange(joinProjects);

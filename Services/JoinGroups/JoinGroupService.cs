@@ -27,7 +27,7 @@
 //            var isNotInProject = new List<Guid>();
 
 //            foreach (var implementerId in request.ImplementerIds)
-//            {            
+//            {
 //                bool isInGroup = await _joinGroupRepository.IsImplementerInGroup(implementerId, request.GroupId);
 //                if (isInGroup)
 //                {
@@ -35,43 +35,43 @@
 //                    continue;
 //                }
 
-                bool isInGroup = await _joinGroupRepository.IsImplementerInGroup(implementerId, request.GroupId);
-                if (isInGroup)
-                {
-//            if (successfulImplementers.Count > 0)
-//            {
-//                bool result = await _joinGroupRepository.AddImplementersToGroup(successfulImplementers, request.GroupId);
-//                if (result)
+//                bool isInGroup = await _joinGroupRepository.IsImplementerInGroup(implementerId, request.GroupId);
+//                if (isInGroup)
 //                {
-//                    foreach (var implementerId in successfulImplementers)
+//                    if (successfulImplementers.Count > 0)
 //                    {
-//                        bool isInProject = await _joinGroupRepository.IsUserInProject(implementerId, group.EventId);
-//                        if (!isInProject)
+//                        bool result = await _joinGroupRepository.AddImplementersToGroup(successfulImplementers, request.GroupId);
+//                        if (result)
 //                        {
-//                            isNotInProject.Add(implementerId);
-//                            continue;
+//                            foreach (var implementerId in successfulImplementers)
+//                            {
+//                                bool isInProject = await _joinGroupRepository.IsUserInProject(implementerId, group.EventId);
+//                                if (!isInProject)
+//                                {
+//                                    isNotInProject.Add(implementerId);
+//                                    continue;
+//                                }
+//                            }
+//                            await _joinProjectRepository.AddImplementersToProject(isNotInProject, group.EventId);
+//                            await _joinProjectRepository.AddRoleImplementers(successfulImplementers);
+//                            var successMessage = $"Đã thêm {successfulImplementers.Count} Implementers vào Group thành công!";
+//                            return new ResponseDTO(200, successMessage, successfulImplementers);
 //                        }
 //                    }
-//                    await _joinProjectRepository.AddImplementersToProject(isNotInProject, group.EventId);
-//                    await _joinProjectRepository.AddRoleImplementers(successfulImplementers);
-//                    var successMessage = $"Đã thêm {successfulImplementers.Count} Implementers vào Group thành công!";
-//                    return new ResponseDTO(200, successMessage, successfulImplementers);
+//                    {
+//                        await _joinProjectRepository.AddImplementersToProject(successfulImplementers, group.EventId);
+//                        await _joinProjectRepository.AddRoleImplementers(successfulImplementers);
+//                        var successMessage = $"Đã thêm {successfulImplementers.Count} Implementers vào Group thành công!";
+//                        return new ResponseDTO(200, successMessage, successfulImplementers);
+//                    }
 //                }
-//            }
-                {
-                    await _joinProjectRepository.AddImplementersToProject(successfulImplementers, group.EventId);
-                    await _joinProjectRepository.AddRoleImplementers(successfulImplementers);
-                    var successMessage = $"Đã thêm {successfulImplementers.Count} Implementers vào Group thành công!";
-                    return new ResponseDTO(200, successMessage, successfulImplementers);
-                }
-            }
 
-//            if (failedImplementers.Count == request.ImplementerIds.Count)
-//            {
-//                return new ResponseDTO(400, "Tất cả Implementers không thể thêm vào Group!", null);
-//            }
+//                if (failedImplementers.Count == request.ImplementerIds.Count)
+//                {
+//                    return new ResponseDTO(400, "Tất cả Implementers không thể thêm vào Group!", null);
+//                }
 
-//            return new ResponseDTO(500, "Có lỗi xảy ra khi thêm Implementers vào Group!", null);
+//                return new ResponseDTO(500, "Có lỗi xảy ra khi thêm Implementers vào Group!", null);
+//            }
 //        }
 //    }
-//}

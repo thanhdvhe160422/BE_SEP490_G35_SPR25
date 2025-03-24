@@ -109,23 +109,7 @@ public class EventRepository : IEventRepository
                 {
                     Id = em.Id,
                     MediaUrl = em.Media.MediaUrl
-                }).ToList(),
-                Groups = e.Groups.Select(g => new GroupDto
-                {
-                    Id = g.Id,
-                    GroupName = g.GroupName,
-                    AmountBudget = g.AmountBudget,
-                    JoinGroups = g.JoinGroups.Select(jg => new JoinGroupDto
-                    {
-                        Id = jg.Id,
-                        ImplementerId = jg.ImplementerId,
-                        ImplementerFirstName = jg.Implementer.FirstName,
-                        ImplementerLastName = jg.Implementer.LastName,
-                        TimeJoin = jg.TimeJoin,
-                        TimeOut = jg.TimeOut,
-                        Status = jg.Status
-                    }).ToList()
-                }).ToList()
+                }).ToList().ToList()
             })
             .FirstOrDefaultAsync();
 

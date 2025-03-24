@@ -41,7 +41,7 @@ namespace Planify_BackEnd.Controllers
                         e.CategoryEventId,
                         e.AmountBudget,
                         DurationHours = (e.EndTime - e.StartTime).TotalHours,
-                        Tasks = e.Groups.SelectMany(g => g.Tasks).Select(t => new
+                        Tasks = _dbContext.Tasks.Select(t => new
                         {
                             t.TaskName,
                             t.TaskDescription,
