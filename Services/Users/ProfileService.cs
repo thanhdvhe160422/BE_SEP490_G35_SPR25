@@ -134,7 +134,7 @@ namespace Planify_BackEnd.Services.User
                 return updatedprofile;
             }catch
             {
-                return new ProfileUpdateModel();
+                throw new Exception();
             }
         }
     }
