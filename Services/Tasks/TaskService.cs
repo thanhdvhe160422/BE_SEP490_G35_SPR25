@@ -4,7 +4,7 @@ using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.SubTasks;
 using Planify_BackEnd.DTOs.Tasks;
 using Planify_BackEnd.Models;
-using Planify_BackEnd.Repositories.Groups;
+//using Planify_BackEnd.Repositories.Groups;
 using Planify_BackEnd.Repositories.Tasks;
 using TaskModel = Planify_BackEnd.Models.Task;
 using Planify_BackEnd.DTOs.Groups;
@@ -12,12 +12,11 @@ namespace Planify_BackEnd.Services.Tasks
 {
     public class TaskService : ITaskService
     {
-        private readonly IGroupRepository _groupRepository;
+        //private readonly IGroupRepository _groupRepository;
         private readonly ITaskRepository _taskRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public TaskService(ITaskRepository taskRepository, IHttpContextAccessor httpContextAccessor, IGroupRepository groupRepository)
+        public TaskService(ITaskRepository taskRepository, IHttpContextAccessor httpContextAccessor/*, IGroupRepository groupRepository*/)
         {
-            _groupRepository = groupRepository;
             _taskRepository = taskRepository;
             _httpContextAccessor = httpContextAccessor;
         }
@@ -25,10 +24,10 @@ namespace Planify_BackEnd.Services.Tasks
         {
             try
             {
-                if (!_groupRepository.IsGroupExists(taskDTO.GroupId))
-                {
-                    throw new ArgumentException("Group does not exists.");
-                }
+                //if (!_groupRepository.IsGroupExists(taskDTO.GroupId))
+                //{
+                //    throw new ArgumentException("Group does not exists.");
+                //}
                 if (string.IsNullOrWhiteSpace(taskDTO.TaskName))
                 {
                     return new ResponseDTO(400, "Task name is required.", null);
@@ -45,7 +44,7 @@ namespace Planify_BackEnd.Services.Tasks
                     StartTime = taskDTO.StartTime,
                     Deadline = taskDTO.Deadline,
                     AmountBudget = taskDTO.AmountBudget,
-                    GroupId = taskDTO.GroupId,
+                    //GroupId = taskDTO.GroupId,
                     Progress = taskDTO.Progress,
                     Status = 1,
                     CreateBy = organizerId,
@@ -81,7 +80,7 @@ namespace Planify_BackEnd.Services.Tasks
                     TaskDescription = item.TaskDescription,
                     StartTime = item.StartTime,
                     Deadline = item.Deadline,
-                    GroupId = item.GroupId,
+                    //GroupId = item.GroupId,
                     AmountBudget = item.AmountBudget,
                     Progress = item.Progress,
                     Status = item.Status
@@ -106,7 +105,7 @@ namespace Planify_BackEnd.Services.Tasks
                     TaskDescription = item.TaskDescription,
                     StartTime = item.StartTime,
                     Deadline = item.Deadline,
-                    GroupId = item.GroupId,
+                    //GroupId = item.GroupId,
                     AmountBudget = item.AmountBudget,
                     Progress = item.Progress,
                     Status = item.Status
@@ -203,13 +202,13 @@ namespace Planify_BackEnd.Services.Tasks
                     },
                     CreateDate = task.CreateDate,
                     Deadline = task.Deadline,
-                    GroupId = task.GroupId,
-                    Group = task.Group == null ? new GroupNameVM() : new GroupNameVM
-                    {
-                        Id = task.Group.Id,
-                        GroupName = task.Group.GroupName,
-                        EventName = task.Group.Event.EventTitle
-                    },
+                    //GroupId = task.GroupId,
+                    //Group = task.Group == null ? new GroupNameVM() : new GroupNameVM
+                    //{
+                    //    Id = task.Group.Id,
+                    //    GroupName = task.Group.GroupName,
+                    //    EventName = task.Group.Event.EventTitle
+                    //},
                     Progress = task.Progress,
                     StartTime = task.StartTime,
                     Status = task.Status,

@@ -47,8 +47,6 @@ public partial class Event
 
     public virtual ICollection<EventMedium> EventMedia { get; set; } = new List<EventMedium>();
 
-    public virtual ICollection<Group> Groups { get; set; } = new List<Group>();
-
     public virtual ICollection<JoinProject> JoinProjects { get; set; } = new List<JoinProject>();
 
     public virtual User? Manager { get; set; }
