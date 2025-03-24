@@ -4,7 +4,7 @@ using Planify_BackEnd.DTOs.Campus;
 using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories;
-using Planify_BackEnd.Repositories.Groups;
+//using Planify_BackEnd.Repositories.Groups;
 using Planify_BackEnd.Services.Events;
 using static Planify_BackEnd.DTOs.Events.EventDetailResponseDTO;
 using Planify_BackEnd.Services.GoogleDrive;
@@ -15,15 +15,15 @@ public class EventService : IEventService
 {
     private readonly IEventRepository _eventRepository;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IGroupRepository _groupRepository;
+    //private readonly IGroupRepository _groupRepository;
     private readonly GoogleDriveService _googleDriveService;
     private readonly IJoinProjectRepository _joinProjectRepository;
     private readonly ICampusRepository _campusRepository;
     private readonly ICategoryRepository _categoryRepository;
-    public EventService(IEventRepository eventRepository, IHttpContextAccessor httpContextAccessor, IGroupRepository groupRepository, GoogleDriveService googleDriveService, IJoinProjectRepository joinProjectRepository, ICampusRepository campusRepository, ICategoryRepository categoryRepository)
+    public EventService(IEventRepository eventRepository, IHttpContextAccessor httpContextAccessor, /*IGroupRepository groupRepository,*/ GoogleDriveService googleDriveService, IJoinProjectRepository joinProjectRepository, ICampusRepository campusRepository, ICategoryRepository categoryRepository)
     {
         _eventRepository = eventRepository;
-        _groupRepository = groupRepository;
+        //_groupRepository = groupRepository;
         _httpContextAccessor = httpContextAccessor;
         _googleDriveService = googleDriveService;
         _joinProjectRepository = joinProjectRepository;
@@ -104,7 +104,7 @@ public class EventService : IEventService
                 AmountBudget = eventDTO.AmountBudget,
                 IsPublic = 0,
                 TimePublic = null,
-                Status =  0,
+                Status = 0,
                 CampusId = int.Parse(campusIdClaim),
                 CategoryEventId = eventDTO.CategoryEventId,
                 Placed = eventDTO.Placed,
@@ -114,36 +114,36 @@ public class EventService : IEventService
 
             await _eventRepository.CreateEventAsync(newEvent);
 
-            if (eventDTO.Groups != null && eventDTO.Groups.Count > 0)
-            {
-                foreach (var group in eventDTO.Groups)
-                {
-                    var newGroup = new Group
-                    {
-                        EventId = newEvent.Id,
-                        GroupName = group.GroupName,
-                        CreateBy = organizerId,
-                    };
-                    await _groupRepository.CreateGroupAsync(newGroup);
+            //if (eventDTO.Groups != null && eventDTO.Groups.Count > 0)
+            //{
+            //    foreach (var group in eventDTO.Groups)
+            //    {
+            //        var newGroup = new Group
+            //        {
+            //            EventId = newEvent.Id,
+            //            GroupName = group.GroupName,
+            //            CreateBy = organizerId,
+            //        };
+            //        await _groupRepository.CreateGroupAsync(newGroup);
 
-                    foreach (var implementerId in group.ImplementerIds)
-                    {
-                        var joinGroup = new JoinGroup
-                        {
-                            GroupId = newGroup.Id,
-                            ImplementerId = implementerId,
-                            TimeJoin = DateTime.UtcNow,
-                            Status = 1,
-                        };
-                        bool result = await _groupRepository.AddImplementerToGroupAsync(joinGroup);
-                        if (result)
-                        {
-                            await _joinProjectRepository.AddImplementerToProject(implementerId, newEvent.Id);
-                            await _joinProjectRepository.AddRoleImplementer(implementerId);
-                        }
-                    }
-                }
-            }
+            //        foreach (var implementerId in group.ImplementerIds)
+            //        {
+            //            var joinGroup = new JoinGroup
+            //            {
+            //                GroupId = newGroup.Id,
+            //                ImplementerId = implementerId,
+            //                TimeJoin = DateTime.UtcNow,
+            //                Status = 1,
+            //            };
+            //            bool result = await _groupRepository.AddImplementerToGroupAsync(joinGroup);
+            //            if (result)
+            //            {
+            //                await _joinProjectRepository.AddImplementerToProject(implementerId, newEvent.Id);
+            //                await _joinProjectRepository.AddRoleImplementer(implementerId);
+            //            }
+            //        }
+            //    }
+            //}
             return new ResponseDTO(201, "Event creates successfully!", newEvent);
         }
         catch (Exception ex)
@@ -156,15 +156,21 @@ public class EventService : IEventService
     {
         if (imageDTO.EventMediaFiles != null && imageDTO.EventMediaFiles.Any())
         {
-            var uploadTasks = imageDTO.EventMediaFiles.Select(async file =>
+            foreach (var file in imageDTO.EventMediaFiles)
             {
                 using var stream = file.OpenReadStream();
-                string contentType = file.ContentType; // Lấy loại file (image/jpeg, image/png,...)
-                string driveUrl = await _googleDriveService.UploadFileAsync(stream, file.FileName, contentType);
-
+                string contentType = file.ContentType;
+                string driveUrl;
+                driveUrl = await _googleDriveService.UploadFileAsync(stream, file.FileName, contentType);
+                if (string.IsNullOrEmpty(driveUrl))
+                {
+                    Console.WriteLine($"❌ Upload thất bại cho file {file.FileName}");
+                    throw new Exception("Upload failed, MediaURL is null or empty.");
+                }
+                Console.WriteLine($"✅ File {file.FileName} đã upload thành công: {driveUrl}");
                 var mediaItem = new Medium { MediaUrl = driveUrl };
                 await _eventRepository.CreateMediaItemAsync(mediaItem);
-
+              
                 var eventMedia = new EventMedium
                 {
                     EventId = imageDTO.EventId,
@@ -172,13 +178,12 @@ public class EventService : IEventService
                     Status = 1
                 };
                 await _eventRepository.AddEventMediaAsync(eventMedia);
-            });
-
-            await System.Threading.Tasks.Task.WhenAll(uploadTasks); // Chạy tất cả các task upload cùng lúc
+            }
         }
 
         return new ResponseDTO(201, "Upload Image successfully!", null);
     }
+
 
     public async Task<ResponseDTO> GetEventDetailAsync(int eventId)
     {
@@ -250,7 +255,8 @@ public class EventService : IEventService
                 }).ToList()
             };
             return eventDetailResponseDTO;
-        }catch(Exception ex)
+        }
+        catch (Exception ex)
         {
             Console.WriteLine("event service - update event: " + ex.Message);
             return new EventDetailDto();
@@ -262,7 +268,8 @@ public class EventService : IEventService
         try
         {
             return await _eventRepository.DeleteEventAsync(eventId);
-        }catch(Exception ex)
+        }
+        catch (Exception ex)
         {
             Console.WriteLine("event service - delete event: " + ex.Message);
             return false;
@@ -273,8 +280,8 @@ public class EventService : IEventService
     {
         try
         {
-            var events = await _eventRepository.SearchEventAsync(page,pageSize,title,startTime,endTime,
-                minBudget,maxBudget,isPublic,status,CategoryEventId,placed);
+            var events = await _eventRepository.SearchEventAsync(page, pageSize, title, startTime, endTime,
+                minBudget, maxBudget, isPublic, status, CategoryEventId, placed);
             var eventDTOs = events.Select(e => new EventGetListResponseDTO
             {
                 Id = e.Id,
@@ -296,7 +303,8 @@ public class EventService : IEventService
             }).ToList();
 
             return eventDTOs;
-        }catch(Exception ex)
+        }
+        catch (Exception ex)
         {
             Console.WriteLine("event service - search event: " + ex.Message);
             return new List<EventGetListResponseDTO>();

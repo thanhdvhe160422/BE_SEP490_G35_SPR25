@@ -17,7 +17,7 @@ public partial class SubTask
 
     public DateTime StartTime { get; set; }
 
-    public DateTime Deadline { get; set; }
+    public DateTime? Deadline { get; set; }
 
     public decimal AmountBudget { get; set; }
 

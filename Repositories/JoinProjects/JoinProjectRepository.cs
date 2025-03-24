@@ -19,6 +19,9 @@ namespace Planify_BackEnd.Repositories.JoinGroups
             try
             {
                 return await _context.JoinProjects
+                    .Include(jp => jp.Event)
+                    .Include(jp => jp.User)
+                    .Include(jp => jp.Role)
                     .Where(jp => jp.UserId == userId)
                     .Skip((page - 1) * pageSize).Take(pageSize)
                     .ToListAsync(); 
@@ -58,7 +61,6 @@ namespace Planify_BackEnd.Repositories.JoinGroups
                     UserId = implementerId,
                     EventId = eventId,
                     TimeJoinProject = DateTime.UtcNow,
-                    RoleId = 1
                 }).ToList();
 
                 _context.JoinProjects.AddRange(joinProjects);
@@ -87,7 +89,6 @@ namespace Planify_BackEnd.Repositories.JoinGroups
                     UserId = implementerId,
                     EventId = eventId,
                     TimeJoinProject = DateTime.UtcNow,
-                    RoleId = 1
                 };
 
                 _context.JoinProjects.AddRange(joinProjects);
