@@ -24,16 +24,10 @@ namespace Planify_BackEnd.Services.JoinGroups
 
             var failedImplementers = new List<Guid>();
             var successfulImplementers = new List<Guid>();
+            var isNotInProject = new List<Guid>();
 
             foreach (var implementerId in request.ImplementerIds)
-            {
-                bool isInProject = await _joinGroupRepository.IsUserInProject(implementerId, group.EventId);
-                if (!isInProject)
-                {
-                    failedImplementers.Add(implementerId);
-                    continue;
-                }
-
+            {            
                 bool isInGroup = await _joinGroupRepository.IsImplementerInGroup(implementerId, request.GroupId);
                 if (isInGroup)
                 {
@@ -49,7 +43,16 @@ namespace Planify_BackEnd.Services.JoinGroups
                 bool result = await _joinGroupRepository.AddImplementersToGroup(successfulImplementers, request.GroupId);
                 if (result)
                 {
-                    await _joinProjectRepository.AddImplementersToProject(successfulImplementers, group.EventId);
+                    foreach (var implementerId in successfulImplementers)
+                    {
+                        bool isInProject = await _joinGroupRepository.IsUserInProject(implementerId, group.EventId);
+                        if (!isInProject)
+                        {
+                            isNotInProject.Add(implementerId);
+                            continue;
+                        }
+                    }
+                    await _joinProjectRepository.AddImplementersToProject(isNotInProject, group.EventId);
                     await _joinProjectRepository.AddRoleImplementers(successfulImplementers);
                     var successMessage = $"Đã thêm {successfulImplementers.Count} Implementers vào Group thành công!";
                     return new ResponseDTO(200, successMessage, successfulImplementers);

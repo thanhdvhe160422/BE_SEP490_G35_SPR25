@@ -38,6 +38,7 @@ using Planify_BackEnd.Services.GoogleDrive;
 using Planify_BackEnd.Services.JoinGroups;
 using Planify_BackEnd.Services.Medias;
 using Planify_BackEnd.Repositories.Medias;
+using Planify_BackEnd.Services.ChatGPT;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -95,6 +96,7 @@ builder.Services.AddScoped<IUserservice, UserService>();
 builder.Services.AddScoped<GoogleDriveService>();
 builder.Services.AddScoped<IJoinGroupService, JoinGroupService>();
 builder.Services.AddScoped<IMediumService, MediumService>();
+builder.Services.AddScoped<IChatGPTService, ChatGPTService>();
 // Thêm Repository
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<IEventSpectatorRepository, EventSpectatorRepository>();
@@ -120,6 +122,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 
 builder.Services.AddSignalR();
+builder.Services.AddHttpClient<IChatGPTService, ChatGPTService>();
 
 // Thêm Swagger
 builder.Services.AddEndpointsApiExplorer();
