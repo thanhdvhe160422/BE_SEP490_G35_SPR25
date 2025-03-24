@@ -27,15 +27,13 @@ public partial class PlanifyContext : DbContext
 
     public virtual DbSet<EventMedium> EventMedia { get; set; }
 
-    public virtual DbSet<Group> Groups { get; set; }
-
     public virtual DbSet<InvoiceImagesSubTask> InvoiceImagesSubTasks { get; set; }
 
     public virtual DbSet<InvoiceImagesTask> InvoiceImagesTasks { get; set; }
 
-    public virtual DbSet<JoinGroup> JoinGroups { get; set; }
-
     public virtual DbSet<JoinProject> JoinProjects { get; set; }
+
+    public virtual DbSet<JoinTask> JoinTasks { get; set; }
 
     public virtual DbSet<Medium> Media { get; set; }
 
@@ -59,11 +57,15 @@ public partial class PlanifyContext : DbContext
 
     public virtual DbSet<Ward> Wards { get; set; }
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Server=VUMINH;Database=Planify;User Id=sa;Password=Vuminh271103@;TrustServerCertificate=True;");
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Address>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Address__3214EC074BE65F67");
+            entity.HasKey(e => e.Id).HasName("PK__Address__3214EC07B0AB2338");
 
             entity.ToTable("Address");
 
@@ -72,12 +74,12 @@ public partial class PlanifyContext : DbContext
             entity.HasOne(d => d.Ward).WithMany(p => p.Addresses)
                 .HasForeignKey(d => d.WardId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Address__WardId__619B8048");
+                .HasConstraintName("FK__Address__WardId__29221CFB");
         });
 
         modelBuilder.Entity<Campus>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Campus__3214EC07FE14ED64");
+            entity.HasKey(e => e.Id).HasName("PK__Campus__3214EC0773E647DE");
 
             entity.ToTable("Campus");
 
@@ -86,7 +88,7 @@ public partial class PlanifyContext : DbContext
 
         modelBuilder.Entity<CategoryEvent>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Category__3214EC07C2C4BC9B");
+            entity.HasKey(e => e.Id).HasName("PK__Category__3214EC07DD5F1F51");
 
             entity.ToTable("CategoryEvent");
 
@@ -96,12 +98,12 @@ public partial class PlanifyContext : DbContext
             entity.HasOne(d => d.Campus).WithMany(p => p.CategoryEvents)
                 .HasForeignKey(d => d.CampusId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__CategoryE__Campu__6383C8BA");
+                .HasConstraintName("FK__CategoryE__Campu__2A164134");
         });
 
         modelBuilder.Entity<District>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__District__3214EC076D4EBBB7");
+            entity.HasKey(e => e.Id).HasName("PK__District__3214EC07EDA8543A");
 
             entity.ToTable("District");
 
@@ -110,12 +112,12 @@ public partial class PlanifyContext : DbContext
             entity.HasOne(d => d.Province).WithMany(p => p.Districts)
                 .HasForeignKey(d => d.ProvinceId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__District__Provin__656C112C");
+                .HasConstraintName("FK__District__Provin__2B0A656D");
         });
 
         modelBuilder.Entity<Event>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Event__3214EC0778B2F0DC");
+            entity.HasKey(e => e.Id).HasName("PK__Event__3214EC07F04798FE");
 
             entity.ToTable("Event");
 
@@ -131,65 +133,45 @@ public partial class PlanifyContext : DbContext
             entity.HasOne(d => d.Campus).WithMany(p => p.Events)
                 .HasForeignKey(d => d.CampusId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Event__CampusId__6754599E");
+                .HasConstraintName("FK__Event__CampusId__2BFE89A6");
 
             entity.HasOne(d => d.CategoryEvent).WithMany(p => p.Events)
                 .HasForeignKey(d => d.CategoryEventId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Event__CategoryE__693CA210");
+                .HasConstraintName("FK__Event__CategoryE__2CF2ADDF");
 
             entity.HasOne(d => d.CreateByNavigation).WithMany(p => p.EventCreateByNavigations)
                 .HasForeignKey(d => d.CreateBy)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Event__CreateBy__6B24EA82");
+                .HasConstraintName("FK__Event__CreateBy__2DE6D218");
 
             entity.HasOne(d => d.Manager).WithMany(p => p.EventManagers)
                 .HasForeignKey(d => d.ManagerId)
-                .HasConstraintName("FK__Event__ManagerId__6D0D32F4");
+                .HasConstraintName("FK__Event__ManagerId__2EDAF651");
 
             entity.HasOne(d => d.UpdateByNavigation).WithMany(p => p.EventUpdateByNavigations)
                 .HasForeignKey(d => d.UpdateBy)
-                .HasConstraintName("FK__Event__UpdateBy__6EF57B66");
+                .HasConstraintName("FK__Event__UpdateBy__2FCF1A8A");
         });
 
         modelBuilder.Entity<EventMedium>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__EventMed__3214EC0773D4708A");
+            entity.HasKey(e => e.Id).HasName("PK__EventMed__3214EC074DB46BA9");
 
             entity.HasOne(d => d.Event).WithMany(p => p.EventMedia)
                 .HasForeignKey(d => d.EventId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__EventMedi__Event__70DDC3D8");
+                .HasConstraintName("FK__EventMedi__Event__30C33EC3");
 
             entity.HasOne(d => d.Media).WithMany(p => p.EventMedia)
                 .HasForeignKey(d => d.MediaId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__EventMedi__Media__72C60C4A");
-        });
-
-        modelBuilder.Entity<Group>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__Group__3214EC0705CC4DBD");
-
-            entity.ToTable("Group");
-
-            entity.Property(e => e.AmountBudget).HasColumnType("money");
-            entity.Property(e => e.GroupName).HasMaxLength(255);
-
-            entity.HasOne(d => d.CreateByNavigation).WithMany(p => p.Groups)
-                .HasForeignKey(d => d.CreateBy)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Group__CreateBy__74AE54BC");
-
-            entity.HasOne(d => d.Event).WithMany(p => p.Groups)
-                .HasForeignKey(d => d.EventId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Group__EventId__76969D2E");
+                .HasConstraintName("FK__EventMedi__Media__31B762FC");
         });
 
         modelBuilder.Entity<InvoiceImagesSubTask>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__InvoiceI__3214EC07913DC55B");
+            entity.HasKey(e => e.Id).HasName("PK__InvoiceI__3214EC07E4B4A7BB");
 
             entity.ToTable("InvoiceImagesSubTask");
 
@@ -198,17 +180,17 @@ public partial class PlanifyContext : DbContext
             entity.HasOne(d => d.Media).WithMany(p => p.InvoiceImagesSubTasks)
                 .HasForeignKey(d => d.MediaId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__InvoiceIm__Media__787EE5A0");
+                .HasConstraintName("FK__InvoiceIm__Media__3493CFA7");
 
             entity.HasOne(d => d.SubTask).WithMany(p => p.InvoiceImagesSubTasks)
                 .HasForeignKey(d => d.SubTaskId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__InvoiceIm__SubTa__7A672E12");
+                .HasConstraintName("FK__InvoiceIm__SubTa__3587F3E0");
         });
 
         modelBuilder.Entity<InvoiceImagesTask>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__InvoiceI__3214EC077620075E");
+            entity.HasKey(e => e.Id).HasName("PK__InvoiceI__3214EC079F0F1DA1");
 
             entity.ToTable("InvoiceImagesTask");
 
@@ -217,37 +199,17 @@ public partial class PlanifyContext : DbContext
             entity.HasOne(d => d.Media).WithMany(p => p.InvoiceImagesTasks)
                 .HasForeignKey(d => d.MediaId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__InvoiceIm__Media__7C4F7684");
+                .HasConstraintName("FK__InvoiceIm__Media__00200768");
 
             entity.HasOne(d => d.Task).WithMany(p => p.InvoiceImagesTasks)
                 .HasForeignKey(d => d.TaskId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__InvoiceIm__TaskI__7E37BEF6");
-        });
-
-        modelBuilder.Entity<JoinGroup>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__JoinGrou__3214EC07C5D9612B");
-
-            entity.ToTable("JoinGroup");
-
-            entity.Property(e => e.TimeJoin).HasColumnType("datetime");
-            entity.Property(e => e.TimeOut).HasColumnType("datetime");
-
-            entity.HasOne(d => d.Group).WithMany(p => p.JoinGroups)
-                .HasForeignKey(d => d.GroupId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__JoinGroup__Group__00200768");
-
-            entity.HasOne(d => d.Implementer).WithMany(p => p.JoinGroups)
-                .HasForeignKey(d => d.ImplementerId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__JoinGroup__Imple__02084FDA");
+                .HasConstraintName("FK__InvoiceIm__TaskI__37703C52");
         });
 
         modelBuilder.Entity<JoinProject>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__JoinProj__3214EC07797AC8DD");
+            entity.HasKey(e => e.Id).HasName("PK__JoinProj__3214EC07FB0FD2A3");
 
             entity.ToTable("JoinProject");
 
@@ -259,22 +221,36 @@ public partial class PlanifyContext : DbContext
             entity.HasOne(d => d.Event).WithMany(p => p.JoinProjects)
                 .HasForeignKey(d => d.EventId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__JoinProje__Event__03F0984C");
-
-            entity.HasOne(d => d.Role).WithMany(p => p.JoinProjects)
-                .HasForeignKey(d => d.RoleId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__JoinProje__RoleI__05D8E0BE");
+                .HasConstraintName("FK__JoinProje__Event__3A4CA8FD");
 
             entity.HasOne(d => d.User).WithMany(p => p.JoinProjects)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__JoinProje__UserI__07C12930");
+                .HasConstraintName("FK__JoinProje__UserI__3C34F16F");
+        });
+
+        modelBuilder.Entity<JoinTask>(entity =>
+        {
+            entity.HasKey(e => e.JoinTaskId).HasName("PK__JoinTask__FE88AED4E2FFA127");
+
+            entity.ToTable("JoinTask");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Task).WithMany(p => p.JoinTasks)
+                .HasForeignKey(d => d.TaskId)
+                .HasConstraintName("FK_JoinTask_Task");
+
+            entity.HasOne(d => d.User).WithMany(p => p.JoinTasks)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK_JoinTask_User");
         });
 
         modelBuilder.Entity<Medium>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Media__3214EC0797EB161A");
+            entity.HasKey(e => e.Id).HasName("PK__Media__3214EC07A53CB768");
 
             entity.Property(e => e.MediaUrl)
                 .HasMaxLength(500)
@@ -283,7 +259,7 @@ public partial class PlanifyContext : DbContext
 
         modelBuilder.Entity<Province>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Province__3214EC073FDC12C3");
+            entity.HasKey(e => e.Id).HasName("PK__Province__3214EC07BEC5875A");
 
             entity.ToTable("Province");
 
@@ -292,7 +268,7 @@ public partial class PlanifyContext : DbContext
 
         modelBuilder.Entity<Report>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Report__3214EC07A666102D");
+            entity.HasKey(e => e.Id).HasName("PK__Report__3214EC07270C41DE");
 
             entity.ToTable("Report");
 
@@ -302,37 +278,37 @@ public partial class PlanifyContext : DbContext
             entity.HasOne(d => d.SendFromNavigation).WithMany(p => p.ReportSendFromNavigations)
                 .HasForeignKey(d => d.SendFrom)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Report__SendFrom__09A971A2");
+                .HasConstraintName("FK__Report__SendFrom__3D2915A8");
 
             entity.HasOne(d => d.SendToNavigation).WithMany(p => p.ReportSendToNavigations)
                 .HasForeignKey(d => d.SendTo)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Report__SendTo__0B91BA14");
+                .HasConstraintName("FK__Report__SendTo__3E1D39E1");
 
             entity.HasOne(d => d.Task).WithMany(p => p.Reports)
                 .HasForeignKey(d => d.TaskId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Report__TaskId__0D7A0286");
+                .HasConstraintName("FK__Report__TaskId__3F115E1A");
         });
 
         modelBuilder.Entity<ReportMedium>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__ReportMe__3214EC07C2321FC1");
+            entity.HasKey(e => e.Id).HasName("PK__ReportMe__3214EC077E460D6D");
 
             entity.HasOne(d => d.Media).WithMany(p => p.ReportMedia)
                 .HasForeignKey(d => d.MediaId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__ReportMed__Media__0F624AF8");
+                .HasConstraintName("FK__ReportMed__Media__40058253");
 
             entity.HasOne(d => d.Report).WithMany(p => p.ReportMedia)
                 .HasForeignKey(d => d.ReportId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__ReportMed__Repor__114A936A");
+                .HasConstraintName("FK__ReportMed__Repor__40F9A68C");
         });
 
         modelBuilder.Entity<Role>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Role__3214EC07D70769ED");
+            entity.HasKey(e => e.Id).HasName("PK__Role__3214EC070FA2515F");
 
             entity.ToTable("Role");
 
@@ -341,7 +317,7 @@ public partial class PlanifyContext : DbContext
 
         modelBuilder.Entity<SendRequest>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SendRequ__3214EC07D7C0EDC2");
+            entity.HasKey(e => e.Id).HasName("PK__SendRequ__3214EC07A2AE8E62");
 
             entity.ToTable("SendRequest");
 
@@ -350,16 +326,16 @@ public partial class PlanifyContext : DbContext
             entity.HasOne(d => d.Event).WithMany(p => p.SendRequests)
                 .HasForeignKey(d => d.EventId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__SendReque__Event__1332DBDC");
+                .HasConstraintName("FK__SendReque__Event__41EDCAC5");
 
             entity.HasOne(d => d.Manager).WithMany(p => p.SendRequests)
                 .HasForeignKey(d => d.ManagerId)
-                .HasConstraintName("FK__SendReque__Manag__151B244E");
+                .HasConstraintName("FK__SendReque__Manag__42E1EEFE");
         });
 
         modelBuilder.Entity<SubTask>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__SubTask__3214EC07309C87B4");
+            entity.HasKey(e => e.Id).HasName("PK__SubTask__3214EC07AC10CF57");
 
             entity.ToTable("SubTask");
 
@@ -371,17 +347,17 @@ public partial class PlanifyContext : DbContext
             entity.HasOne(d => d.CreateByNavigation).WithMany(p => p.SubTasks)
                 .HasForeignKey(d => d.CreateBy)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__SubTask__CreateB__17036CC0");
+                .HasConstraintName("FK__SubTask__CreateB__43D61337");
 
             entity.HasOne(d => d.Task).WithMany(p => p.SubTasks)
                 .HasForeignKey(d => d.TaskId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__SubTask__TaskId__18EBB532");
+                .HasConstraintName("FK__SubTask__TaskId__44CA3770");
         });
 
         modelBuilder.Entity<Task>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Task__3214EC07947E819F");
+            entity.HasKey(e => e.Id).HasName("PK__Task__3214EC07BBDCA440");
 
             entity.ToTable("Task");
 
@@ -394,17 +370,17 @@ public partial class PlanifyContext : DbContext
             entity.HasOne(d => d.CreateByNavigation).WithMany(p => p.Tasks)
                 .HasForeignKey(d => d.CreateBy)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Task__CreateBy__1AD3FDA4");
+                .HasConstraintName("FK__Task__CreateBy__45BE5BA9");
 
-            entity.HasOne(d => d.Group).WithMany(p => p.Tasks)
-                .HasForeignKey(d => d.GroupId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Task__GroupId__1CBC4616");
+            entity.HasOne(d => d.Event).WithMany(p => p.Tasks)
+                .HasForeignKey(d => d.EventId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("FK_Task_Event");
         });
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__User__3214EC07BA8F3E40");
+            entity.HasKey(e => e.Id).HasName("PK__User__3214EC07FDD068E8");
 
             entity.ToTable("User");
 
@@ -428,38 +404,38 @@ public partial class PlanifyContext : DbContext
 
             entity.HasOne(d => d.Address).WithMany(p => p.Users)
                 .HasForeignKey(d => d.AddressId)
-                .HasConstraintName("FK__User__AddressId__1EA48E88");
+                .HasConstraintName("FK__User__AddressId__47A6A41B");
 
             entity.HasOne(d => d.Avatar).WithMany(p => p.Users)
                 .HasForeignKey(d => d.AvatarId)
-                .HasConstraintName("FK__User__AvatarId__208CD6FA");
+                .HasConstraintName("FK__User__AvatarId__489AC854");
 
             entity.HasOne(d => d.Campus).WithMany(p => p.Users)
                 .HasForeignKey(d => d.CampusId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__User__CampusId__22751F6C");
+                .HasConstraintName("FK__User__CampusId__498EEC8D");
         });
 
         modelBuilder.Entity<UserRole>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__UserRole__3214EC0790785854");
+            entity.HasKey(e => e.Id).HasName("PK__UserRole__3214EC0766E9DDD1");
 
             entity.ToTable("UserRole");
 
             entity.HasOne(d => d.Role).WithMany(p => p.UserRoles)
                 .HasForeignKey(d => d.RoleId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__UserRole__RoleId__245D67DE");
+                .HasConstraintName("FK__UserRole__RoleId__4A8310C6");
 
             entity.HasOne(d => d.User).WithMany(p => p.UserRoles)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__UserRole__UserId__2645B050");
+                .HasConstraintName("FK__UserRole__UserId__4B7734FF");
         });
 
         modelBuilder.Entity<Ward>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Ward__3214EC078ABF4832");
+            entity.HasKey(e => e.Id).HasName("PK__Ward__3214EC07504C72E0");
 
             entity.ToTable("Ward");
 
@@ -469,7 +445,7 @@ public partial class PlanifyContext : DbContext
             entity.HasOne(d => d.District).WithMany(p => p.Wards)
                 .HasForeignKey(d => d.DistrictId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Ward__DistrictID__282DF8C2");
+                .HasConstraintName("FK__Ward__DistrictID__3E52440B");
         });
 
         OnModelCreatingPartial(modelBuilder);

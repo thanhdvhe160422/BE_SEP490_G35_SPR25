@@ -57,7 +57,7 @@ namespace Planify_BackEnd.Services.Reports
                         Progress = report.Task.Progress,
                         StartTime = report.Task.StartTime,
                         Status = report.Task.Status,
-                        GroupId = report.Task.GroupId
+                        //GroupId = report.Task.GroupId
                     },
                     ReportMedia = report.ReportMedia == null ? new List<ReportMediumVM>() : report.ReportMedia.Select(rm => new ReportMediumVM
                     {
@@ -119,7 +119,7 @@ namespace Planify_BackEnd.Services.Reports
                         Progress = report.Task.Progress,
                         StartTime = report.Task.StartTime,
                         Status = report.Task.Status,
-                        GroupId = report.Task.GroupId
+                        //GroupId = report.Task.GroupId
                     },
                     ReportMedia = report.ReportMedia == null ? new List<ReportMediumVM>() : report.ReportMedia.Select(rm => new ReportMediumVM
                     {
@@ -215,7 +215,7 @@ namespace Planify_BackEnd.Services.Reports
                         Progress = report.Task.Progress,
                         StartTime = report.Task.StartTime,
                         Status = report.Task.Status,
-                        GroupId = report.Task.GroupId
+                        //GroupId = report.Task.GroupId
                     },
                     ReportMedia = report.ReportMedia == null ? new List<ReportMediumVM>() : report.ReportMedia.Select(rm => new ReportMediumVM
                     {

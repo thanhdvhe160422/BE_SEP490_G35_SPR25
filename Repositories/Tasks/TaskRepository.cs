@@ -52,7 +52,8 @@ namespace Planify_BackEnd.Repositories.Tasks
         {
             try
             {
-                return await _context.Tasks.Where(t=>t.GroupId==groupId).ToListAsync();
+                //return await _context.Tasks.Where(t=>t.GroupId==groupId).ToListAsync();
+                return null;
             }
             catch (Exception ex)
             {
@@ -149,7 +150,7 @@ namespace Planify_BackEnd.Repositories.Tasks
             {
                 return _context.Tasks
                     .Include(t=>t.CreateByNavigation)
-                    .Include(t=>t.Group).ThenInclude(g=>g.Event)
+                    //.Include(t=>t.Group).ThenInclude(g=>g.Event)
                     .Include(t=>t.SubTasks).ThenInclude(st=>st.CreateByNavigation)
                     .FirstOrDefault(t => t.Id == taskId);
             }

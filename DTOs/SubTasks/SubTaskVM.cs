@@ -17,7 +17,7 @@ namespace Planify_BackEnd.DTOs.SubTasks
 
         public DateTime StartTime { get; set; }
 
-        public DateTime Deadline { get; set; }
+        public DateTime? Deadline { get; set; }
 
         public decimal AmountBudget { get; set; }
 
