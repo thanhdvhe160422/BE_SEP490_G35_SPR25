@@ -19,7 +19,7 @@ using Planify_BackEnd.Services.SubTasks;
 using Planify_BackEnd.Services.Tasks;
 using Planify_BackEnd.Repositories.Tasks;
 using Planify_BackEnd.Services.Groups;
-using Planify_BackEnd.Repositories.Groups;
+//using Planify_BackEnd.Repositories.Groups;
 using Planify_BackEnd.Services.JoinProjects;
 using Planify_BackEnd.Repositories.JoinGroups;
 using Planify_BackEnd.Services.Campus;
@@ -38,6 +38,7 @@ using Planify_BackEnd.Services.GoogleDrive;
 using Planify_BackEnd.Services.JoinGroups;
 using Planify_BackEnd.Services.Medias;
 using Planify_BackEnd.Repositories.Medias;
+using Planify_BackEnd.Services.ChatGPT;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -84,7 +85,7 @@ builder.Services.AddScoped<IEventSpectatorService, EventSpectatorService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<ISubTaskService, SubTaskService>();
 builder.Services.AddScoped<IProfileService,ProfileService>();
-builder.Services.AddScoped<IGroupService, GroupService>();
+//builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<IJoinProjectService, JoinProjectService>();
 builder.Services.AddScoped<ICampusService, CampusService>();
 builder.Services.AddScoped<IProvinceService, ProvinceService>();
@@ -93,8 +94,9 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IUserservice, UserService>();
 builder.Services.AddScoped<GoogleDriveService>();
-builder.Services.AddScoped<IJoinGroupService, JoinGroupService>();
+//builder.Services.AddScoped<IJoinGroupService, JoinGroupService>();
 builder.Services.AddScoped<IMediumService, MediumService>();
+builder.Services.AddScoped<IChatGPTService, ChatGPTService>();
 // Thêm Repository
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<IEventSpectatorRepository, EventSpectatorRepository>();
@@ -102,12 +104,12 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<ISubTaskRepository, SubTaskRepository>();
-builder.Services.AddScoped<IGroupRepository, GroupRepository>();
+//builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 builder.Services.AddScoped<IJoinProjectRepository, JoinProjectRepository>();
 builder.Services.AddScoped<ICampusRepository, CampusRepository>();
 builder.Services.AddScoped<IProvinceRepository, ProvinceRepository>();
 builder.Services.AddScoped<ISendRequestRepository, SendRequestRepository>();
-builder.Services.AddScoped<IJoinGroupRepository, JoinGroupRepository>();
+//builder.Services.AddScoped<IJoinGroupRepository, JoinGroupRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
 builder.Services.AddScoped<IMediumRepository, MediumRepository>();
@@ -120,6 +122,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 
 builder.Services.AddSignalR();
+builder.Services.AddHttpClient<IChatGPTService, ChatGPTService>();
 
 // Thêm Swagger
 builder.Services.AddEndpointsApiExplorer();
