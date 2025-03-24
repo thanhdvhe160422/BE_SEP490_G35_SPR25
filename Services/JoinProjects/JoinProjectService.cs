@@ -23,7 +23,24 @@ namespace Planify_BackEnd.Services.JoinProjects
                 Id = j.Id,
                 EventId = j.EventId,
                 UserId = j.UserId,
-                //Role = j.Role,
+                TimeJoinProject = j.TimeJoinProject,
+                TimeOutProject = j.TimeOutProject,
+                RoleId = j.RoleId,
+                EventTitle = j.Event.EventTitle,
+                EventDescription = j.Event.EventDescription,
+                StartTime = j.Event.StartTime,
+                EndTime = j.Event.EndTime,
+                AmountBudget = j.Event.AmountBudget,
+                IsPublic = j.Event.IsPublic,
+                TimePublic = j.Event.TimePublic,
+                Status = j.Event.Status,
+                CampusId = j.Event.CampusId,
+                CategoryEventId = j.Event.CategoryEventId,
+                Placed = j.Event.Placed,
+                CreatedAt = j.Event.CreatedAt,
+                CreateBy = j.Event.CreateBy,
+                UpdatedAt = j.Event.UpdatedAt,
+                UpdateBy = j.Event.UpdateBy
             }).ToList();
             return joinedProjectDTOs;
             
