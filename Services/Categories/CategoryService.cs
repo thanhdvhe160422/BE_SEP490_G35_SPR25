@@ -1,4 +1,5 @@
 ﻿using Planify_BackEnd.DTOs.Categories;
+using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories.Categories;
 
 namespace Planify_BackEnd.Services.Categories
@@ -48,6 +49,76 @@ namespace Planify_BackEnd.Services.Categories
             catch
             {
                 return new CategoryViewModel();
+            }
+        }
+
+        public async Task<CategoryViewModel> CreateCategory(CategoryDTO categoryDTO)
+        {
+            try
+            {
+                CategoryEvent category = new CategoryEvent
+                {
+                    Id = categoryDTO.Id,
+                    CategoryEventName = categoryDTO.CategoryEventName,
+                    CampusId = categoryDTO.CampusId,
+                    Status = 1
+                };
+                var createdCategory = await _categoryRepository.CreateCategory(category);
+                CategoryViewModel categoryVm = new CategoryViewModel
+                {
+                    Id = categoryDTO.Id,
+                    CategoryEventName = categoryDTO.CategoryEventName,
+                    CampusId = categoryDTO.CampusId,
+                    Status = 1
+                };
+                return categoryVm;
+            }catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public async Task<CategoryViewModel> UpdateCategory(CategoryDTO categoryDTO)
+        {
+
+            try
+            {
+                CategoryEvent category = new CategoryEvent
+                {
+                    Id = categoryDTO.Id,
+                    CategoryEventName = categoryDTO.CategoryEventName,
+                    CampusId = categoryDTO.CampusId,
+                    Status = 1
+                };
+                var updatedCategory = await _categoryRepository.UpdateCategory(category);
+                CategoryViewModel categoryVm = new CategoryViewModel
+                {
+                    Id = categoryDTO.Id,
+                    CategoryEventName = categoryDTO.CategoryEventName,
+                    CampusId = categoryDTO.CampusId,
+                    Status = 1
+                };
+                return categoryVm;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public async Task<bool> DeleteCategory(int categoryId)
+        {
+            try
+            {
+                var isDeleted = await _categoryRepository.DeleteCategory(categoryId);
+                if (!isDeleted) return false;
+                return true;
+            }
+            catch (NullReferenceException nEx)
+            {
+                throw new NullReferenceException(nEx.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
     }
