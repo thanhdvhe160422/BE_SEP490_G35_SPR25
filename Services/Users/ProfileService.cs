@@ -119,6 +119,10 @@ namespace Planify_BackEnd.Services.User
                     };
                     isUpdateAddressSuccess = _provinceRepository.UpdateAddress(updateAddress);
                 }
+                else
+                {
+                    isUpdateAddressSuccess = true;
+                }
                 if (!isUpdateAddressSuccess) throw new Exception();
                 var profile = _profileRepository.UpdateProfile(updateProfile);
                 ProfileUpdateModel updatedprofile = new ProfileUpdateModel
@@ -134,7 +138,7 @@ namespace Planify_BackEnd.Services.User
                 return updatedprofile;
             }catch
             {
-                return new ProfileUpdateModel();
+                throw new Exception();
             }
         }
     }

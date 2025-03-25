@@ -97,6 +97,7 @@ namespace Planify_BackEnd.Repositories.Tasks
                 existingTask.StartTime = updatedTask.StartTime;
                 existingTask.Deadline = updatedTask.Deadline;
                 existingTask.Status = updatedTask.Status;
+                existingTask.AmountBudget = updatedTask.AmountBudget;
 
                 _context.Tasks.Update(existingTask);
                 await _context.SaveChangesAsync();
