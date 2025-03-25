@@ -86,10 +86,14 @@ namespace Planify_BackEnd.Repositories.Categories
             try
             {
                 var category = _context.CategoryEvents.FirstOrDefault(c => c.Id == categoryId);
+                if (category == null) throw new NullReferenceException();
                 category.Status = 0;
                 _context.Update(category);
                 await _context.SaveChangesAsync();
                 return true;
+            }catch(NullReferenceException nEx)
+            {
+                throw new NullReferenceException(nEx.Message);
             }
             catch (Exception ex)
             {
