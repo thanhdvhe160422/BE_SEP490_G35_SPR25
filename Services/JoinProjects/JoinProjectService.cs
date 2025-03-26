@@ -25,7 +25,6 @@ namespace Planify_BackEnd.Services.JoinProjects
                 UserId = j.UserId,
                 TimeJoinProject = j.TimeJoinProject,
                 TimeOutProject = j.TimeOutProject,
-                RoleId = j.RoleId,
                 EventTitle = j.Event.EventTitle,
                 EventDescription = j.Event.EventDescription,
                 StartTime = j.Event.StartTime,
