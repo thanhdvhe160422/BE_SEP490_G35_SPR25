@@ -116,25 +116,29 @@ namespace Planify_BackEnd.Services.User
                         AddressDetail = updateProfile.addressVM.AddressDetail,
                         WardId = updateProfile.addressVM.WardVM.Id
                     };
-                    _provinceRepository.CreateAddress(createAddress);
+                    var addressId = _provinceRepository.CreateAddress(createAddress);
+                    updateProfile.AddressId = addressId;
                     isUpdateAddressSuccess = true;
                 }
-                if (isUpdateAddressSuccess==false
-                    && updateProfile.addressVM.WardVM.Id != p.Address.Ward.Id
+                if (isUpdateAddressSuccess == false)
+                {
+                    if (updateProfile.addressVM.WardVM.Id != p.Address.Ward.Id
                     || !updateProfile.addressVM.AddressDetail.Equals(p.Address.AddressDetail))
-                {
-                    Models.Address updateAddress = new Models.Address
                     {
-                        Id = p.Address.Id,
-                        AddressDetail = updateProfile.addressVM.AddressDetail,
-                        WardId = updateProfile.addressVM.WardVM.Id
-                    };
-                    isUpdateAddressSuccess = _provinceRepository.UpdateAddress(updateAddress);
+                        Models.Address updateAddress = new Models.Address
+                        {
+                            Id = p.Address.Id,
+                            AddressDetail = updateProfile.addressVM.AddressDetail,
+                            WardId = updateProfile.addressVM.WardVM.Id
+                        };
+                        isUpdateAddressSuccess = _provinceRepository.UpdateAddress(updateAddress);
+                    }
+                    else
+                    {
+                        isUpdateAddressSuccess = true;
+                    }
                 }
-                else
-                {
-                    isUpdateAddressSuccess = true;
-                }
+                
                 if (!isUpdateAddressSuccess) throw new Exception();
                 var profile = _profileRepository.UpdateProfile(updateProfile);
                 ProfileUpdateModel updatedprofile = new ProfileUpdateModel
