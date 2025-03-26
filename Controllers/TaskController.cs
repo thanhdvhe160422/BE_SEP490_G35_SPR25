@@ -175,11 +175,11 @@ namespace Planify_BackEnd.Controllers
         //}
         [HttpGet("search/v2")]
         [Authorize(Roles = "Event Organizer, Implementer")]
-        public async Task<IActionResult> SearchTasksByGroupId(int groupId, DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> SearchTasksByGroupId(int eventId, DateTime startDate, DateTime endDate)
         {
             try
             {
-                var response = await _taskService.SearchTaskByGroupId(groupId, startDate, endDate);
+                var response = await _taskService.SearchTaskByEventId(eventId, startDate, endDate);
                 if (response == null || response.Count() == 0)
                 {
                     return NotFound("Cannot found any task");
