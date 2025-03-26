@@ -51,5 +51,55 @@ namespace Planify_BackEnd.Repositories.Categories
                 return new CategoryEvent();
             }
         }
+
+        public async Task<CategoryEvent> CreateCategory(CategoryEvent categoryEvent)
+        {
+            try
+            {
+                _context.Add(categoryEvent);
+                await _context.SaveChangesAsync();
+                return categoryEvent;
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public async Task<CategoryEvent> UpdateCategory(CategoryEvent categoryEvent)
+        {
+            try
+            {
+                var category = _context.CategoryEvents.FirstOrDefault(c=>c.Id==categoryEvent.Id);
+                category.CategoryEventName = categoryEvent.CategoryEventName;
+                _context.Update(category);
+                await _context.SaveChangesAsync();
+                return category;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<bool> DeleteCategory(int categoryId)
+        {
+            try
+            {
+                var category = _context.CategoryEvents.FirstOrDefault(c => c.Id == categoryId);
+                if (category == null) throw new NullReferenceException();
+                category.Status = 0;
+                _context.Update(category);
+                await _context.SaveChangesAsync();
+                return true;
+            }catch(NullReferenceException nEx)
+            {
+                throw new NullReferenceException(nEx.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
     }
 }

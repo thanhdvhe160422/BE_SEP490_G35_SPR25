@@ -48,12 +48,11 @@ namespace Planify_BackEnd.Repositories.Tasks
             }
         }
 
-        public async Task<List<Models.Task>> GetAllTasksAsync(int groupId)
+        public async Task<List<Models.Task>> GetAllTasksAsync(int eventId)
         {
             try
             {
-                //return await _context.Tasks.Where(t=>t.GroupId==groupId).ToListAsync();
-                return null;
+                return await _context.Tasks.Where(t => t.EventId == eventId).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -97,6 +96,7 @@ namespace Planify_BackEnd.Repositories.Tasks
                 existingTask.StartTime = updatedTask.StartTime;
                 existingTask.Deadline = updatedTask.Deadline;
                 existingTask.Status = updatedTask.Status;
+                existingTask.AmountBudget = updatedTask.AmountBudget;
 
                 _context.Tasks.Update(existingTask);
                 await _context.SaveChangesAsync();
@@ -150,7 +150,7 @@ namespace Planify_BackEnd.Repositories.Tasks
             {
                 return _context.Tasks
                     .Include(t=>t.CreateByNavigation)
-                    //.Include(t=>t.Group).ThenInclude(g=>g.Event)
+                    .Include(t=>t.Event)
                     .Include(t=>t.SubTasks).ThenInclude(st=>st.CreateByNavigation)
                     .FirstOrDefault(t => t.Id == taskId);
             }
@@ -175,13 +175,14 @@ namespace Planify_BackEnd.Repositories.Tasks
             }
         }
 
-        public async Task<List<Models.Task>> SearchTaskByGroupId(int groupId, DateTime startDate, DateTime endDate)
+        public async Task<List<Models.Task>> SearchTaskByEventId(int eventId, DateTime startDate, DateTime endDate)
         {
             try
             {
                 return await _context.Tasks
                     .Where(e => e.StartTime <= endDate &&
-                                e.Deadline >= startDate)
+                                e.Deadline >= startDate &&
+                                e.EventId == eventId)
                     .OrderBy(e => e.StartTime)
                     .ToListAsync();
             }

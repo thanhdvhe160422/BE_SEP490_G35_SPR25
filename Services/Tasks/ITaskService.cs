@@ -11,10 +11,10 @@ namespace Planify_BackEnd.Services.Tasks
         Task<List<TaskSearchResponeDTO>> SearchTaskOrderByStartDateAsync(int page, int pageSize, string? name, DateTime startDate, DateTime endDate);
         Task<ResponseDTO> UpdateTaskAsync(int taskId, TaskUpdateRequestDTO taskDTO);
         Task<ResponseDTO> DeleteTaskAsync(int taskId);
-        Task<List<TaskSearchResponeDTO>> GetAllTasksAsync(int groupId);
+        Task<List<TaskSearchResponeDTO>> GetAllTasksAsync(int eventId);
         public TaskDetailVM GetTaskById(int taskId);
         Task<bool> changeStatus(int taskId, int status);
-        Task<List<TaskSearchResponeDTO>> SearchTaskByGroupId(int groupId, DateTime startDate, DateTime endDate);
+        Task<List<TaskSearchResponeDTO>> SearchTaskByEventId(int eventId, DateTime startDate, DateTime endDate);
 
     }
 }
