@@ -14,7 +14,7 @@ namespace Planify_BackEnd.Repositories.Tasks
         bool UpdateActualTaskAmount(int taskId, decimal amount);
         public Models.Task GetTaskById(int taskId);
         public Task<bool> changeStatus(int taskId, int status);
-        Task<List<Models.Task>> SearchTaskByEventId(int eventId, DateTime startDate, DateTime endDate);
+        Task<List<Models.Task>> SearchTaskByImplementerId(Guid implementerId, DateTime startDate, DateTime endDate);
 
     }
 }
