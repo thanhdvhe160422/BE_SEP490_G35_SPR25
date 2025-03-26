@@ -142,44 +142,45 @@ namespace Planify_BackEnd.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        //[HttpPut("{taskId}/status/{status}")]
-        //[Authorize(Roles = "Implementer")]
-        //public async Task<IActionResult> ChangeStatus(int taskId, int status)
-        //{
-        //    try
-        //    {
-        //        var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-        //        var handler = new JwtSecurityTokenHandler();
-        //        var jwtToken = handler.ReadJwtToken(token);
-        //        var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "sub");
-        //        Guid userId = Guid.Parse(userIdClaim.Value);
-
-        //        var task = _taskService.GetTaskById(taskId);
-        //        if (task == null || task.Id==null || task.Id == 0)
-        //            return NotFound("Cannot found any task with id: " + taskId);
-        //        var checkLead = await _groupService.CheckLeadGroup(userId, task.GroupId);
-        //        if (!checkLead)
-        //        {
-        //            return BadRequest("Only group leader can change status of task");
-        //        }
-        //        var response =await _taskService.changeStatus(taskId, status);
-        //        if (!response)
-        //        {
-        //            return BadRequest("Cannot change status");
-        //        }
-        //        return Ok();
-        //    }catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
-        //}
-        [HttpGet("search/v2")]
-        [Authorize(Roles = "Event Organizer, Implementer")]
-        public async Task<IActionResult> SearchTasksByGroupId(int eventId, DateTime startDate, DateTime endDate)
+        [HttpPut("{taskId}/status/{status}")]
+        [Authorize(Roles = "Implementer")]
+        public async Task<IActionResult> ChangeStatus(int taskId, int status)
         {
             try
             {
-                var response = await _taskService.SearchTaskByEventId(eventId, startDate, endDate);
+                var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+                var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "sub");
+                Guid userId = Guid.Parse(userIdClaim.Value);
+
+                var task = _taskService.GetTaskById(taskId);
+                if (task == null || task.Id == null || task.Id == 0)
+                    return NotFound("Cannot found any task with id: " + taskId);
+                //var checkLead = await _groupService.CheckLeadGroup(userId, task.GroupId);
+                //if (!checkLead)
+                //{
+                //    return BadRequest("Only group leader can change status of task");
+                //}
+                var response = await _taskService.changeStatus(taskId, status);
+                if (!response)
+                {
+                    return BadRequest("Cannot change status");
+                }
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("search/v2")]
+        [Authorize(Roles = "Event Organizer, Implementer")]
+        public async Task<IActionResult> SearchTasksByGroupId(Guid implementerId, DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                var response = await _taskService.SearchTaskByImplementerId(implementerId, startDate, endDate);
                 if (response == null || response.Count() == 0)
                 {
                     return NotFound("Cannot found any task");

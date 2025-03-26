@@ -245,11 +245,11 @@ namespace Planify_BackEnd.Services.Tasks
             }
         }
 
-        public async Task<List<TaskSearchResponeDTO>> SearchTaskByEventId(int eventId, DateTime startDate, DateTime endDate)
+        public async Task<List<TaskSearchResponeDTO>> SearchTaskByImplementerId(Guid implementerId, DateTime startDate, DateTime endDate)
         {
             try
             {
-                var tasks = await _taskRepository.SearchTaskByEventId(eventId,startDate, endDate);
+                var tasks = await _taskRepository.SearchTaskByImplementerId(implementerId,startDate, endDate);
                 return tasks.Select(item => new TaskSearchResponeDTO
                 {
                     Id = item.Id,
