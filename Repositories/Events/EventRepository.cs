@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories;
-using static Planify_BackEnd.DTOs.Events.EventDetailResponseDTO;
 
 
 public class EventRepository : IEventRepository
@@ -82,36 +81,69 @@ public class EventRepository : IEventRepository
         try
         {
             var eventDetail = await _context.Events
-            .Where(e => e.Id == eventId)
-            .Select(e => new EventDetailDto
-            {
-                Id = e.Id,
-                EventTitle = e.EventTitle,
-                EventDescription = e.EventDescription,
-                StartTime = e.StartTime,
-                EndTime = e.EndTime,
-                AmountBudget = e.AmountBudget,
-                IsPublic = e.IsPublic,
-                TimePublic = e.TimePublic,
-                Status = e.Status,
-                Placed = e.Placed,
-                CreatedAt = e.CreatedAt,
-                CampusName = e.Campus.CampusName,
-                CategoryEventName = e.CategoryEvent.CategoryEventName,
-                CreatedBy = new UserDto
+                .Where(e => e.Id == eventId)
+                .Select(e => new EventDetailDto
                 {
-                    Id = e.CreateByNavigation.Id,
-                    FirstName = e.CreateByNavigation.FirstName,
-                    LastName = e.CreateByNavigation.LastName,
-                    Email = e.CreateByNavigation.Email
-                },
-                EventMedia = e.EventMedia.Select(em => new EventMediaDto
-                {
-                    Id = em.Id,
-                    MediaUrl = em.Media.MediaUrl
-                }).ToList().ToList()
-            })
-            .FirstOrDefaultAsync();
+                    Id = e.Id,
+                    EventTitle = e.EventTitle,
+                    EventDescription = e.EventDescription,
+                    StartTime = e.StartTime,
+                    EndTime = e.EndTime,
+                    AmountBudget = e.AmountBudget,
+                    IsPublic = e.IsPublic,
+                    TimePublic = e.TimePublic,
+                    Status = e.Status,
+                    Placed = e.Placed,
+                    CreatedAt = e.CreatedAt,
+                    CampusName = e.Campus.CampusName,
+                    CategoryEventName = e.CategoryEvent.CategoryEventName,
+                    CreatedBy = new UserDto
+                    {
+                        Id = e.CreateByNavigation.Id,
+                        FirstName = e.CreateByNavigation.FirstName,
+                        LastName = e.CreateByNavigation.LastName,
+                        Email = e.CreateByNavigation.Email
+                    },
+                    EventMedia = e.EventMedia.Select(em => new EventMediaDto
+                    {
+                        Id = em.Id,
+                        MediaUrl = em.Media.MediaUrl
+                    }).ToList(),
+                    Tasks = e.Tasks.Select(t => new TaskDetailDto
+                    {
+                        Id = t.Id,
+                        TaskName = t.TaskName,
+                        TaskDescription = t.TaskDescription,
+                        StartTime = t.StartTime,
+                        Deadline = t.Deadline,
+                        AmountBudget = t.AmountBudget,
+                        CreatedAt = t.CreateDate,
+                        CreatedBy = new UserDto
+                        {
+                            Id = t.CreateByNavigation.Id,
+                            FirstName = t.CreateByNavigation.FirstName,
+                            LastName = t.CreateByNavigation.LastName,
+                            Email = t.CreateByNavigation.Email
+                        },
+                        SubTasks = t.SubTasks.Select(st => new SubTaskDetailDto
+                        {
+                            Id = st.Id,
+                            SubTaskName = st.SubTaskName,
+                            SubTaskDescription = st.SubTaskDescription,
+                            StartTime = st.StartTime,
+                            Deadline = st.Deadline,
+                            AmountBudget = st.AmountBudget,
+                            CreatedBy = new UserDto
+                            {
+                                Id = st.CreateByNavigation.Id,
+                                FirstName = st.CreateByNavigation.FirstName,
+                                LastName = st.CreateByNavigation.LastName,
+                                Email = st.CreateByNavigation.Email
+                            }
+                        }).ToList()
+                    }).ToList()
+                })
+                .FirstOrDefaultAsync();
 
             return eventDetail;
         }

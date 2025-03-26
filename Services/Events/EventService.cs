@@ -4,31 +4,32 @@ using Planify_BackEnd.DTOs.Campus;
 using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories;
-//using Planify_BackEnd.Repositories.Groups;
 using Planify_BackEnd.Services.Events;
-using static Planify_BackEnd.DTOs.Events.EventDetailResponseDTO;
 using Planify_BackEnd.Services.GoogleDrive;
 using Planify_BackEnd.Repositories.JoinGroups;
 using Planify_BackEnd.Repositories.Categories;
+using Planify_BackEnd.Repositories.Tasks;
 
 public class EventService : IEventService
 {
     private readonly IEventRepository _eventRepository;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    //private readonly IGroupRepository _groupRepository;
+    private readonly ITaskRepository _taskRepository;
+    private readonly ISubTaskRepository _subTaskRepository;
     private readonly GoogleDriveService _googleDriveService;
     private readonly IJoinProjectRepository _joinProjectRepository;
     private readonly ICampusRepository _campusRepository;
     private readonly ICategoryRepository _categoryRepository;
-    public EventService(IEventRepository eventRepository, IHttpContextAccessor httpContextAccessor, /*IGroupRepository groupRepository,*/ GoogleDriveService googleDriveService, IJoinProjectRepository joinProjectRepository, ICampusRepository campusRepository, ICategoryRepository categoryRepository)
+    public EventService(IEventRepository eventRepository, IHttpContextAccessor httpContextAccessor, GoogleDriveService googleDriveService, IJoinProjectRepository joinProjectRepository, ICampusRepository campusRepository, ICategoryRepository categoryRepository, ISubTaskRepository subTaskRepository, ITaskRepository taskRepository)
     {
         _eventRepository = eventRepository;
-        //_groupRepository = groupRepository;
         _httpContextAccessor = httpContextAccessor;
         _googleDriveService = googleDriveService;
         _joinProjectRepository = joinProjectRepository;
         _campusRepository = campusRepository;
         _categoryRepository = categoryRepository;
+        _subTaskRepository = subTaskRepository;
+        _taskRepository = taskRepository;
     }
     public async Task<IEnumerable<EventGetListResponseDTO>> GetAllEventAsync(int page, int pageSize)
     {
@@ -114,36 +115,44 @@ public class EventService : IEventService
 
             await _eventRepository.CreateEventAsync(newEvent);
 
-            //if (eventDTO.Groups != null && eventDTO.Groups.Count > 0)
-            //{
-            //    foreach (var group in eventDTO.Groups)
-            //    {
-            //        var newGroup = new Group
-            //        {
-            //            EventId = newEvent.Id,
-            //            GroupName = group.GroupName,
-            //            CreateBy = organizerId,
-            //        };
-            //        await _groupRepository.CreateGroupAsync(newGroup);
+            if (eventDTO.Tasks != null && eventDTO.Tasks.Count > 0)
+            {
+                foreach (var task in eventDTO.Tasks)
+                {
+                    var newTask = new Planify_BackEnd.Models.Task
+                    {
+                        EventId = newEvent.Id,
+                        TaskName = task.TaskName,
+                        TaskDescription = task.Description,
+                        StartTime = task.StartTime ?? newEvent.StartTime,
+                        Deadline = task.Deadline,
+                        AmountBudget = task.Budget,
+                        CreateBy = organizerId,
+                        CreateDate = DateTime.UtcNow
 
-            //        foreach (var implementerId in group.ImplementerIds)
-            //        {
-            //            var joinGroup = new JoinGroup
-            //            {
-            //                GroupId = newGroup.Id,
-            //                ImplementerId = implementerId,
-            //                TimeJoin = DateTime.UtcNow,
-            //                Status = 1,
-            //            };
-            //            bool result = await _groupRepository.AddImplementerToGroupAsync(joinGroup);
-            //            if (result)
-            //            {
-            //                await _joinProjectRepository.AddImplementerToProject(implementerId, newEvent.Id);
-            //                await _joinProjectRepository.AddRoleImplementer(implementerId);
-            //            }
-            //        }
-            //    }
-            //}
+                    };
+                    await _taskRepository.CreateTaskAsync(newTask);
+
+                    if (task.SubTasks != null && task.SubTasks.Count > 0)
+                    {
+                        foreach (var subTask in task.SubTasks)
+                        {
+                            var newSubTask = new SubTask
+                            {
+                                TaskId = newTask.Id,
+                                SubTaskName = subTask.SubTaskName,
+                                SubTaskDescription = subTask.Description,
+                                StartTime = subTask.StartTime ?? newTask.StartTime,
+                                Deadline = subTask.Deadline,
+                                AmountBudget = subTask.Budget,
+                                CreateBy = organizerId,
+                            };
+                            await _subTaskRepository.CreateSubTaskAsync(newSubTask);
+                        }
+                    }
+                }
+            }
+
             return new ResponseDTO(201, "Event creates successfully!", newEvent);
         }
         catch (Exception ex)
