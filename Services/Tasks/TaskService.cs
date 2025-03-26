@@ -105,7 +105,7 @@ namespace Planify_BackEnd.Services.Tasks
                     TaskDescription = item.TaskDescription,
                     StartTime = item.StartTime,
                     Deadline = item.Deadline,
-                    //GroupId = item.GroupId,
+                    EventId = item.EventId,
                     AmountBudget = item.AmountBudget,
                     Progress = item.Progress,
                     Status = item.Status
@@ -202,13 +202,7 @@ namespace Planify_BackEnd.Services.Tasks
                     },
                     CreateDate = task.CreateDate,
                     Deadline = task.Deadline,
-                    //GroupId = task.GroupId,
-                    //Group = task.Group == null ? new GroupNameVM() : new GroupNameVM
-                    //{
-                    //    Id = task.Group.Id,
-                    //    GroupName = task.Group.GroupName,
-                    //    EventName = task.Group.Event.EventTitle
-                    //},
+                    EventId = task.EventId,
                     Progress = task.Progress,
                     StartTime = task.StartTime,
                     Status = task.Status,
@@ -251,11 +245,11 @@ namespace Planify_BackEnd.Services.Tasks
             }
         }
 
-        public async Task<List<TaskSearchResponeDTO>> SearchTaskByGroupId(int groupId, DateTime startDate, DateTime endDate)
+        public async Task<List<TaskSearchResponeDTO>> SearchTaskByEventId(int eventId, DateTime startDate, DateTime endDate)
         {
             try
             {
-                var tasks = await _taskRepository.SearchTaskByGroupId(groupId,startDate, endDate);
+                var tasks = await _taskRepository.SearchTaskByEventId(eventId,startDate, endDate);
                 return tasks.Select(item => new TaskSearchResponeDTO
                 {
                     Id = item.Id,
@@ -263,7 +257,7 @@ namespace Planify_BackEnd.Services.Tasks
                     TaskDescription = item.TaskDescription,
                     StartTime = item.StartTime,
                     Deadline = item.Deadline,
-                    //GroupId = item.GroupId,
+                    EventId = item.EventId,
                     AmountBudget = item.AmountBudget,
                     Progress = item.Progress,
                     Status = item.Status

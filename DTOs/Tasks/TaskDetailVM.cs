@@ -21,17 +21,15 @@ namespace Planify_BackEnd.DTOs.Tasks
 
         public DateTime? Deadline { get; set; }
 
-        public int GroupId { get; set; }
-
         public decimal AmountBudget { get; set; }
 
         public double Progress { get; set; }
 
         public int Status { get; set; }
 
-        public UserNameVM CreateByNavigation { get; set; }
+        public int? EventId { get; set; }
 
-        public GroupNameVM Group { get; set; }
+        public UserNameVM CreateByNavigation { get; set; }
 
         public ICollection<SubTaskVM> SubTasks { get; set; }
     }
