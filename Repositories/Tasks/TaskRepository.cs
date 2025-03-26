@@ -1,4 +1,5 @@
 ﻿
+using Google.Apis.Drive.v3.Data;
 using Microsoft.EntityFrameworkCore;
 using Planify_BackEnd.Models;
 
@@ -175,14 +176,15 @@ namespace Planify_BackEnd.Repositories.Tasks
             }
         }
 
-        public async Task<List<Models.Task>> SearchTaskByEventId(int eventId, DateTime startDate, DateTime endDate)
+        public async Task<List<Models.Task>> SearchTaskByImplementerId(Guid implementerId, DateTime startDate, DateTime endDate)
         {
             try
             {
-                return await _context.Tasks
-                    .Where(e => e.StartTime <= endDate &&
-                                e.Deadline >= startDate &&
-                                e.EventId == eventId)
+                return await _context.JoinTasks
+                       .Where(jt => jt.UserId == implementerId &&
+                                   jt.Task.StartTime <= endDate &&
+                                   (jt.Task.Deadline >= startDate || jt.Task.Deadline == null))
+                       .Select(jt => jt.Task)
                     .OrderBy(e => e.StartTime)
                     .ToListAsync();
             }
