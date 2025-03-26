@@ -9,6 +9,7 @@ namespace Planify_BackEnd.Repositories.Address
         public Task<IEnumerable<District>> getAllDistrictByProvinceID(int id);
 
         public Task<IEnumerable<Ward>> getAllWardByDistrictID(int id);
+        int CreateAddress(Models.Address address);
         bool UpdateAddress(Models.Address address);
     }
 }

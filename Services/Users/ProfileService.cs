@@ -108,7 +108,19 @@ namespace Planify_BackEnd.Services.User
             {
                 var p = _profileRepository.GetUserProfileById(updateProfile.Id);
                 bool isUpdateAddressSuccess = false;
-                if (updateProfile.addressVM.WardVM.Id != p.Address.Ward.Id
+                if (p.AddressId == null)
+                {
+                    Models.Address createAddress = new Models.Address
+                    {
+                        Id = 0,
+                        AddressDetail = updateProfile.addressVM.AddressDetail,
+                        WardId = updateProfile.addressVM.WardVM.Id
+                    };
+                    _provinceRepository.CreateAddress(createAddress);
+                    isUpdateAddressSuccess = true;
+                }
+                if (isUpdateAddressSuccess==false
+                    && updateProfile.addressVM.WardVM.Id != p.Address.Ward.Id
                     || !updateProfile.addressVM.AddressDetail.Equals(p.Address.AddressDetail))
                 {
                     Models.Address updateAddress = new Models.Address
