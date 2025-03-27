@@ -1,7 +1,9 @@
-﻿using Planify_BackEnd.DTOs.Campus;
+﻿using Planify_BackEnd.DTOs;
+using Planify_BackEnd.DTOs.Campus;
 using Planify_BackEnd.DTOs.Roles;
 using Planify_BackEnd.DTOs.Users;
 using Planify_BackEnd.Models;
+using Planify_BackEnd.Repositories;
 
 namespace Planify_BackEnd.Services.Users
 {
@@ -12,6 +14,72 @@ namespace Planify_BackEnd.Services.Users
         {
             _userRepository = userRepository;
         }
+        public async Task<IEnumerable<UserListDTO>> GetListUserAsync(int page, int pageSize)
+        {
+            var users = await _userRepository.GetListUserAsync(page, pageSize);
+
+            var userDTOs = users.Select(c => new UserListDTO
+            {
+                Id = c.Id,
+                UserName = c.UserName,
+                Email = c.Email,
+                FirstName = c.FirstName,
+                LastName = c.LastName,
+                Password = c.Password,
+                DateOfBirth = c.DateOfBirth,
+                PhoneNumber = c.PhoneNumber,
+                AddressId = c.AddressId,
+                AvatarId = c.AvatarId,
+                CreatedAt = c.CreatedAt,
+                CampusId = c.CampusId,
+                Status = c.Status,
+                Gender = c.Gender
+            }).ToList();
+            return userDTOs;
+        }
+        public async Task<UserDetailDTO> GetUserDetailAsync(Guid id)
+        {
+            var c = await _userRepository.GetUserDetailAsync(id);
+            if (c == null)
+            {
+                return null; 
+            }
+
+            var userDTO = new UserDetailDTO
+            {
+                Id = c.Id,
+                UserName = c.UserName,
+                Email = c.Email,
+                FirstName = c.FirstName,
+                LastName = c.LastName,
+                Password = c.Password,
+                DateOfBirth = c.DateOfBirth,
+                PhoneNumber = c.PhoneNumber,
+                Address = c.Address.AddressDetail,
+                AvatarId = c.AvatarId,
+                CreatedAt = c.CreatedAt,
+                CampusName = c.Campus.CampusName,
+                Status = c.Status,
+                Gender = c.Gender ? "Male" : "Female"
+              
+            };
+
+            return userDTO;
+        }
+        public async Task<ResponseDTO> UpdateUserStatusAsync(Guid id, int newStatus)
+        {
+            try
+            {
+                var updateUser = await _userRepository.UpdateUserStatusAsync(id, newStatus);
+
+                return new ResponseDTO(200, "User status updated successfully!", updateUser);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseDTO(500, "Error occurs while updating user atus!", ex.Message);
+            }
+        }
+
         public async Task<IEnumerable<UserListDTO>> GetListImplementer(int eventId, int page, int pageSize)
         {
             var users = await _userRepository.GetListImplementer(eventId, page, pageSize);
