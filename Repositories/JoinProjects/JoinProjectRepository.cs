@@ -20,7 +20,6 @@ namespace Planify_BackEnd.Repositories.JoinGroups
             {
                 return await _context.JoinProjects
                     .Include(jp => jp.Event)
-                    .Include(jp => jp.User)
                     .Where(jp => jp.UserId == userId)
                     .Skip((page - 1) * pageSize).Take(pageSize)
                     .ToListAsync(); 

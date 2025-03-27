@@ -1,6 +1,5 @@
 ﻿using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.Models;
-using static Planify_BackEnd.DTOs.Events.EventDetailResponseDTO;
 
 namespace Planify_BackEnd.Repositories
 {

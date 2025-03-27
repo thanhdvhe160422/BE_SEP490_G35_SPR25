@@ -22,15 +22,26 @@ namespace Planify_BackEnd.DTOs.Events
         [Required]
         public string Placed { get; set; }
 
-        public List<GroupCreateDTO>? Groups { get; set; } = new();
+        public List<TaskEventCreateRequestDTO> Tasks { get; set; }
 
-        public EventCreateRequestDTO() { }
     }
 
-    public class GroupCreateDTO
+    public class TaskEventCreateRequestDTO
     {
-        [Required]
-        public string GroupName { get; set; } = null!;
-        public List<Guid> ImplementerIds { get; set; } = new();
+        public string TaskName { get; set; }
+        public string Description { get; set; }
+        public DateTime? StartTime { get; set; }
+        public DateTime Deadline { get; set; }
+        public decimal Budget { get; set; }
+        public List<SubTaskEventCreateRequestDTO> SubTasks { get; set; }
+    }
+
+    public class SubTaskEventCreateRequestDTO
+    {
+        public string SubTaskName { get; set; }
+        public string Description { get; set; }
+        public DateTime? StartTime { get; set; }
+        public DateTime Deadline { get; set; }
+        public decimal Budget { get; set; }
     }
 }
