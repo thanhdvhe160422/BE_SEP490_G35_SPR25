@@ -49,7 +49,6 @@ namespace Planify_BackEnd.Controllers
                                 t.StartTime,
                                 t.Deadline,
                                 t.AmountBudget,
-                                t.Progress,
                                 t.Status,
                                 SubTasks = _dbContext.SubTasks.Where(st => st.TaskId == t.Id)
                                     .Select(st => new
