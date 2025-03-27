@@ -16,6 +16,42 @@ namespace Planify_BackEnd.Controllers.User
         {
             _userService = userService;
         }
+        [HttpPost("create-campus-manager")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> CreateManagerAsync(UserCreateDTO userDTO)
+        {
+            try
+            {
+                var user = await _userService.CreateManagerAsync(userDTO);
+                if (user == null)
+                {
+                    return BadRequest("Cannot create user!");
+                }
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost("update-campus-manager/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateManagerAsync(UserUpdateDTO userDTO, Guid id)
+        {
+            try
+            {
+                var user = await _userService.UpdateManagerAsync(userDTO, id);
+                if (user == null)
+                {
+                    return BadRequest("Cannot update user!");
+                }
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [HttpGet("get-list-user")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetListUserAsync(int page, int pageSize)

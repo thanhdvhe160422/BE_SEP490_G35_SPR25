@@ -24,10 +24,6 @@ namespace Planify_BackEnd.Services.Tasks
         {
             try
             {
-                //if (!_groupRepository.IsGroupExists(taskDTO.GroupId))
-                //{
-                //    throw new ArgumentException("Group does not exists.");
-                //}
                 if (string.IsNullOrWhiteSpace(taskDTO.TaskName))
                 {
                     return new ResponseDTO(400, "Task name is required.", null);
@@ -44,8 +40,6 @@ namespace Planify_BackEnd.Services.Tasks
                     StartTime = taskDTO.StartTime,
                     Deadline = taskDTO.Deadline,
                     AmountBudget = taskDTO.AmountBudget,
-                    //GroupId = taskDTO.GroupId,
-                    Progress = taskDTO.Progress,
                     Status = 1,
                     CreateBy = organizerId,
                     CreateDate = DateTime.UtcNow
@@ -82,7 +76,6 @@ namespace Planify_BackEnd.Services.Tasks
                     Deadline = item.Deadline,
                     //GroupId = item.GroupId,
                     AmountBudget = item.AmountBudget,
-                    Progress = item.Progress,
                     Status = item.Status
                 }).ToList();
             }
@@ -107,7 +100,6 @@ namespace Planify_BackEnd.Services.Tasks
                     Deadline = item.Deadline,
                     EventId = item.EventId,
                     AmountBudget = item.AmountBudget,
-                    Progress = item.Progress,
                     Status = item.Status
                 }).ToList();
             }
@@ -131,7 +123,6 @@ namespace Planify_BackEnd.Services.Tasks
                     Deadline = taskDTO.Deadline,
                     AmountBudget = taskDTO.AmountBudget,
                     //GroupId = taskDTO.GroupId,
-                    Progress = taskDTO.Progress,
                     Status = taskDTO.Status
                 });
 
@@ -203,7 +194,6 @@ namespace Planify_BackEnd.Services.Tasks
                     CreateDate = task.CreateDate,
                     Deadline = task.Deadline,
                     EventId = task.EventId,
-                    Progress = task.Progress,
                     StartTime = task.StartTime,
                     Status = task.Status,
                     SubTasks = task.SubTasks == null ? new List<SubTaskVM>() : task.SubTasks.Select(st => new SubTaskVM
@@ -259,7 +249,6 @@ namespace Planify_BackEnd.Services.Tasks
                     Deadline = item.Deadline,
                     EventId = item.EventId,
                     AmountBudget = item.AmountBudget,
-                    Progress = item.Progress,
                     Status = item.Status
                 }).ToList();
             }
