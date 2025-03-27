@@ -14,5 +14,6 @@ namespace Planify_BackEnd.Services.Users
         Task<UserListDTO> UpdateEventOrganizer(UserDTO userDTO);
         Task<UserRoleDTO> AddUserRole(UserRoleDTO roleDTO);
         Task<ResponseDTO> CreateManagerAsync(UserCreateDTO user);
+        Task<ResponseDTO> UpdateManagerAsync(UserUpdateDTO user, Guid id);
     }
 }

@@ -14,6 +14,23 @@ namespace Planify_BackEnd.Services.Users
         {
             _userRepository = userRepository;
         }
+        public async Task<ResponseDTO> UpdateManagerAsync(UserUpdateDTO user, Guid id)
+        {
+            try
+            {
+                var updateUser = await _userRepository.UpdateManagerAsync( id, user);
+
+                if (updateUser == null)
+                {
+                    return new ResponseDTO(400, "User not found!", null);
+                }
+                return new ResponseDTO(200, "User updated successfully!", updateUser);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseDTO(500, "Error occurs while updating user!", ex.Message);
+            }
+        }
         public async Task<ResponseDTO> CreateManagerAsync(UserCreateDTO user)
         {
             try
@@ -36,7 +53,7 @@ namespace Planify_BackEnd.Services.Users
                     AvatarId = user.AvatarId,
                     CreatedAt = user.CreatedAt,
                     CampusId = user.CampusId,
-                    Status = user.Status,
+                    Status = 1,
                     Gender = user.Gender,
                 };
                 try

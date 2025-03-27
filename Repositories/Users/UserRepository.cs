@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Planify_BackEnd.DTOs.Users;
 using Planify_BackEnd.Models;
 
 public class UserRepository : IUserRepository
@@ -8,6 +9,36 @@ public class UserRepository : IUserRepository
     public UserRepository(PlanifyContext context)
     {
         _context = context;
+    }
+    public async Task<User> UpdateManagerAsync(Guid id, UserUpdateDTO updateUser)
+    {
+        try
+        {
+            var existingUser = await _context.Users.FindAsync(id);
+            if (existingUser == null)
+            {
+                return null;
+            }
+            existingUser.AddressId = updateUser.AddressId;
+            existingUser.FirstName = updateUser.FirstName;
+            existingUser.LastName = updateUser.LastName;
+            existingUser.UserName = updateUser.UserName;
+            existingUser.Status = updateUser.Status;
+            existingUser.DateOfBirth = updateUser.DateOfBirth;
+            existingUser.Gender = updateUser.Gender;
+            existingUser.CampusId = updateUser.CampusId;
+            existingUser.Email = updateUser.Email;
+            existingUser.PhoneNumber = updateUser.PhoneNumber;
+            existingUser.AvatarId = updateUser.AvatarId;
+            existingUser.Password = updateUser.Password;
+            _context.Users.Update(existingUser);
+                await _context.SaveChangesAsync();
+                return existingUser;
+            }
+            catch (Exception ex)
+        {
+            throw new Exception("An unexpected error occurred.", ex);
+        }
     }
     public async Task<User> CreateManagerAsync(User user)
     {

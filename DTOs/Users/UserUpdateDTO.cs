@@ -1,9 +1,7 @@
 ﻿namespace Planify_BackEnd.DTOs.Users
 {
-    public class UserCreateDTO
+    public class UserUpdateDTO
     {
-        public Guid Id { get; set; }
-
         public string? UserName { get; set; }
 
         public string Email { get; set; } = null!;
@@ -22,9 +20,9 @@
 
         public int? AvatarId { get; set; }
 
-        public DateTime? CreatedAt { get; set; }
-
         public int CampusId { get; set; }
+
+        public int Status { get; set; }
 
         public bool Gender { get; set; }
     }
