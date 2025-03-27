@@ -12,6 +12,29 @@ namespace Planify_BackEnd.Services.Users
         {
             _userRepository = userRepository;
         }
+        public async Task<IEnumerable<UserGetListDTO>> GetListUserAsync(int page, int pageSize)
+        {
+            var users = await _userRepository.GetListUserAsync(page, pageSize);
+
+            var userDTOs = users.Select(c => new UserGetListDTO
+            {
+                Id = c.Id,
+                UserName = c.UserName,
+                Email = c.Email,
+                FirstName = c.FirstName,
+                LastName = c.LastName,
+                Password = c.Password,
+                DateOfBirth = c.DateOfBirth,
+                PhoneNumber = c.PhoneNumber,
+                Address = c.Address.AddressDetail,
+                AvatarId = c.AvatarId,
+                CreatedAt = c.CreatedAt,
+                CampusName = c.Campus.CampusName,
+                Status = c.Status,
+                Gender = c.Gender ? "Male" : "Female"
+            }).ToList();
+            return userDTOs;
+        }
         public async Task<IEnumerable<UserListDTO>> GetListImplementer(int eventId, int page, int pageSize)
         {
             var users = await _userRepository.GetListImplementer(eventId, page, pageSize);

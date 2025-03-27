@@ -10,6 +10,24 @@ public class UserRepository : IUserRepository
         _context = context;
     }
 
+    public async Task<IEnumerable<User>> GetListUserAsync(int page, int pageSize)
+    {
+        try
+        {
+            return await _context.Users
+                .Include(r => r.UserRoles)
+                .ThenInclude(u => u.Role)
+                .Include(c => c.Campus)
+                .Include(a => a.Address)
+                .Skip((page - 1) * pageSize).Take(pageSize)
+                .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in GetListUserAsync: {ex.Message}");
+            return null;
+        }
+    }
     public async Task<User> GetUserByEmailAsync(string email)
     {
         if (string.IsNullOrWhiteSpace(email))

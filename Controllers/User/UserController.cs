@@ -16,6 +16,20 @@ namespace Planify_BackEnd.Controllers.User
         {
             _userService = userService;
         }
+        [HttpGet("get-list-user")]
+        //[Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetListUserAsync(int page, int pageSize)
+        {
+            try
+            {
+                var response = await _userService.GetListUserAsync(page, pageSize);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
         [HttpGet("getListImplementer/{eventId}")]
         [Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> GetListImplementer(int eventId, int page, int pageSize)
