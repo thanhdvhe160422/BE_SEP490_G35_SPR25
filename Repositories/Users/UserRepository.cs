@@ -10,6 +10,62 @@ public class UserRepository : IUserRepository
         _context = context;
     }
 
+    public async Task<IEnumerable<User>> GetListUserAsync(int page, int pageSize)
+    {
+        try
+        {
+            return await _context.Users
+                .Include(r => r.UserRoles)
+                .ThenInclude(u => u.Role)
+                .Include(c => c.Campus)
+                .Include(a => a.Address)
+                .Skip((page - 1) * pageSize).Take(pageSize)
+                .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in GetListUserAsync: {ex.Message}");
+            return null;
+        }
+    }
+    public async Task<User> GetUserDetailAsync(Guid userId)
+    {
+        try
+        {
+            return await _context.Users
+                .Include(r => r.UserRoles)
+                .ThenInclude(u => u.Role)
+                .Include(c => c.Campus)
+                .Include(a => a.Address)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in GetUserDetailAsync: {ex.Message}");
+            return null;
+        }
+    }
+    public async Task<bool> UpdateUserStatusAsync(Guid id, int newStatus)
+    {
+        try
+        {
+            var existingUser = await _context.Users.FindAsync(id);
+            if (existingUser == null)
+            {
+                return false; // Không tìm thấy User
+            }
+
+            existingUser.Status = newStatus;
+            _context.Users.Update(existingUser);
+            await _context.SaveChangesAsync();
+
+            return true; // Cập nhật thành công
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An unexpected error occurred while updating the user status.", ex);
+        }
+    }
     public async Task<User> GetUserByEmailAsync(string email)
     {
         if (string.IsNullOrWhiteSpace(email))

@@ -26,5 +26,18 @@ namespace Planify_BackEnd.Controllers
 
             }
         }
+        [HttpGet("{campusName}")]
+        public async Task<IActionResult> GetCampusIdByName(string campusName)
+        {
+            try
+            {
+                var response = await _campusService.GetCampusByName(campusName);
+                if (response==null) return NotFound("Not found campus with name "+ campusName);
+                return Ok(response);
+            }catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
