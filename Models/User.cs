@@ -45,13 +45,11 @@ public partial class User
 
     public virtual ICollection<Event> EventUpdateByNavigations { get; set; } = new List<Event>();
 
+    public virtual ICollection<FavouriteEvent> FavouriteEvents { get; set; } = new List<FavouriteEvent>();
+
     public virtual ICollection<JoinProject> JoinProjects { get; set; } = new List<JoinProject>();
 
     public virtual ICollection<JoinTask> JoinTasks { get; set; } = new List<JoinTask>();
-
-    public virtual ICollection<Report> ReportSendFromNavigations { get; set; } = new List<Report>();
-
-    public virtual ICollection<Report> ReportSendToNavigations { get; set; } = new List<Report>();
 
     public virtual ICollection<SendRequest> SendRequests { get; set; } = new List<SendRequest>();
 

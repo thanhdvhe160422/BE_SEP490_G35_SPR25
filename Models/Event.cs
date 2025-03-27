@@ -39,6 +39,14 @@ public partial class Event
 
     public Guid? UpdateBy { get; set; }
 
+    public string? MeasuringSuccess { get; set; }
+
+    public string? Goals { get; set; }
+
+    public string? MonitoringProcess { get; set; }
+
+    public int? SizeParticipants { get; set; }
+
     public virtual Campus Campus { get; set; } = null!;
 
     public virtual CategoryEvent CategoryEvent { get; set; } = null!;
@@ -47,9 +55,13 @@ public partial class Event
 
     public virtual ICollection<EventMedium> EventMedia { get; set; } = new List<EventMedium>();
 
+    public virtual ICollection<FavouriteEvent> FavouriteEvents { get; set; } = new List<FavouriteEvent>();
+
     public virtual ICollection<JoinProject> JoinProjects { get; set; } = new List<JoinProject>();
 
     public virtual User? Manager { get; set; }
+
+    public virtual ICollection<Risk> Risks { get; set; } = new List<Risk>();
 
     public virtual ICollection<SendRequest> SendRequests { get; set; } = new List<SendRequest>();
 
