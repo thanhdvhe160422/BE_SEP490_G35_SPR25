@@ -2,7 +2,6 @@
 using Planify_BackEnd.DTOs.Roles;
 using Planify_BackEnd.DTOs.Users;
 using Planify_BackEnd.Models;
-using static Planify_BackEnd.DTOs.Events.EventDetailResponseDTO;
 
 namespace Planify_BackEnd.Services.Users
 {

@@ -1,7 +1,5 @@
 ﻿namespace Planify_BackEnd.DTOs.Events
 {
-    public class EventDetailResponseDTO
-    {
         public class EventDetailDto
         {
             public int Id { get; set; }
@@ -19,7 +17,32 @@
             public string CategoryEventName { get; set; }
             public UserDto CreatedBy { get; set; }
             public List<EventMediaDto> EventMedia { get; set; }
-            public List<GroupDto> Groups { get; set; }
+            public List<TaskDetailDto> Tasks { get; set; }
+        }
+
+        public class TaskDetailDto
+        {
+            public int Id { get; set; }
+            public string TaskName { get; set; }
+            public string TaskDescription { get; set; }
+            public DateTime StartTime { get; set; }
+            public DateTime? Deadline { get; set; }
+            public decimal AmountBudget { get; set; }
+            public DateTime CreatedAt { get; set; }
+            public UserDto CreatedBy { get; set; }
+            public List<SubTaskDetailDto> SubTasks { get; set; }
+        }
+
+        public class SubTaskDetailDto
+        {
+            public int Id { get; set; }
+            public string SubTaskName { get; set; }
+            public string SubTaskDescription { get; set; }
+            public DateTime StartTime { get; set; }
+            public DateTime? Deadline { get; set; }
+            public decimal AmountBudget { get; set; }
+            public DateTime CreatedAt { get; set; }
+            public UserDto CreatedBy { get; set; }
         }
 
         public class UserDto
@@ -35,24 +58,4 @@
             public int Id { get; set; }
             public string MediaUrl { get; set; }
         }
-
-        public class GroupDto
-        {
-            public int Id { get; set; }
-            public string GroupName { get; set; }
-            public decimal AmountBudget { get; set; }
-            public List<JoinGroupDto> JoinGroups { get; set; }
-        }
-
-        public class JoinGroupDto
-        {
-            public int Id { get; set; }
-            public Guid ImplementerId { get; set; }
-            public string ImplementerFirstName { get; set; }
-            public string ImplementerLastName { get; set; }
-            public DateTime TimeJoin { get; set; }
-            public DateTime? TimeOut { get; set; }
-            public int Status { get; set; }
-        }
     }
-}

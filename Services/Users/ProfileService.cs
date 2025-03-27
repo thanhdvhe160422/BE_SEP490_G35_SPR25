@@ -108,17 +108,37 @@ namespace Planify_BackEnd.Services.User
             {
                 var p = _profileRepository.GetUserProfileById(updateProfile.Id);
                 bool isUpdateAddressSuccess = false;
-                if (updateProfile.addressVM.WardVM.Id != p.Address.Ward.Id
-                    || !updateProfile.addressVM.AddressDetail.Equals(p.Address.AddressDetail))
+                if (p.AddressId == null)
                 {
-                    Models.Address updateAddress = new Models.Address
+                    Models.Address createAddress = new Models.Address
                     {
-                        Id = p.Address.Id,
+                        Id = 0,
                         AddressDetail = updateProfile.addressVM.AddressDetail,
                         WardId = updateProfile.addressVM.WardVM.Id
                     };
-                    isUpdateAddressSuccess = _provinceRepository.UpdateAddress(updateAddress);
+                    var addressId = _provinceRepository.CreateAddress(createAddress);
+                    updateProfile.AddressId = addressId;
+                    isUpdateAddressSuccess = true;
                 }
+                if (isUpdateAddressSuccess == false)
+                {
+                    if (updateProfile.addressVM.WardVM.Id != p.Address.Ward.Id
+                    || !updateProfile.addressVM.AddressDetail.Equals(p.Address.AddressDetail))
+                    {
+                        Models.Address updateAddress = new Models.Address
+                        {
+                            Id = p.Address.Id,
+                            AddressDetail = updateProfile.addressVM.AddressDetail,
+                            WardId = updateProfile.addressVM.WardVM.Id
+                        };
+                        isUpdateAddressSuccess = _provinceRepository.UpdateAddress(updateAddress);
+                    }
+                    else
+                    {
+                        isUpdateAddressSuccess = true;
+                    }
+                }
+                
                 if (!isUpdateAddressSuccess) throw new Exception();
                 var profile = _profileRepository.UpdateProfile(updateProfile);
                 ProfileUpdateModel updatedprofile = new ProfileUpdateModel
@@ -134,7 +154,7 @@ namespace Planify_BackEnd.Services.User
                 return updatedprofile;
             }catch
             {
-                return new ProfileUpdateModel();
+                throw new Exception();
             }
         }
     }
