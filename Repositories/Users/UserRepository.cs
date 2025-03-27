@@ -9,7 +9,24 @@ public class UserRepository : IUserRepository
     {
         _context = context;
     }
-
+    public async Task<User> CreateManagerAsync(User user)
+    {
+        try
+        {
+            await _context.UserRoles.AddAsync(new UserRole
+            {
+                UserId = user.Id,
+                RoleId = 2
+            });
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
+            return user;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
     public async Task<IEnumerable<User>> GetListUserAsync(int page, int pageSize)
     {
         try

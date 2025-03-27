@@ -12,4 +12,5 @@ public interface IUserRepository
     Task<User> CreateEventOrganizer(User user);
     Task<User> UpdateEventOrganizer(User user);
     Task<UserRole> AddUserRole(UserRole role);
+    Task<User> CreateManagerAsync(User user);
 }

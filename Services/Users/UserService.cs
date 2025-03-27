@@ -14,6 +14,46 @@ namespace Planify_BackEnd.Services.Users
         {
             _userRepository = userRepository;
         }
+        public async Task<ResponseDTO> CreateManagerAsync(UserCreateDTO user)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(user.FirstName))
+                {
+                    return new ResponseDTO(400, "First name is required.", null);
+                }
+                var newUser = new Models.User
+                {
+                    Id = user.Id,
+                    UserName = user.UserName,
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Password = user.Password,
+                    DateOfBirth = user.DateOfBirth,
+                    PhoneNumber = user.PhoneNumber,
+                    AddressId = user.AddressId,
+                    AvatarId = user.AvatarId,
+                    CreatedAt = user.CreatedAt,
+                    CampusId = user.CampusId,
+                    Status = user.Status,
+                    Gender = user.Gender,
+                };
+                try
+                {
+                    await _userRepository.CreateManagerAsync(newUser);
+                }
+                catch (Exception dbEx)
+                {
+                    return new ResponseDTO(500, "Database error while creating user!", dbEx.Message);
+                }
+                return new ResponseDTO(201, "Campus Manager creates successfully!", newUser);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
         public async Task<IEnumerable<UserListDTO>> GetListUserAsync(int page, int pageSize)
         {
             var users = await _userRepository.GetListUserAsync(page, pageSize);
