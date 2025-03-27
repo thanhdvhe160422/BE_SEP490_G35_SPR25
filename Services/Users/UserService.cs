@@ -1,7 +1,9 @@
-﻿using Planify_BackEnd.DTOs.Campus;
+﻿using Planify_BackEnd.DTOs;
+using Planify_BackEnd.DTOs.Campus;
 using Planify_BackEnd.DTOs.Roles;
 using Planify_BackEnd.DTOs.Users;
 using Planify_BackEnd.Models;
+using Planify_BackEnd.Repositories;
 
 namespace Planify_BackEnd.Services.Users
 {
@@ -63,6 +65,19 @@ namespace Planify_BackEnd.Services.Users
             };
 
             return userDTO;
+        }
+        public async Task<ResponseDTO> UpdateUserStatusAsync(Guid id, int newStatus)
+        {
+            try
+            {
+                var updateUser = await _userRepository.UpdateUserStatusAsync(id, newStatus);
+
+                return new ResponseDTO(200, "User status updated successfully!", updateUser);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseDTO(500, "Error occurs while updating user atus!", ex.Message);
+            }
         }
 
         public async Task<IEnumerable<UserListDTO>> GetListImplementer(int eventId, int page, int pageSize)

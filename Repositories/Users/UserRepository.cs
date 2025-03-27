@@ -45,6 +45,27 @@ public class UserRepository : IUserRepository
             return null;
         }
     }
+    public async Task<bool> UpdateUserStatusAsync(Guid id, int newStatus)
+    {
+        try
+        {
+            var existingUser = await _context.Users.FindAsync(id);
+            if (existingUser == null)
+            {
+                return false; // Không tìm thấy User
+            }
+
+            existingUser.Status = newStatus;
+            _context.Users.Update(existingUser);
+            await _context.SaveChangesAsync();
+
+            return true; // Cập nhật thành công
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An unexpected error occurred while updating the user status.", ex);
+        }
+    }
     public async Task<User> GetUserByEmailAsync(string email)
     {
         if (string.IsNullOrWhiteSpace(email))

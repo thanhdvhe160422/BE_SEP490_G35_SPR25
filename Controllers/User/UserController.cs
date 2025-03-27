@@ -17,7 +17,7 @@ namespace Planify_BackEnd.Controllers.User
             _userService = userService;
         }
         [HttpGet("get-list-user")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetListUserAsync(int page, int pageSize)
         {
             try
@@ -31,12 +31,30 @@ namespace Planify_BackEnd.Controllers.User
             }
         }
         [HttpGet("get-user-detail/{id}")]
-        //Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetUserDetailAsync(Guid id)
         {
             try
             {
                 var response = await _userService.GetUserDetailAsync(id);
+                if (response == null)
+                {
+                    return NotFound(new { message = "User not found!" });
+                }
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+        [HttpPut("ban/unban-users/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateUserStatusAsync(Guid id, int newStatus)
+        {
+            try
+            {
+                var response = await _userService.UpdateUserStatusAsync(id, newStatus);
                 if (response == null)
                 {
                     return NotFound(new { message = "User not found!" });
