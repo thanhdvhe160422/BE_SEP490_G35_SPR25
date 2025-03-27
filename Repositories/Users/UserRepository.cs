@@ -28,6 +28,23 @@ public class UserRepository : IUserRepository
             return null;
         }
     }
+    public async Task<User> GetUserDetailAsync(Guid userId)
+    {
+        try
+        {
+            return await _context.Users
+                .Include(r => r.UserRoles)
+                .ThenInclude(u => u.Role)
+                .Include(c => c.Campus)
+                .Include(a => a.Address)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in GetUserDetailAsync: {ex.Message}");
+            return null;
+        }
+    }
     public async Task<User> GetUserByEmailAsync(string email)
     {
         if (string.IsNullOrWhiteSpace(email))

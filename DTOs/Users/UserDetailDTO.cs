@@ -1,6 +1,6 @@
 ﻿namespace Planify_BackEnd.DTOs.Users
 {
-    public class UserGetListDTO
+    public class UserDetailDTO
     {
         public Guid Id { get; set; }
 

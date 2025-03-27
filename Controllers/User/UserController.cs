@@ -30,6 +30,24 @@ namespace Planify_BackEnd.Controllers.User
                 return BadRequest(new { message = ex.Message });
             }
         }
+        [HttpGet("get-user-detail/{id}")]
+        //Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetUserDetailAsync(Guid id)
+        {
+            try
+            {
+                var response = await _userService.GetUserDetailAsync(id);
+                if (response == null)
+                {
+                    return NotFound(new { message = "User not found!" });
+                }
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
         [HttpGet("getListImplementer/{eventId}")]
         [Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> GetListImplementer(int eventId, int page, int pageSize)

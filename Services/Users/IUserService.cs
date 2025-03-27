@@ -5,6 +5,7 @@ namespace Planify_BackEnd.Services.Users
     public interface IUserservice
     {
         Task<IEnumerable<UserListDTO>> GetListUserAsync(int page, int pageSize);
+        Task<UserDetailDTO> GetUserDetailAsync(Guid id);
         Task<IEnumerable<UserListDTO>> GetListImplementer(int eventId, int page, int pageSize);
         Task<List<Models.User>> GetUserByNameOrEmailAsync(string input, int campusId);
         Task<UserListDTO> CreateEventOrganizer(UserDTO userDTO);
