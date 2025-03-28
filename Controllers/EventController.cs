@@ -135,16 +135,18 @@ namespace Planify_BackEnd.Controllers
             }
         }
         [HttpGet("search")]
-        [Authorize(Roles = "Event Organizer")]
+        [Authorize(Roles = "Event Organizer, Implementer, Campus Manager")]
         public async Task<IActionResult> SearchEventAsync(int page, int pageSize, string? title, 
             DateTime? startTime, DateTime? endTime, decimal? minBudget, decimal? maxBudget, 
             int? isPublic, int? status, int? CategoryEventId, string? placed)
         {
             try
             {
+                var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                var campusClaim = User.Claims.FirstOrDefault(c => c.Type == "campusId");
                 var response = await _eventService.SearchEventAsync(page, pageSize, title, startTime, endTime,
-                minBudget, maxBudget, isPublic, status, CategoryEventId, placed);
-                if (response == null || response.Count() == 0)
+                minBudget, maxBudget, isPublic, status, CategoryEventId, placed,userId,int.Parse(campusClaim.Value));
+                if (response.TotalCount == 0)
                     return NotFound("Not found any event");
                 return Ok(response);
             }catch(Exception ex)
@@ -153,5 +155,36 @@ namespace Planify_BackEnd.Controllers
             }
         }
 
+        //[HttpPost("create-save-draft")]
+        //[Authorize(Roles = "Event Organizer, Campus Manager")]
+        //public async Task<IActionResult> CreateSaveDraft([FromBody] EventCreateRequestDTO eventDTO)
+        //{
+        //    var organizerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+        //    var response = await _eventService.CreateSaveDraft(eventDTO, organizerId);
+
+        //    return StatusCode(response.Status, response);
+        //}
+
+        //[HttpPut("update-save-draft")]
+        //[Authorize(Roles = "Event Organizer, Campus Manager")]
+        //public async Task<IActionResult> UpdateSaveDraft([FromBody] EventDTO eventDTO)
+        //{
+        //    var organizerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+        //    var response = await _eventService.UpdateSaveDraft(eventDTO);
+
+        //    return StatusCode(response.Status, response);
+        //}
+        //[HttpGet("get-save-draft")]
+        //[Authorize(Roles = "Event Organizer, Campus Manager")]
+        //public async Task<IActionResult> GetSaveDraft()
+        //{
+        //    var organizerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+        //    var response = await _eventService.GetSaveDraft(organizerId);
+
+        //    return StatusCode(response.Status, response);
+        //}
     }
 }

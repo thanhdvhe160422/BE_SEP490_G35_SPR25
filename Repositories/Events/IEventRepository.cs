@@ -15,13 +15,19 @@ namespace Planify_BackEnd.Repositories
         Task<EventDetailDto> GetEventDetailAsync(int eventId);
         Task<Event> UpdateEventAsync(Event e);
         Task<bool> DeleteEventAsync(int eventId);
-        Task<IEnumerable<Event>>SearchEventAsync(int page,int pageSize, 
+        Task<PageResultDTO<Event>>SearchEventAsync(int page,int pageSize, 
             string? title, 
             DateTime? startTime, DateTime? endTime,
             decimal? minBudget, decimal? maxBudget,
             int? isPublic,
             int? status,
             int? CategoryEventId,
+            string? placed,
+            Guid userId,
+            int campusId);
+        Task<Event> CreateSaveDraft(Event saveEvent);
+        Task<Event> UpdateSaveDraft(Event saveEvent);
+        Task<Event> GetSaveDraft(Guid createBy);
             string? placed);
         System.Threading.Tasks.Task CreateRiskAsync(Risk risk);
         Task<Event> GetEventByIdAsync(int eventId);

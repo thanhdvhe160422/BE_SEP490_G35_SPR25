@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Planify_BackEnd.Repositories.Events;
 using Planify_BackEnd.Services.Events;
+using System.Security.Claims;
 
 namespace Planify_BackEnd.Controllers.Events
 {
@@ -19,8 +20,9 @@ namespace Planify_BackEnd.Controllers.Events
         {
             try
             {
-                var response = _service.GetEventsOrderByStartDate(page, pageSize);
-                if (response == null || response.Count==0)
+                var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                var response = _service.GetEvents(page, pageSize,userId);
+                if (response.TotalCount==0)
                 {
                     return NotFound("Cannot found any event");
                 }
@@ -35,7 +37,8 @@ namespace Planify_BackEnd.Controllers.Events
         {
             try
             {
-                var response = _service.GetEventById(id);
+                var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                var response = _service.GetEventById(id,userId);
                 if (response== null || response.Id == 0)
                 {
                     return NotFound("Cannot fount event with id: "+id);
@@ -47,12 +50,13 @@ namespace Planify_BackEnd.Controllers.Events
             }
         }
         [HttpGet("search")]
-        public IActionResult SearchEvents(int page, int pageSize, string? name, DateTime startDate, DateTime endDate)
+        public IActionResult SearchEvents(int page, int pageSize, string? name, DateTime? startDate, DateTime? endDate, string? placed)
         {
             try
             {
-                var response = _service.SearchEventOrderByStartDate(page, pageSize, name, startDate, endDate);
-                if (response == null || response.Count == 0)
+                var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                var response = _service.SearchEvent(page, pageSize, name, startDate, endDate,placed,userId);
+                if (response.TotalCount == 0)
                 {
                     return NotFound("Cannot found any event");
                 }
