@@ -1,11 +1,12 @@
-﻿using Planify_BackEnd.Models;
+﻿using Planify_BackEnd.DTOs;
+using Planify_BackEnd.Models;
 
 namespace Planify_BackEnd.Repositories.Events
 {
     public interface IEventSpectatorRepository
     {
-        List<Event> GetEventsOrderByStartDate(int page, int pageSize);
+        PageResultDTO<Event> GetEvents(int page, int pageSize, Guid userId);
         Event GetEventById(int id);
-        List<Event> SearchEventOrderByStartDate(int page, int pageSize, string? name, DateTime startDate, DateTime endDate);
+        PageResultDTO<Event> SearchEvent(int page, int pageSize, string? name, DateTime? startDate, DateTime? endDate, string? placed, Guid userId);
     }
 }
