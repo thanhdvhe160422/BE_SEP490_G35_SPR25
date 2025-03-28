@@ -33,9 +33,9 @@ public class EventService : IEventService
         _subTaskRepository = subTaskRepository;
         _taskRepository = taskRepository;
     }
-    public async Task<IEnumerable<EventGetListResponseDTO>> GetAllEventAsync(int page, int pageSize)
+    public async Task<IEnumerable<EventGetListResponseDTO>> GetAllEventAsync(int campusId, int page, int pageSize)
     {
-        var events = await _eventRepository.GetAllEventAsync(page, pageSize);
+        var events = await _eventRepository.GetAllEventAsync(campusId,page, pageSize);
         var eventDTOs = events.Select(e => new EventGetListResponseDTO
         {
             Id = e.Id,

@@ -34,13 +34,13 @@ namespace Planify_BackEnd.Controllers
         /// Retrieves all events with related data.
         /// </summary>
         /// <returns>A list of all events.</returns>
-        [HttpGet ("List")]
+        [HttpGet ("list/{campusId}")]
         //[Authorize(Roles = "Event Organizer")]
-        public async Task<IActionResult> GetAllEvents(int page, int pageSize)
+        public async Task<IActionResult> GetAllEvents(int campusId,int page, int pageSize)
         {
             try
             {
-                var response = await _eventService.GetAllEventAsync( page,  pageSize);
+                var response = await _eventService.GetAllEventAsync(campusId, page,  pageSize);
                 return Ok(response);
             }
             catch (Exception ex)
@@ -49,7 +49,11 @@ namespace Planify_BackEnd.Controllers
 
             }
         }
-
+        /// <summary>
+        /// Create a new event.
+        /// </summary>
+        /// <param name="eventDTO"></param>
+        /// <returns></returns>
         [HttpPost("create")]
         [Authorize(Roles = "Event Organizer, Campus Manager")]
         public async Task<IActionResult> CreateEvent([FromBody] EventCreateRequestDTO eventDTO)
@@ -60,7 +64,11 @@ namespace Planify_BackEnd.Controllers
 
             return StatusCode(response.Status, response);
         }
-
+        /// <summary>
+        /// Upload image for event.
+        /// </summary>
+        /// <param name="imageDTO"></param>
+        /// <returns></returns>
         [HttpPost("upload-image")]
         [Authorize(Roles = "Event Organizer, Campus Manager")]
         public async Task<IActionResult> UploadImage([FromForm] UploadImageRequestDTO imageDTO)
@@ -69,7 +77,11 @@ namespace Planify_BackEnd.Controllers
 
             return StatusCode(response.Status, response);
         }
-
+        /// <summary>
+        ///     Get event detail by event id.
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <returns></returns>
         [HttpGet("get-event-detail")]
         [Authorize(Roles = "Event Organizer, Campus Manager")]
         public async Task<IActionResult> GetEventDetail(int eventId)
@@ -78,6 +90,11 @@ namespace Planify_BackEnd.Controllers
 
             return StatusCode(response.Status, response);
         }
+        /// <summary>
+        /// Get event detail for implementer.
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <returns></returns>
         [HttpGet("get-event-detail-implementer")]
         [Authorize(Roles = "Implementer")]
         public async Task<IActionResult> GetEventDetailForImp(int eventId)
@@ -86,6 +103,12 @@ namespace Planify_BackEnd.Controllers
 
             return StatusCode(response.Status, response);
         }
+        /// <summary>
+        /// Update event.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="eventDTO"></param>
+        /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> UpdateEvent(int id,[FromBody] EventDTO eventDTO)
@@ -118,6 +141,11 @@ namespace Planify_BackEnd.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        /// <summary>
+        /// Delete event.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpPut("delete/{id}")]
         [Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> DeleteEvent(int id)
@@ -134,6 +162,21 @@ namespace Planify_BackEnd.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        /// <summary>
+        /// Search event by title, start time, end time, min budget, max budget, is public, status, category event id, placed.
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="title"></param>
+        /// <param name="startTime"></param>
+        /// <param name="endTime"></param>
+        /// <param name="minBudget"></param>
+        /// <param name="maxBudget"></param>
+        /// <param name="isPublic"></param>
+        /// <param name="status"></param>
+        /// <param name="CategoryEventId"></param>
+        /// <param name="placed"></param>
+        /// <returns></returns>
         [HttpGet("search")]
         [Authorize(Roles = "Event Organizer, Implementer, Campus Manager")]
         public async Task<IActionResult> SearchEventAsync(int page, int pageSize, string? title, 
