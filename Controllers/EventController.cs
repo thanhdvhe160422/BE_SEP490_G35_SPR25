@@ -78,6 +78,14 @@ namespace Planify_BackEnd.Controllers
 
             return StatusCode(response.Status, response);
         }
+        [HttpGet("get-event-detail-implementer")]
+        [Authorize(Roles = "Implementer")]
+        public async Task<IActionResult> GetEventDetailForImp(int eventId)
+        {
+            var response = await _eventService.GetEventDetailAsync(eventId);
+
+            return StatusCode(response.Status, response);
+        }
         [HttpPut("{id}")]
         [Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> UpdateEvent(int id,[FromBody] EventDTO eventDTO)
