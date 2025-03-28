@@ -34,12 +34,13 @@ namespace Planify_BackEnd.Controllers
         /// Retrieves all events with related data.
         /// </summary>
         /// <returns>A list of all events.</returns>
-        [HttpGet ("list/{campusId}")]
+        [HttpGet ("list")]
         //[Authorize(Roles = "Event Organizer")]
-        public async Task<IActionResult> GetAllEvents(int campusId,int page, int pageSize)
+        public async Task<IActionResult> GetAllEvents(int page, int pageSize)
         {
             try
             {
+                var campusId = int.Parse(User.FindFirst("campusId")?.Value);
                 var response = await _eventService.GetAllEventAsync(campusId, page,  pageSize);
                 return Ok(response);
             }
