@@ -37,7 +37,8 @@ namespace Planify_BackEnd.Controllers.Events
         {
             try
             {
-                var response = _service.GetEventById(id);
+                var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                var response = _service.GetEventById(id,userId);
                 if (response== null || response.Id == 0)
                 {
                     return NotFound("Cannot fount event with id: "+id);
@@ -49,7 +50,7 @@ namespace Planify_BackEnd.Controllers.Events
             }
         }
         [HttpGet("search")]
-        public IActionResult SearchEvents(int page, int pageSize, string? name, DateTime startDate, DateTime endDate, string? placed)
+        public IActionResult SearchEvents(int page, int pageSize, string? name, DateTime? startDate, DateTime? endDate, string? placed)
         {
             try
             {
