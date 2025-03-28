@@ -1,4 +1,5 @@
-﻿using Planify_BackEnd.DTOs.Events;
+﻿using Planify_BackEnd.DTOs;
+using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.Models;
 
 namespace Planify_BackEnd.Repositories
@@ -14,14 +15,15 @@ namespace Planify_BackEnd.Repositories
         Task<EventDetailDto?> GetEventDetailAsync(int eventId);
         Task<Event> UpdateEventAsync(Event e);
         Task<bool> DeleteEventAsync(int eventId);
-        Task<IEnumerable<Event>>SearchEventAsync(int page,int pageSize, 
+        Task<PageResultDTO<Event>>SearchEventAsync(int page,int pageSize, 
             string? title, 
             DateTime? startTime, DateTime? endTime,
             decimal? minBudget, decimal? maxBudget,
             int? isPublic,
             int? status,
             int? CategoryEventId,
-            string? placed);
+            string? placed,
+            Guid userId);
         Task<Event> CreateSaveDraft(Event saveEvent);
         Task<Event> UpdateSaveDraft(Event saveEvent);
         Task<Event> GetSaveDraft(Guid createBy);

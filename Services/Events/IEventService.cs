@@ -12,14 +12,15 @@ namespace Planify_BackEnd.Services.Events
         Task<ResponseDTO> GetEventDetailAsync(int eventId);
         Task<EventDetailDto> UpdateEventAsync(EventDTO e);
         Task<bool> DeleteEventAsync(int eventId);
-        Task<IEnumerable<EventGetListResponseDTO>> SearchEventAsync(int page, int pageSize,
+        Task<PageResultDTO<EventGetListResponseDTO>> SearchEventAsync(int page, int pageSize,
             string? title,
             DateTime? startTime, DateTime? endTime,
             decimal? minBudget, decimal? maxBudget,
             int? isPublic,
             int? status,
             int? CategoryEventId,
-            string? placed);
+            string? placed,
+            Guid userId);
 
         Task<ResponseDTO> CreateSaveDraft(EventCreateRequestDTO eventDTO, Guid organizerId);
         Task<ResponseDTO> UpdateSaveDraft(EventDTO eventDTO);

@@ -30,5 +30,13 @@ namespace Planify_BackEnd.DTOs.Events
         public int? CategoryEventId { get; set; }
 
         public Guid? UpdateBy { get; set; }
+
+        public string? MeasuringSuccess { get; set; }
+
+        public string? Goals { get; set; }
+
+        public string? MonitoringProcess { get; set; }
+
+        public int? SizeParticipants { get; set; }
     }
 }

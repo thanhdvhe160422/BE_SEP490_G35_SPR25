@@ -233,7 +233,11 @@ public class EventService : IEventService
                 Status = e.Status,
                 TimePublic = e.TimePublic,
                 UpdateBy = e.UpdateBy,
-                UpdatedAt = DateTime.Now
+                UpdatedAt = DateTime.Now,
+                MeasuringSuccess = e.MeasuringSuccess,
+                Goals = e.Goals,
+                MonitoringProcess = e.MonitoringProcess,
+                SizeParticipants = e.SizeParticipants
             };
             Event updatedEvent = await _eventRepository.UpdateEventAsync(updateEvent);
             EventDetailDto eventDetailResponseDTO = new EventDetailDto
@@ -251,6 +255,10 @@ public class EventService : IEventService
                 CreatedAt = updatedEvent.CreatedAt,
                 CampusName = updatedEvent.Campus.CampusName,
                 CategoryEventName = updatedEvent.CategoryEvent.CategoryEventName,
+                MeasuringSuccess = updatedEvent.MeasuringSuccess,
+                Goals = updatedEvent.Goals,
+                MonitoringProcess = updatedEvent.Goals,
+                SizeParticipants = updatedEvent.SizeParticipants,
                 CreatedBy = new UserDto
                 {
                     Id = updatedEvent.CreateByNavigation.Id,
@@ -268,8 +276,7 @@ public class EventService : IEventService
         }
         catch (Exception ex)
         {
-            Console.WriteLine("event service - update event: " + ex.Message);
-            return new EventDetailDto();
+            throw new Exception(ex.Message);
         }
     }
 
@@ -281,18 +288,19 @@ public class EventService : IEventService
         }
         catch (Exception ex)
         {
-            Console.WriteLine("event service - delete event: " + ex.Message);
-            return false;
+            throw new Exception(ex.Message);
         }
     }
 
-    public async Task<IEnumerable<EventGetListResponseDTO>> SearchEventAsync(int page, int pageSize, string? title, DateTime? startTime, DateTime? endTime, decimal? minBudget, decimal? maxBudget, int? isPublic, int? status, int? CategoryEventId, string? placed)
+    public async Task<PageResultDTO<EventGetListResponseDTO>> SearchEventAsync(int page, int pageSize, 
+        string? title, DateTime? startTime, DateTime? endTime, decimal? minBudget, decimal? maxBudget, 
+        int? isPublic, int? status, int? CategoryEventId, string? placed, Guid userId)
     {
         try
         {
-            var events = await _eventRepository.SearchEventAsync(page, pageSize, title, startTime, endTime,
-                minBudget, maxBudget, isPublic, status, CategoryEventId, placed);
-            var eventDTOs = events.Select(e => new EventGetListResponseDTO
+            var resultEvents = await _eventRepository.SearchEventAsync(page, pageSize, title, startTime, endTime,
+                minBudget, maxBudget, isPublic, status, CategoryEventId, placed, userId);
+            var eventDTOs = resultEvents.Items.Select(e => new EventGetListResponseDTO
             {
                 Id = e.Id,
                 EventTitle = e.EventTitle,
@@ -312,12 +320,11 @@ public class EventService : IEventService
 
             }).ToList();
 
-            return eventDTOs;
+            return new PageResultDTO<EventGetListResponseDTO>(eventDTOs,resultEvents.TotalCount,page,pageSize);
         }
         catch (Exception ex)
         {
-            Console.WriteLine("event service - search event: " + ex.Message);
-            return new List<EventGetListResponseDTO>();
+            throw new Exception(ex.Message);
         }
     }
 
