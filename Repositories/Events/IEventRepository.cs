@@ -12,7 +12,7 @@ namespace Planify_BackEnd.Repositories
         System.Threading.Tasks.Task CreateMediaItemAsync(Medium mediaItem);
         System.Threading.Tasks.Task AddEventMediaAsync(EventMedium eventMedia);
         Task<CategoryEvent> GetCategoryEventAsync(int categoryId, int campusId);
-        Task<EventDetailDto?> GetEventDetailAsync(int eventId);
+        Task<EventDetailDto> GetEventDetailAsync(int eventId);
         Task<Event> UpdateEventAsync(Event e);
         Task<bool> DeleteEventAsync(int eventId);
         Task<PageResultDTO<Event>>SearchEventAsync(int page,int pageSize, 
@@ -28,5 +28,7 @@ namespace Planify_BackEnd.Repositories
         Task<Event> CreateSaveDraft(Event saveEvent);
         Task<Event> UpdateSaveDraft(Event saveEvent);
         Task<Event> GetSaveDraft(Guid createBy);
+        System.Threading.Tasks.Task CreateRiskAsync(Risk risk);
+        Task<Event> GetEventByIdAsync(int eventId);
     }
 }

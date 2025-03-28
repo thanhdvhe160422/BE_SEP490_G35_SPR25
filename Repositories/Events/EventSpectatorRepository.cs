@@ -12,17 +12,18 @@ namespace Planify_BackEnd.Repositories.Events
         {
             _context = context;
         }
-        public Event GetEventById(int id)
+        public Event GetEventById(int id,Guid userId)
         {
             return _context.Events
                 .Include(e=>e.Campus)
                 .Include(e=>e.CategoryEvent)
                 .Include(e=>e.EventMedia)
                 .ThenInclude(e=>e.Media)
+                .Where(e => e.FavouriteEvents.Any(fe => fe.UserId == userId) || !e.FavouriteEvents.Any())
                 .FirstOrDefault(em => em.Id == id);
         }
 
-        public PageResultDTO<Event> GetEvents(int page, int pageSize, Guid userId)
+        public PageResultDTO<Event> GetEvents(int page, int pageSize, Guid userId, int campusId)
         {
             try
             {
@@ -31,7 +32,7 @@ namespace Planify_BackEnd.Repositories.Events
                     .Include(e => e.CategoryEvent)
                     .Include(e => e.EventMedia).ThenInclude(em => em.Media)
                     .Include(e => e.FavouriteEvents)
-                    .Where(e => e.Status != -1 && e.IsPublic == 1)
+                    .Where(e => e.CampusId == campusId && e.Status != -1 && e.IsPublic == 1)
                     .Where(e => e.FavouriteEvents.Any(fe => fe.UserId == userId) || !e.FavouriteEvents.Any())
                     .AsEnumerable()
                     .OrderBy(e =>
@@ -47,7 +48,7 @@ namespace Planify_BackEnd.Repositories.Events
                     .Include(e => e.CategoryEvent)
                     .Include(e => e.EventMedia).ThenInclude(em => em.Media)
                     .Include(e => e.FavouriteEvents)
-                    .Where(e => e.Status != -1 && e.IsPublic == 1)
+                    .Where(e => e.CampusId == campusId && e.Status != -1 && e.IsPublic == 1)
                     .Where(e => e.FavouriteEvents.Any(fe => fe.UserId == userId) || !e.FavouriteEvents.Any())
                     .AsEnumerable()
                     .OrderBy(e =>
@@ -65,7 +66,7 @@ namespace Planify_BackEnd.Repositories.Events
             }
         }
 
-        public PageResultDTO<Event> SearchEvent(int page, int pageSize, string? name, DateTime? startDate, DateTime? endDate, string? placed,Guid userId)
+        public PageResultDTO<Event> SearchEvent(int page, int pageSize, string? name, DateTime? startDate, DateTime? endDate, string? placed,Guid userId, int campusId)
         {
             try
             {
@@ -74,7 +75,7 @@ namespace Planify_BackEnd.Repositories.Events
                     .Include(e => e.CategoryEvent)
                     .Include(e => e.EventMedia).ThenInclude(em => em.Media)
                     .Include(e => e.FavouriteEvents)
-                    .Where(e => e.Status != -1 && e.IsPublic == 1)
+                    .Where(e => e.CampusId == campusId && e.Status != -1 && e.IsPublic == 1)
                     .Where(e => string.IsNullOrEmpty(name) || e.EventTitle.Contains(name))
                     .Where(e => !startDate.HasValue || e.StartTime >= startDate.Value)
                     .Where(e => !endDate.HasValue || e.EndTime <= endDate.Value)
@@ -93,7 +94,7 @@ namespace Planify_BackEnd.Repositories.Events
                     .Include(e => e.CategoryEvent)
                     .Include(e => e.EventMedia).ThenInclude(em => em.Media)
                     .Include(e => e.FavouriteEvents)
-                    .Where(e => e.Status != -1 && e.IsPublic == 1)
+                    .Where(e => e.CampusId == campusId && e.Status != -1 && e.IsPublic == 1)
                     .Where(e => string.IsNullOrEmpty(name) || e.EventTitle.Contains(name))
                     .Where(e => !startDate.HasValue || e.StartTime >= startDate.Value)
                     .Where(e => !endDate.HasValue || e.EndTime <= endDate.Value)

@@ -1,13 +1,14 @@
 ﻿namespace Planify_BackEnd.Hub
 {
     using Microsoft.AspNetCore.SignalR;
+    using Planify_BackEnd.Models;
     using System.Threading.Tasks;
 
     public class EventRequestHub : Hub
     {
-        public async Task SendRequest(string message)
+        public async System.Threading.Tasks.Task SendRequest(SendRequest request)
         {
-            await Clients.All.SendAsync("ReceiveEventRequest", message);
+            await Clients.All.SendAsync("ReceiveEventRequest", request);
         }
     }
 }

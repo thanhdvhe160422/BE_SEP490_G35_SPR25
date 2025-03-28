@@ -13,12 +13,12 @@ namespace Planify_BackEnd.Services.Events
         {
             _repository = repository;
         }
-        public EventVMSpectator GetEventById(int id)
+        public EventVMSpectator GetEventById(int id, Guid userId)
         {
             try
             {
 
-                var e = _repository.GetEventById(id);
+                var e = _repository.GetEventById(id,userId);
                 EventVMSpectator eventVM = new EventVMSpectator
                 {
                     Id = e.Id,
@@ -54,21 +54,21 @@ namespace Planify_BackEnd.Services.Events
                             Id = em.Media.Id,
                             MediaUrl = em.Media.MediaUrl
                         }
-                    }).ToList()
+                    }).ToList(),
+                    isFavorite = e.FavouriteEvents.Count()!=0
                 };
                 return eventVM;
             }catch (Exception ex)
             {
-                Console.WriteLine("event spectator - getEvent: "+ex.Message);
-                return new EventVMSpectator();
+                throw new Exception(ex.Message);
             }
         }
-        public PageResultDTO<EventBasicVMSpectator> GetEvents(int page, int pageSize, Guid userId)
+        public PageResultDTO<EventBasicVMSpectator> GetEvents(int page, int pageSize, Guid userId, int campusId)
         {
             try
             {
 
-                PageResultDTO<Event> events = _repository.GetEvents(page, pageSize, userId);
+                PageResultDTO<Event> events = _repository.GetEvents(page, pageSize, userId, campusId);
                 if (events.TotalCount == 0) 
                     return new PageResultDTO<EventBasicVMSpectator>(new List<EventBasicVMSpectator>(), 0, page, pageSize);
                 List<EventBasicVMSpectator> eventBasicVMs = new List<EventBasicVMSpectator>();
@@ -120,13 +120,13 @@ namespace Planify_BackEnd.Services.Events
                 throw new Exception(ex.Message);
             }
         }
-        public PageResultDTO<EventBasicVMSpectator> SearchEvent(int page, int pageSize, string?name, DateTime? startDate, DateTime? endDate, string? placed, Guid userId)
+        public PageResultDTO<EventBasicVMSpectator> SearchEvent(int page, int pageSize, string?name, DateTime? startDate, DateTime? endDate, string? placed, Guid userId, int campusId)
         {
             try
             {
                 if (name == null) name = "";
                 if (placed == null) placed = "";
-                PageResultDTO<Event> resultEvents = _repository.SearchEvent(page, pageSize, name, startDate, endDate,placed,userId);
+                PageResultDTO<Event> resultEvents = _repository.SearchEvent(page, pageSize, name, startDate, endDate,placed,userId,campusId);
                 List<EventBasicVMSpectator> eventBasicVMs = new List<EventBasicVMSpectator>();
                 foreach (var item in resultEvents.Items)
                 {

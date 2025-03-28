@@ -75,7 +75,6 @@ public class EventService : IEventService
         return eventDTOs;
     }
 
-
     public async Task<ResponseDTO> CreateEventAsync(EventCreateRequestDTO eventDTO, Guid organizerId)
     {
         try
@@ -95,11 +94,12 @@ public class EventService : IEventService
             {
                 return new ResponseDTO(400, "Invalid campus ID.", null);
             }
+            int campusId = int.Parse(campusIdClaim);
 
-            var category = await _eventRepository.GetCategoryEventAsync(eventDTO.CategoryEventId, int.Parse(campusIdClaim));
+            var category = await _eventRepository.GetCategoryEventAsync(eventDTO.CategoryEventId, campusId);
             if (category == null)
             {
-                return new ResponseDTO(400, "Category is not existed.", null);
+                return new ResponseDTO(400, "Category does not exist or does not belong to this campus.", null);
             }
 
             var newEvent = new Event
@@ -112,11 +112,15 @@ public class EventService : IEventService
                 IsPublic = 0,
                 TimePublic = null,
                 Status = 0,
-                CampusId = int.Parse(campusIdClaim),
+                CampusId = campusId,
                 CategoryEventId = eventDTO.CategoryEventId,
                 Placed = eventDTO.Placed,
                 CreateBy = organizerId,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                MeasuringSuccess = eventDTO.MeasuringSuccess,
+                Goals = eventDTO.Goals,
+                MonitoringProcess = eventDTO.MonitoringProcess,
+                SizeParticipants = eventDTO.SizeParticipants
             };
 
             await _eventRepository.CreateEventAsync(newEvent);
@@ -135,7 +139,6 @@ public class EventService : IEventService
                         AmountBudget = task.Budget,
                         CreateBy = organizerId,
                         CreateDate = DateTime.UtcNow
-
                     };
                     await _taskRepository.CreateTaskAsync(newTask);
 
@@ -151,7 +154,7 @@ public class EventService : IEventService
                                 StartTime = subTask.StartTime ?? newTask.StartTime,
                                 Deadline = subTask.Deadline,
                                 AmountBudget = subTask.Budget,
-                                CreateBy = organizerId,
+                                CreateBy = organizerId
                             };
                             await _subTaskRepository.CreateSubTaskAsync(newSubTask);
                         }
@@ -159,11 +162,32 @@ public class EventService : IEventService
                 }
             }
 
-            return new ResponseDTO(201, "Event creates successfully!", newEvent);
+            if (eventDTO.Risks != null && eventDTO.Risks.Count > 0)
+            {
+                foreach (var risk in eventDTO.Risks)
+                {
+                    if (string.IsNullOrWhiteSpace(risk.Name))
+                    {
+                        return new ResponseDTO(400, "Risk name is required.", null);
+                    }
+
+                    var newRisk = new Risk
+                    {
+                        EventId = newEvent.Id,
+                        Name = risk.Name,
+                        Reason = risk.Reason,
+                        Solution = risk.Solution,
+                        Description = risk.Description
+                    };
+                    await _eventRepository.CreateRiskAsync(newRisk);
+                }
+            }
+
+            return new ResponseDTO(201, "Event created successfully!", newEvent);
         }
         catch (Exception ex)
         {
-            return new ResponseDTO(500, "Error orcurs while creating event!", ex.Message);
+            return new ResponseDTO(500, "An error occurred while creating the event.", ex.Message);
         }
     }
 
@@ -331,7 +355,8 @@ public class EventService : IEventService
                         Id = em.Media.Id,
                         MediaUrl = em.Media.MediaUrl,
                     }
-                }).ToList()
+                }).ToList(),
+                isFavorite = e.FavouriteEvents.Count != 0,
             }).ToList();
 
             return new PageResultDTO<EventGetListResponseDTO>(eventDTOs,resultEvents.TotalCount,page,pageSize);

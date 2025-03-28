@@ -179,7 +179,7 @@ namespace Planify_BackEnd.Controllers
         /// <param name="placed"></param>
         /// <returns></returns>
         [HttpGet("search")]
-        [Authorize(Roles = "Event Organizer")]
+        [Authorize(Roles = "Event Organizer, Implementer, Campus Manager")]
         public async Task<IActionResult> SearchEventAsync(int page, int pageSize, string? title, 
             DateTime? startTime, DateTime? endTime, decimal? minBudget, decimal? maxBudget, 
             int? isPublic, int? status, int? CategoryEventId, string? placed)

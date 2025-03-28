@@ -8,6 +8,6 @@ namespace Planify_BackEnd.Services.Auths
     {
         Task<ResponseDTO> GoogleLoginAsync(GoogleLoginRequestDTO request);
         Task<AuthResponseDTO> RefreshToken(string refreshToken, string accessToken);
-
+        Task<ResponseDTO> AdminLoginAsync(LoginRequestDTO request);
     }
 }

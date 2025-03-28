@@ -15,4 +15,5 @@ public interface IUserRepository
     Task<UserRole> AddUserRole(UserRole role);
     Task<User> CreateManagerAsync(User user);
     Task<User> UpdateManagerAsync(Guid id, UserUpdateDTO updateUser);
+    Task<User> GetUserByUsernameAsync(string username);
 }

@@ -3,6 +3,5 @@
     public class SendRequestDTO
     {
         public int EventId { get; set; }
-        public string Reason { get; set; } = null!;
     }
 }

@@ -76,7 +76,7 @@ public class EventRepository : IEventRepository
         }
     }
 
-    public async Task<EventDetailDto?> GetEventDetailAsync(int eventId)
+    public async Task<EventDetailDto> GetEventDetailAsync(int eventId)
     {
         if (eventId <= 0)
         {
@@ -100,6 +100,11 @@ public class EventRepository : IEventRepository
                     Status = e.Status,
                     Placed = e.Placed,
                     CreatedAt = e.CreatedAt,
+                    UpdatedAt = e.UpdatedAt,
+                    MeasuringSuccess = e.MeasuringSuccess,
+                    Goals = e.Goals,
+                    MonitoringProcess = e.MonitoringProcess,
+                    SizeParticipants = e.SizeParticipants,
                     CampusName = e.Campus.CampusName,
                     CategoryEventName = e.CategoryEvent.CategoryEventName,
                     CreatedBy = new UserDto
@@ -109,10 +114,44 @@ public class EventRepository : IEventRepository
                         LastName = e.CreateByNavigation.LastName,
                         Email = e.CreateByNavigation.Email
                     },
+                    Manager = e.Manager != null ? new UserDto
+                    {
+                        Id = e.Manager.Id,
+                        FirstName = e.Manager.FirstName,
+                        LastName = e.Manager.LastName,
+                        Email = e.Manager.Email
+                    } : null,
+                    UpdatedBy = e.UpdateByNavigation != null ? new UserDto
+                    {
+                        Id = e.UpdateByNavigation.Id,
+                        FirstName = e.UpdateByNavigation.FirstName,
+                        LastName = e.UpdateByNavigation.LastName,
+                        Email = e.UpdateByNavigation.Email
+                    } : null,
                     EventMedia = e.EventMedia.Select(em => new EventMediaDto
                     {
                         Id = em.Id,
                         MediaUrl = em.Media.MediaUrl
+                    }).ToList(),
+                    FavouriteEvents = e.FavouriteEvents.Select(fe => new FavouriteEventDto
+                    {
+                        UserId = fe.UserId,
+                        UserFullName = $"{fe.User.FirstName} {fe.User.LastName}"
+                    }).ToList(),
+                    JoinProjects = e.JoinProjects.Select(jp => new JoinProjectDto
+                    {
+                        UserId = jp.UserId,
+                        UserFullName = $"{jp.User.FirstName} {jp.User.LastName}",
+                        TimeJoinProject = jp.TimeJoinProject,
+                        TimeOutProject = jp.TimeOutProject
+                    }).ToList(),
+                    Risks = e.Risks.Select(r => new RiskDto
+                    {
+                        Id = r.Id,
+                        Name = r.Name,
+                        Reason = r.Reason,
+                        Solution = r.Solution,
+                        Description = r.Description
                     }).ToList(),
                     Tasks = e.Tasks.Select(t => new TaskDetailDto
                     {
@@ -154,7 +193,7 @@ public class EventRepository : IEventRepository
         }
         catch (Exception ex)
         {
-            throw new Exception("An unexpected error occurred.", ex);
+            throw new Exception("An unexpected error occurred while retrieving event details.", ex);
         }
     }
 
@@ -258,7 +297,7 @@ public class EventRepository : IEventRepository
                 .Include(e => e.FavouriteEvents)
                 .Where(e => e.Status != -1 && e.IsPublic == 1)
                 .Where(e => e.FavouriteEvents.Any(fe => fe.UserId == userId) || !e.FavouriteEvents.Any())
-                .Where(e =>
+                .Where(e => e.CampusId == campusId &&
                     (string.IsNullOrEmpty(title) || e.EventTitle.Contains(title)) &&
                     (!startTime.HasValue || e.StartTime >= startTime) &&
                     (!endTime.HasValue || e.EndTime <= endTime) &&
@@ -336,6 +375,17 @@ public class EventRepository : IEventRepository
         {
             throw new Exception(ex.Message);
         }
+    }
+    public async System.Threading.Tasks.Task CreateRiskAsync(Risk risk)
+    {
+        _context.Risks.Add(risk);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<Event> GetEventByIdAsync(int eventId)
+    {
+        return await _context.Events
+            .FirstOrDefaultAsync(e => e.Id == eventId);
     }
 }
 
