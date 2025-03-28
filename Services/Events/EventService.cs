@@ -72,12 +72,13 @@ public class EventService : IEventService
                         EventId = em.Id,
                         MediaId = em.Id,
                         Status = em.Status,
-                        MediaDTO = new Planify_BackEnd.DTOs.Medias.MediaItemDTO
+                        MediaDTO = em.Media == null ? null : new Planify_BackEnd.DTOs.Medias.MediaItemDTO
                         {
                             Id = em.Media.Id,
                             MediaUrl = em.Media.MediaUrl
-                        },
+                        }
                     }).ToList()
+
                 };
                 eventList.Add(eventDTO);
                 
@@ -86,7 +87,8 @@ public class EventService : IEventService
         }
         catch (Exception ex)
         {
-            throw new Exception(ex.Message);
+            Console.WriteLine(ex.ToString()); 
+            throw;
         }
     }
 
