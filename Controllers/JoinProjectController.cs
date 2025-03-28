@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Planify_BackEnd.DTOs.JoinedProjects;
+using Planify_BackEnd.Services.Events;
 using Planify_BackEnd.Services.JoinProjects;
 
 namespace Planify_BackEnd.Controllers
@@ -30,6 +32,7 @@ namespace Planify_BackEnd.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
         [HttpPut("delete-from-project/{eventId}/{userId}")]
         //[Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> DeleteImplementerFromEvent(int eventId, Guid userId)
@@ -48,6 +51,14 @@ namespace Planify_BackEnd.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        [HttpPost("add-implementers")]
+        [Authorize(Roles = "Event Organizer")]
+        public async Task<IActionResult> AddImplementersToEvent([FromBody] AddImplementersToEventDTO request)
+        {
+            var response = await _joinProjectService.AddImplementersToEventAsync(request);
+            return StatusCode(response.Status, response);
         }
     }
 }

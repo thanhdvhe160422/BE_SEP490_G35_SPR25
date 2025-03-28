@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Login;
 using Planify_BackEnd.Services.Auths;
 
@@ -39,5 +41,19 @@ public class AuthController : ControllerBase
         {
             return BadRequest(new { message = ex.Message });
         }
+    }
+
+    [HttpPost("admin-login")]
+    public async Task<IActionResult> AdminLogin([FromBody] LoginRequestDTO request)
+    {
+        var response = await _authService.AdminLoginAsync(request);
+        return StatusCode(response.Status, response);
+    }
+
+    [HttpPost("logout")]
+    [Authorize]
+    public IActionResult Logout()
+    {
+        return Ok(new ResponseDTO(200, "Đăng xuất thành công.", null));
     }
 }

@@ -188,4 +188,41 @@ public class AuthService : IAuthService
             RefreshToken = newRefreshToken
         };
     }
+    public async Task<ResponseDTO> AdminLoginAsync(LoginRequestDTO request)
+    {
+        if (string.IsNullOrEmpty(request.Username) || string.IsNullOrEmpty(request.Password))
+        {
+            return new ResponseDTO(400, "Username and password are required.", null);
+        }
+
+        var user = await _userRepository.GetUserByUsernameAsync(request.Username);
+        if (user == null)
+        {
+            return new ResponseDTO(401, "Invalid username or password.", null);
+        }
+
+        if (!BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
+        {
+            return new ResponseDTO(401, "Invalid username or password.", null);
+        }
+
+        var isAdmin = user.UserRoles?.Any(ur => ur.RoleId == 1) ?? false;
+        if (!isAdmin)
+        {
+            return new ResponseDTO(403, "Only Admin users can log in with username and password.", null);
+        }
+
+        var jwtToken = GenerateJwtToken(user);
+        var refreshToken = GenerateRefreshToken();
+
+        return new ResponseDTO(200, "Admin login successful!", new AuthResponseDTO
+        {
+            UserId = user.Id,
+            FullName = $"{user.FirstName} {user.LastName}",
+            Email = user.Email,
+            Role = user.UserRoles?.FirstOrDefault(ur => ur.RoleId == 1)?.Role?.RoleName,
+            AccessToken = jwtToken,
+            RefreshToken = refreshToken
+        });
+    }
 }

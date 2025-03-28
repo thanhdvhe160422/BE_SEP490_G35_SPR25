@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
+using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories;
@@ -71,7 +72,7 @@ public class EventRepository : IEventRepository
         }
     }
 
-    public async Task<EventDetailDto?> GetEventDetailAsync(int eventId)
+    public async Task<EventDetailDto> GetEventDetailAsync(int eventId)
     {
         if (eventId <= 0)
         {
@@ -95,6 +96,11 @@ public class EventRepository : IEventRepository
                     Status = e.Status,
                     Placed = e.Placed,
                     CreatedAt = e.CreatedAt,
+                    UpdatedAt = e.UpdatedAt,
+                    MeasuringSuccess = e.MeasuringSuccess,
+                    Goals = e.Goals,
+                    MonitoringProcess = e.MonitoringProcess,
+                    SizeParticipants = e.SizeParticipants,
                     CampusName = e.Campus.CampusName,
                     CategoryEventName = e.CategoryEvent.CategoryEventName,
                     CreatedBy = new UserDto
@@ -104,10 +110,44 @@ public class EventRepository : IEventRepository
                         LastName = e.CreateByNavigation.LastName,
                         Email = e.CreateByNavigation.Email
                     },
+                    Manager = e.Manager != null ? new UserDto
+                    {
+                        Id = e.Manager.Id,
+                        FirstName = e.Manager.FirstName,
+                        LastName = e.Manager.LastName,
+                        Email = e.Manager.Email
+                    } : null,
+                    UpdatedBy = e.UpdateByNavigation != null ? new UserDto
+                    {
+                        Id = e.UpdateByNavigation.Id,
+                        FirstName = e.UpdateByNavigation.FirstName,
+                        LastName = e.UpdateByNavigation.LastName,
+                        Email = e.UpdateByNavigation.Email
+                    } : null,
                     EventMedia = e.EventMedia.Select(em => new EventMediaDto
                     {
                         Id = em.Id,
                         MediaUrl = em.Media.MediaUrl
+                    }).ToList(),
+                    FavouriteEvents = e.FavouriteEvents.Select(fe => new FavouriteEventDto
+                    {
+                        UserId = fe.UserId,
+                        UserFullName = $"{fe.User.FirstName} {fe.User.LastName}"
+                    }).ToList(),
+                    JoinProjects = e.JoinProjects.Select(jp => new JoinProjectDto
+                    {
+                        UserId = jp.UserId,
+                        UserFullName = $"{jp.User.FirstName} {jp.User.LastName}",
+                        TimeJoinProject = jp.TimeJoinProject,
+                        TimeOutProject = jp.TimeOutProject
+                    }).ToList(),
+                    Risks = e.Risks.Select(r => new RiskDto
+                    {
+                        Id = r.Id,
+                        Name = r.Name,
+                        Reason = r.Reason,
+                        Solution = r.Solution,
+                        Description = r.Description
                     }).ToList(),
                     Tasks = e.Tasks.Select(t => new TaskDetailDto
                     {
@@ -149,7 +189,7 @@ public class EventRepository : IEventRepository
         }
         catch (Exception ex)
         {
-            throw new Exception("An unexpected error occurred.", ex);
+            throw new Exception("An unexpected error occurred while retrieving event details.", ex);
         }
     }
 
@@ -250,6 +290,11 @@ public class EventRepository : IEventRepository
             Console.WriteLine("event repository - search event: " + ex.Message);
             return new List<Event>();
         }
+    }
+    public async System.Threading.Tasks.Task CreateRiskAsync(Risk risk)
+    {
+        _context.Risks.Add(risk);
+        await _context.SaveChangesAsync();
     }
 }
 

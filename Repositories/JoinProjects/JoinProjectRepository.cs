@@ -169,5 +169,22 @@ namespace Planify_BackEnd.Repositories.JoinGroups
             }
         }
 
+        public async Task<bool> EventExistsAsync(int eventId)
+        {
+            return await _context.Events.AnyAsync(e => e.Id == eventId);
+        }
+
+        public async Task<List<Guid>> GetInvalidUserIdsAsync(List<Guid> userIds)
+        {
+            return userIds.Where(id => !_context.Users.Any(u => u.Id == id)).ToList();
+        }
+
+        public async Task<List<Guid>> GetExistingImplementerIdsAsync(int eventId)
+        {
+            return await _context.JoinProjects
+                .Where(jp => jp.EventId == eventId)
+                .Select(jp => jp.UserId)
+                .ToListAsync();
+        }
     }
 }
