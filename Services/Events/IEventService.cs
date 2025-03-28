@@ -20,5 +20,9 @@ namespace Planify_BackEnd.Services.Events
             int? status,
             int? CategoryEventId,
             string? placed);
+
+        Task<ResponseDTO> CreateSaveDraft(EventCreateRequestDTO eventDTO, Guid organizerId);
+        Task<ResponseDTO> UpdateSaveDraft(EventDTO eventDTO);
+        Task<ResponseDTO> GetSaveDraft(Guid createBy);
     }
 }

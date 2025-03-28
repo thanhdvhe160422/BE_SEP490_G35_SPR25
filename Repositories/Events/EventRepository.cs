@@ -251,5 +251,58 @@ public class EventRepository : IEventRepository
             return new List<Event>();
         }
     }
+    public async Task<Event> CreateSaveDraft(Event saveEvent)
+    {
+        try
+        {
+            await _context.Events.AddAsync(saveEvent);
+            await _context.SaveChangesAsync();
+            return saveEvent;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+    public async Task<Event> UpdateSaveDraft(Event saveEvent)
+    {
+        try
+        {
+            var updateSaveDraft = await _context.Events.FirstOrDefaultAsync(ev => ev.Id == saveEvent.Id);
+            updateSaveDraft.Id = saveEvent.Id;
+            updateSaveDraft.AmountBudget = saveEvent.AmountBudget;
+            updateSaveDraft.CampusId = saveEvent.CampusId;
+            updateSaveDraft.CategoryEventId = saveEvent.CategoryEventId;
+            updateSaveDraft.StartTime = saveEvent.StartTime;
+            updateSaveDraft.EndTime = saveEvent.EndTime;
+            updateSaveDraft.EventDescription = saveEvent.EventDescription;
+            updateSaveDraft.EventTitle = saveEvent.EventTitle;
+            updateSaveDraft.IsPublic = saveEvent.IsPublic;
+            updateSaveDraft.Placed = saveEvent.Placed;
+            updateSaveDraft.Status = saveEvent.Status;
+            updateSaveDraft.TimePublic = saveEvent.TimePublic;
+            updateSaveDraft.UpdateBy = saveEvent.UpdateBy;
+            updateSaveDraft.UpdatedAt = DateTime.Now;
+            _context.Events.Update(updateSaveDraft);
+            await _context.SaveChangesAsync();
+            return updateSaveDraft;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+
+    public async Task<Event> GetSaveDraft(Guid createBy)
+    {
+        try
+        {
+            return _context.Events.Where(e=>e.CreateBy.Equals(createBy)&&e.Status==10).OrderBy(e=>e.CreatedAt).FirstOrDefault();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
 }
 

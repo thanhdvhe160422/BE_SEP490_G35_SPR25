@@ -27,6 +27,7 @@ namespace Planify_BackEnd.DTOs.Events
         public string CategoryEventName { get; set; }
 
         public string Placed { get; set; }
+        public int? CategoryEventId { get; set; }
 
         public Guid? UpdateBy { get; set; }
     }
