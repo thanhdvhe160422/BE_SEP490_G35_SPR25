@@ -28,7 +28,9 @@ public class EventRepository : IEventRepository
                            e.StartTime > now ? 1 : // Not Started Yet
                            2) // Closed 
                 .Count();
-            if (count == 0) new PageResultDTO<Event>(new List<Event>(), count, page, pageSize);
+            if (count == 0)
+                return new PageResultDTO<Event>(new List<Event>(), count, page, pageSize);
+
             var events = _context.Events
                 .Where(e => e.Status != -1 && e.CampusId == campusId)
                 .Include(e => e.EventMedia)
