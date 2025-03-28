@@ -12,13 +12,14 @@ namespace Planify_BackEnd.Repositories.Events
         {
             _context = context;
         }
-        public Event GetEventById(int id)
+        public Event GetEventById(int id,Guid userId)
         {
             return _context.Events
                 .Include(e=>e.Campus)
                 .Include(e=>e.CategoryEvent)
                 .Include(e=>e.EventMedia)
                 .ThenInclude(e=>e.Media)
+                .Where(e => e.FavouriteEvents.Any(fe => fe.UserId == userId) || !e.FavouriteEvents.Any())
                 .FirstOrDefault(em => em.Id == id);
         }
 

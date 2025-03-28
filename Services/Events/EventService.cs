@@ -331,7 +331,8 @@ public class EventService : IEventService
                         Id = em.Media.Id,
                         MediaUrl = em.Media.MediaUrl,
                     }
-                }).ToList()
+                }).ToList(),
+                isFavorite = e.FavouriteEvents.Count != 0,
             }).ToList();
 
             return new PageResultDTO<EventGetListResponseDTO>(eventDTOs,resultEvents.TotalCount,page,pageSize);

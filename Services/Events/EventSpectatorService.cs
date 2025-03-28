@@ -13,12 +13,12 @@ namespace Planify_BackEnd.Services.Events
         {
             _repository = repository;
         }
-        public EventVMSpectator GetEventById(int id)
+        public EventVMSpectator GetEventById(int id, Guid userId)
         {
             try
             {
 
-                var e = _repository.GetEventById(id);
+                var e = _repository.GetEventById(id,userId);
                 EventVMSpectator eventVM = new EventVMSpectator
                 {
                     Id = e.Id,
@@ -54,13 +54,13 @@ namespace Planify_BackEnd.Services.Events
                             Id = em.Media.Id,
                             MediaUrl = em.Media.MediaUrl
                         }
-                    }).ToList()
+                    }).ToList(),
+                    isFavorite = e.FavouriteEvents.Count()!=0
                 };
                 return eventVM;
             }catch (Exception ex)
             {
-                Console.WriteLine("event spectator - getEvent: "+ex.Message);
-                return new EventVMSpectator();
+                throw new Exception(ex.Message);
             }
         }
         public PageResultDTO<EventBasicVMSpectator> GetEvents(int page, int pageSize, Guid userId)

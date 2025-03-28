@@ -32,5 +32,24 @@ namespace Planify_BackEnd.DTOs.Events
 
         public ICollection<EventMediumViewMediaModel> EventMedias { get; set; } = new List<EventMediumViewMediaModel>();
 
+        public string? StatusMessage
+        {
+            get
+            {
+                if (StartTime.HasValue && StartTime.Value <= DateTime.Now && EndTime.HasValue && EndTime.Value >= DateTime.Now)
+                {
+                    return "Running";
+                }
+                else if (StartTime.HasValue && StartTime.Value > DateTime.Now)
+                {
+                    return "Not Start Yet";
+                }
+                else if (EndTime.HasValue && EndTime.Value < DateTime.Now)
+                {
+                    return "Closed";
+                }
+                return string.Empty;
+            }
+        }
     }
 }
