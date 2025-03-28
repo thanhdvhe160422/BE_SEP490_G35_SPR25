@@ -33,7 +33,14 @@ namespace Planify_BackEnd.Repositories.Events
                     .Include(e => e.FavouriteEvents)
                     .Where(e => e.Status != -1 && e.IsPublic == 1)
                     .Where(e => e.FavouriteEvents.Any(fe => fe.UserId == userId) || !e.FavouriteEvents.Any())
-                    .OrderBy(e => e.Status).Count();
+                    .AsEnumerable()
+                    .OrderBy(e =>
+                        e.StartTime <= DateTime.Now && DateTime.Now <= e.EndTime ? 0 : 1)
+                    .ThenBy(e =>
+                        e.StartTime > DateTime.Now ? 0 : 1)
+                    .ThenBy(e =>
+                        e.EndTime < DateTime.Now ? 0 : 1)
+                    .Count();
                 if (count == 0) new PageResultDTO<Event>(new List<Event>(), count, page, pageSize);
                 var events = _context.Events
                     .Include(e => e.Campus)
@@ -42,7 +49,13 @@ namespace Planify_BackEnd.Repositories.Events
                     .Include(e => e.FavouriteEvents)
                     .Where(e => e.Status != -1 && e.IsPublic == 1)
                     .Where(e => e.FavouriteEvents.Any(fe => fe.UserId == userId) || !e.FavouriteEvents.Any())
-                    .OrderBy(e => e.Status)
+                    .AsEnumerable()
+                    .OrderBy(e =>
+                        e.StartTime <= DateTime.Now && DateTime.Now <= e.EndTime ? 0 : 1)
+                    .ThenBy(e =>
+                        e.StartTime > DateTime.Now ? 0 : 1)
+                    .ThenBy(e =>
+                        e.EndTime < DateTime.Now ? 0 : 1)
                     .Skip((page - 1) * pageSize).Take(pageSize).ToList();
                 PageResultDTO<Event> result = new PageResultDTO<Event>(events, count, page, pageSize);
                 return result;
@@ -67,7 +80,13 @@ namespace Planify_BackEnd.Repositories.Events
                     .Where(e => !endDate.HasValue || e.EndTime <= endDate.Value)
                     .Where(e => string.IsNullOrEmpty(placed) || e.Placed.Contains(placed))
                     .Where(e => e.FavouriteEvents.Any(fe => fe.UserId == userId) || !e.FavouriteEvents.Any())
-                    .OrderBy(e => e.Status).Count();
+                    .AsEnumerable()
+                    .OrderBy(e =>
+                        e.StartTime <= DateTime.Now && DateTime.Now <= e.EndTime ? 0 : 1)
+                    .ThenBy(e =>
+                        e.StartTime > DateTime.Now ? 0 : 1)
+                    .ThenBy(e =>
+                        e.EndTime < DateTime.Now ? 0 : 1).Count();
                 if (count == 0) return new PageResultDTO<Event>(new List<Event>(),0, page, pageSize);
                 var events = _context.Events
                     .Include(e => e.Campus)
@@ -80,7 +99,13 @@ namespace Planify_BackEnd.Repositories.Events
                     .Where(e => !endDate.HasValue || e.EndTime <= endDate.Value)
                     .Where(e => string.IsNullOrEmpty(placed) || e.Placed.Contains(placed))
                     .Where(e => e.FavouriteEvents.Any(fe => fe.UserId == userId) || !e.FavouriteEvents.Any())
-                    .OrderBy(e => e.Status)
+                    .AsEnumerable()
+                    .OrderBy(e =>
+                        e.StartTime <= DateTime.Now && DateTime.Now <= e.EndTime ? 0 : 1)
+                    .ThenBy(e =>
+                        e.StartTime > DateTime.Now ? 0 : 1)
+                    .ThenBy(e =>
+                        e.EndTime < DateTime.Now ? 0 : 1)
                     .Skip((page - 1) * pageSize).Take(pageSize).ToList();
                 return new PageResultDTO<Event>(events, count, page, pageSize);
             }

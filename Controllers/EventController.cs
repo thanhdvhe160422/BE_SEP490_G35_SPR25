@@ -143,8 +143,9 @@ namespace Planify_BackEnd.Controllers
             try
             {
                 var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                var campusClaim = User.Claims.FirstOrDefault(c => c.Type == "campusId");
                 var response = await _eventService.SearchEventAsync(page, pageSize, title, startTime, endTime,
-                minBudget, maxBudget, isPublic, status, CategoryEventId, placed,userId);
+                minBudget, maxBudget, isPublic, status, CategoryEventId, placed,userId,int.Parse(campusClaim.Value));
                 if (response.TotalCount == 0)
                     return NotFound("Not found any event");
                 return Ok(response);

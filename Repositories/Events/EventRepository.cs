@@ -216,7 +216,7 @@ public class EventRepository : IEventRepository
 
     public async Task<PageResultDTO<Event>> SearchEventAsync(int page, int pageSize, string? title, 
         DateTime? startTime, DateTime? endTime, decimal? minBudget, decimal? maxBudget, int? isPublic, 
-        int? status, int? CategoryEventId, string? placed, Guid userId)
+        int? status, int? CategoryEventId, string? placed, Guid userId, int campusId)
     {
         try
         {
@@ -227,7 +227,7 @@ public class EventRepository : IEventRepository
                 .Include(e => e.FavouriteEvents)
                 .Where(e => e.Status != -1 && e.IsPublic == 1)
                 .Where(e => e.FavouriteEvents.Any(fe => fe.UserId == userId) || !e.FavouriteEvents.Any())
-                .Where(e =>
+                .Where(e => e.CampusId==campusId &&
                     (string.IsNullOrEmpty(title) || e.EventTitle.Contains(title)) &&
                     (!startTime.HasValue || e.StartTime >= startTime) &&
                     (!endTime.HasValue || e.EndTime <= endTime) &&
@@ -237,8 +237,14 @@ public class EventRepository : IEventRepository
                     (!status.HasValue || e.Status == status) &&
                     (!CategoryEventId.HasValue || e.CategoryEventId == CategoryEventId) &&
                     (string.IsNullOrEmpty(placed) || e.Placed.Contains(placed))
-                )
-                .OrderBy(e => e.Status).Count();
+                    ).AsEnumerable()
+                    .OrderBy(e =>
+                        e.StartTime <= DateTime.Now && DateTime.Now <= e.EndTime ? 0:1)
+                    .ThenBy(e =>
+                        e.StartTime > DateTime.Now ? 0 : 1)
+                    .ThenBy(e =>
+                        e.EndTime < DateTime.Now ? 0 : 1)
+                    .Count();
             if (count == 0) new PageResultDTO<Event>(new List<Event>(), count, page, pageSize);
             var events = _context.Events
                 .Include(e => e.Campus)
@@ -257,8 +263,13 @@ public class EventRepository : IEventRepository
                     (!status.HasValue || e.Status == status) &&
                     (!CategoryEventId.HasValue || e.CategoryEventId == CategoryEventId) &&
                     (string.IsNullOrEmpty(placed) || e.Placed.Contains(placed))
-                )
-                .OrderBy(e => e.Status)
+                ).AsEnumerable()
+                .OrderBy(e =>
+                    e.StartTime <= DateTime.Now && DateTime.Now <= e.EndTime ? 0 : 1)
+                .ThenBy(e =>
+                    e.StartTime > DateTime.Now ? 0 : 1)
+                .ThenBy(e =>
+                    e.EndTime < DateTime.Now ? 0 : 1)
                 .Skip((page - 1) * pageSize).Take(pageSize).ToList();
             PageResultDTO<Event> result = new PageResultDTO<Event>(events, count, page, pageSize);
             return result;

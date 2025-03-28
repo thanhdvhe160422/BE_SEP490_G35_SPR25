@@ -10,6 +10,7 @@ using Planify_BackEnd.Repositories.JoinGroups;
 using Planify_BackEnd.Repositories.Categories;
 using Planify_BackEnd.Repositories.Tasks;
 using Microsoft.Extensions.Logging;
+using Planify_BackEnd.DTOs.Medias;
 
 public class EventService : IEventService
 {
@@ -294,12 +295,12 @@ public class EventService : IEventService
 
     public async Task<PageResultDTO<EventGetListResponseDTO>> SearchEventAsync(int page, int pageSize, 
         string? title, DateTime? startTime, DateTime? endTime, decimal? minBudget, decimal? maxBudget, 
-        int? isPublic, int? status, int? CategoryEventId, string? placed, Guid userId)
+        int? isPublic, int? status, int? CategoryEventId, string? placed, Guid userId, int campusId)
     {
         try
         {
             var resultEvents = await _eventRepository.SearchEventAsync(page, pageSize, title, startTime, endTime,
-                minBudget, maxBudget, isPublic, status, CategoryEventId, placed, userId);
+                minBudget, maxBudget, isPublic, status, CategoryEventId, placed, userId, campusId);
             var eventDTOs = resultEvents.Items.Select(e => new EventGetListResponseDTO
             {
                 Id = e.Id,
@@ -317,7 +318,16 @@ public class EventService : IEventService
                 CreateBy = e.CreateBy,
                 CreatedAt = e.CreatedAt,
                 ManagerId = e.ManagerId,
-
+                EventMedias = e.EventMedia.Select(em=> new EventMediumViewMediaModel
+                {
+                    Id=em.Id,
+                    MediaId = em.MediaId,
+                    MediaDTO = new MediaItemDTO
+                    {
+                        Id = em.Media.Id,
+                        MediaUrl = em.Media.MediaUrl,
+                    }
+                }).ToList()
             }).ToList();
 
             return new PageResultDTO<EventGetListResponseDTO>(eventDTOs,resultEvents.TotalCount,page,pageSize);
