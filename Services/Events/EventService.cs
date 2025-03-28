@@ -53,6 +53,10 @@ public class EventService : IEventService
             CreateBy = e.CreateBy,
             CreatedAt = e.CreatedAt,
             ManagerId = e.ManagerId,
+            MeasuringSuccess = e.MeasuringSuccess,
+            Goals = e.Goals,
+            MonitoringProcess = e.MonitoringProcess,
+            SizeParticipants = e.SizeParticipants,
             EventMedias = e.EventMedia == null ? null : e.EventMedia.Select(em => new Planify_BackEnd.DTOs.Medias.EventMediumViewMediaModel
             {
                 Id = em.Id,
