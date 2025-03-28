@@ -18,10 +18,15 @@ public class EventRepository : IEventRepository
     {
         try
         {
+            var now = DateTime.UtcNow;
+
             return await _context.Events
                 .Where(e => e.Status != -1)
-                .Include(e => e.EventMedia) 
-                .ThenInclude(em => em.Media) 
+                .Include(e => e.EventMedia)
+                .ThenInclude(em => em.Media)
+                .OrderBy(e => e.StartTime <= now && now <= e.EndTime ? 0 : // Running
+                           e.StartTime > now ? 1 : // Not Started Yet
+                           2) // Closed 
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
