@@ -23,7 +23,8 @@ namespace Planify_BackEnd.Repositories
             int? status,
             int? CategoryEventId,
             string? placed,
-            Guid userId);
+            Guid userId,
+            int campusId);
         Task<Event> CreateSaveDraft(Event saveEvent);
         Task<Event> UpdateSaveDraft(Event saveEvent);
         Task<Event> GetSaveDraft(Guid createBy);
