@@ -4,31 +4,34 @@ using Planify_BackEnd.DTOs.Campus;
 using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories;
-//using Planify_BackEnd.Repositories.Groups;
 using Planify_BackEnd.Services.Events;
-using static Planify_BackEnd.DTOs.Events.EventDetailResponseDTO;
 using Planify_BackEnd.Services.GoogleDrive;
 using Planify_BackEnd.Repositories.JoinGroups;
 using Planify_BackEnd.Repositories.Categories;
+using Planify_BackEnd.Repositories.Tasks;
+using Microsoft.Extensions.Logging;
+using Planify_BackEnd.DTOs.Medias;
 
 public class EventService : IEventService
 {
     private readonly IEventRepository _eventRepository;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    //private readonly IGroupRepository _groupRepository;
+    private readonly ITaskRepository _taskRepository;
+    private readonly ISubTaskRepository _subTaskRepository;
     private readonly GoogleDriveService _googleDriveService;
     private readonly IJoinProjectRepository _joinProjectRepository;
     private readonly ICampusRepository _campusRepository;
     private readonly ICategoryRepository _categoryRepository;
-    public EventService(IEventRepository eventRepository, IHttpContextAccessor httpContextAccessor, /*IGroupRepository groupRepository,*/ GoogleDriveService googleDriveService, IJoinProjectRepository joinProjectRepository, ICampusRepository campusRepository, ICategoryRepository categoryRepository)
+    public EventService(IEventRepository eventRepository, IHttpContextAccessor httpContextAccessor, GoogleDriveService googleDriveService, IJoinProjectRepository joinProjectRepository, ICampusRepository campusRepository, ICategoryRepository categoryRepository, ISubTaskRepository subTaskRepository, ITaskRepository taskRepository)
     {
         _eventRepository = eventRepository;
-        //_groupRepository = groupRepository;
         _httpContextAccessor = httpContextAccessor;
         _googleDriveService = googleDriveService;
         _joinProjectRepository = joinProjectRepository;
         _campusRepository = campusRepository;
         _categoryRepository = categoryRepository;
+        _subTaskRepository = subTaskRepository;
+        _taskRepository = taskRepository;
     }
     public async Task<IEnumerable<EventGetListResponseDTO>> GetAllEventAsync(int page, int pageSize)
     {
@@ -114,36 +117,44 @@ public class EventService : IEventService
 
             await _eventRepository.CreateEventAsync(newEvent);
 
-            //if (eventDTO.Groups != null && eventDTO.Groups.Count > 0)
-            //{
-            //    foreach (var group in eventDTO.Groups)
-            //    {
-            //        var newGroup = new Group
-            //        {
-            //            EventId = newEvent.Id,
-            //            GroupName = group.GroupName,
-            //            CreateBy = organizerId,
-            //        };
-            //        await _groupRepository.CreateGroupAsync(newGroup);
+            if (eventDTO.Tasks != null && eventDTO.Tasks.Count > 0)
+            {
+                foreach (var task in eventDTO.Tasks)
+                {
+                    var newTask = new Planify_BackEnd.Models.Task
+                    {
+                        EventId = newEvent.Id,
+                        TaskName = task.TaskName,
+                        TaskDescription = task.Description,
+                        StartTime = task.StartTime ?? newEvent.StartTime,
+                        Deadline = task.Deadline,
+                        AmountBudget = task.Budget,
+                        CreateBy = organizerId,
+                        CreateDate = DateTime.UtcNow
 
-            //        foreach (var implementerId in group.ImplementerIds)
-            //        {
-            //            var joinGroup = new JoinGroup
-            //            {
-            //                GroupId = newGroup.Id,
-            //                ImplementerId = implementerId,
-            //                TimeJoin = DateTime.UtcNow,
-            //                Status = 1,
-            //            };
-            //            bool result = await _groupRepository.AddImplementerToGroupAsync(joinGroup);
-            //            if (result)
-            //            {
-            //                await _joinProjectRepository.AddImplementerToProject(implementerId, newEvent.Id);
-            //                await _joinProjectRepository.AddRoleImplementer(implementerId);
-            //            }
-            //        }
-            //    }
-            //}
+                    };
+                    await _taskRepository.CreateTaskAsync(newTask);
+
+                    if (task.SubTasks != null && task.SubTasks.Count > 0)
+                    {
+                        foreach (var subTask in task.SubTasks)
+                        {
+                            var newSubTask = new SubTask
+                            {
+                                TaskId = newTask.Id,
+                                SubTaskName = subTask.SubTaskName,
+                                SubTaskDescription = subTask.Description,
+                                StartTime = subTask.StartTime ?? newTask.StartTime,
+                                Deadline = subTask.Deadline,
+                                AmountBudget = subTask.Budget,
+                                CreateBy = organizerId,
+                            };
+                            await _subTaskRepository.CreateSubTaskAsync(newSubTask);
+                        }
+                    }
+                }
+            }
+
             return new ResponseDTO(201, "Event creates successfully!", newEvent);
         }
         catch (Exception ex)
@@ -223,7 +234,11 @@ public class EventService : IEventService
                 Status = e.Status,
                 TimePublic = e.TimePublic,
                 UpdateBy = e.UpdateBy,
-                UpdatedAt = DateTime.Now
+                UpdatedAt = DateTime.Now,
+                MeasuringSuccess = e.MeasuringSuccess,
+                Goals = e.Goals,
+                MonitoringProcess = e.MonitoringProcess,
+                SizeParticipants = e.SizeParticipants
             };
             Event updatedEvent = await _eventRepository.UpdateEventAsync(updateEvent);
             EventDetailDto eventDetailResponseDTO = new EventDetailDto
@@ -241,6 +256,10 @@ public class EventService : IEventService
                 CreatedAt = updatedEvent.CreatedAt,
                 CampusName = updatedEvent.Campus.CampusName,
                 CategoryEventName = updatedEvent.CategoryEvent.CategoryEventName,
+                MeasuringSuccess = updatedEvent.MeasuringSuccess,
+                Goals = updatedEvent.Goals,
+                MonitoringProcess = updatedEvent.Goals,
+                SizeParticipants = updatedEvent.SizeParticipants,
                 CreatedBy = new UserDto
                 {
                     Id = updatedEvent.CreateByNavigation.Id,
@@ -258,8 +277,7 @@ public class EventService : IEventService
         }
         catch (Exception ex)
         {
-            Console.WriteLine("event service - update event: " + ex.Message);
-            return new EventDetailDto();
+            throw new Exception(ex.Message);
         }
     }
 
@@ -271,18 +289,19 @@ public class EventService : IEventService
         }
         catch (Exception ex)
         {
-            Console.WriteLine("event service - delete event: " + ex.Message);
-            return false;
+            throw new Exception(ex.Message);
         }
     }
 
-    public async Task<IEnumerable<EventGetListResponseDTO>> SearchEventAsync(int page, int pageSize, string? title, DateTime? startTime, DateTime? endTime, decimal? minBudget, decimal? maxBudget, int? isPublic, int? status, int? CategoryEventId, string? placed)
+    public async Task<PageResultDTO<EventGetListResponseDTO>> SearchEventAsync(int page, int pageSize, 
+        string? title, DateTime? startTime, DateTime? endTime, decimal? minBudget, decimal? maxBudget, 
+        int? isPublic, int? status, int? CategoryEventId, string? placed, Guid userId, int campusId)
     {
         try
         {
-            var events = await _eventRepository.SearchEventAsync(page, pageSize, title, startTime, endTime,
-                minBudget, maxBudget, isPublic, status, CategoryEventId, placed);
-            var eventDTOs = events.Select(e => new EventGetListResponseDTO
+            var resultEvents = await _eventRepository.SearchEventAsync(page, pageSize, title, startTime, endTime,
+                minBudget, maxBudget, isPublic, status, CategoryEventId, placed, userId, campusId);
+            var eventDTOs = resultEvents.Items.Select(e => new EventGetListResponseDTO
             {
                 Id = e.Id,
                 EventTitle = e.EventTitle,
@@ -299,15 +318,180 @@ public class EventService : IEventService
                 CreateBy = e.CreateBy,
                 CreatedAt = e.CreatedAt,
                 ManagerId = e.ManagerId,
-
+                EventMedias = e.EventMedia.Select(em=> new EventMediumViewMediaModel
+                {
+                    Id=em.Id,
+                    MediaId = em.MediaId,
+                    MediaDTO = new MediaItemDTO
+                    {
+                        Id = em.Media.Id,
+                        MediaUrl = em.Media.MediaUrl,
+                    }
+                }).ToList()
             }).ToList();
 
-            return eventDTOs;
+            return new PageResultDTO<EventGetListResponseDTO>(eventDTOs,resultEvents.TotalCount,page,pageSize);
         }
         catch (Exception ex)
         {
-            Console.WriteLine("event service - search event: " + ex.Message);
-            return new List<EventGetListResponseDTO>();
+            throw new Exception(ex.Message);
+        }
+    }
+
+    public async Task<ResponseDTO> CreateSaveDraft(EventCreateRequestDTO eventDTO, Guid organizerId)
+    {
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(eventDTO.EventTitle))
+            {
+                return new ResponseDTO(400, "Event title is required.", null);
+            }
+
+            if (eventDTO.StartTime >= eventDTO.EndTime)
+            {
+                return new ResponseDTO(400, "Start time must be earlier than end time.", null);
+            }
+
+            var campusIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("campusId")?.Value;
+            if (string.IsNullOrEmpty(campusIdClaim))
+            {
+                return new ResponseDTO(400, "Invalid campus ID.", null);
+            }
+
+            var category = await _eventRepository.GetCategoryEventAsync(eventDTO.CategoryEventId, int.Parse(campusIdClaim));
+            if (category == null)
+            {
+                return new ResponseDTO(400, "Category is not existed.", null);
+            }
+
+            var newEvent = new Event
+            {
+                EventTitle = eventDTO.EventTitle,
+                EventDescription = eventDTO.EventDescription,
+                StartTime = eventDTO.StartTime,
+                EndTime = eventDTO.EndTime,
+                AmountBudget = eventDTO.AmountBudget,
+                IsPublic = 0,
+                TimePublic = null,
+                Status = 10,
+                CampusId = int.Parse(campusIdClaim),
+                CategoryEventId = eventDTO.CategoryEventId,
+                Placed = eventDTO.Placed,
+                CreateBy = organizerId,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _eventRepository.CreateSaveDraft(newEvent);
+
+            if (eventDTO.Tasks != null && eventDTO.Tasks.Count > 0)
+            {
+                foreach (var task in eventDTO.Tasks)
+                {
+                    var newTask = new Planify_BackEnd.Models.Task
+                    {
+                        EventId = newEvent.Id,
+                        TaskName = task.TaskName,
+                        TaskDescription = task.Description,
+                        StartTime = task.StartTime ?? newEvent.StartTime,
+                        Deadline = task.Deadline,
+                        AmountBudget = task.Budget,
+                        CreateBy = organizerId,
+                        CreateDate = DateTime.UtcNow
+
+                    };
+                    await _taskRepository.CreateTaskAsync(newTask);
+
+                    if (task.SubTasks != null && task.SubTasks.Count > 0)
+                    {
+                        foreach (var subTask in task.SubTasks)
+                        {
+                            var newSubTask = new SubTask
+                            {
+                                TaskId = newTask.Id,
+                                SubTaskName = subTask.SubTaskName,
+                                SubTaskDescription = subTask.Description,
+                                StartTime = subTask.StartTime ?? newTask.StartTime,
+                                Deadline = subTask.Deadline,
+                                AmountBudget = subTask.Budget,
+                                CreateBy = organizerId,
+                            };
+                            await _subTaskRepository.CreateSubTaskAsync(newSubTask);
+                        }
+                    }
+                }
+            }
+
+            return new ResponseDTO(201, "Save draft successfully!", newEvent);
+        }
+        catch (Exception ex)
+        {
+            return new ResponseDTO(500, "Error orcurs while save draft event!", ex.Message);
+        }
+    }
+    public async Task<ResponseDTO> UpdateSaveDraft(EventDTO eventDTO)
+    {
+
+        try
+        {
+            var campus = await _campusRepository.GetCampusByName(eventDTO.CampusName);
+            //var category = await _categoryRepository.GetCategoryByName(eventDTO.CategoryEventName, campus.Id);
+            Event updateEvent = new Event
+            {
+                Id = eventDTO.Id,
+                AmountBudget = eventDTO.AmountBudget,
+                CampusId = campus.Id,
+                CategoryEventId = (int)eventDTO.CategoryEventId,
+                StartTime = eventDTO.StartTime,
+                EndTime = eventDTO.EndTime,
+                EventDescription = eventDTO.EventDescription,
+                EventTitle = eventDTO.EventTitle,
+                IsPublic = eventDTO.IsPublic,
+                Placed = eventDTO.Placed,
+                Status = eventDTO.Status,
+                TimePublic = eventDTO.TimePublic,
+                UpdateBy = eventDTO.UpdateBy,
+                UpdatedAt = DateTime.Now
+            };
+            Event updatedEvent = await _eventRepository.UpdateSaveDraft(updateEvent);
+            var e = new Event
+            {
+                EventTitle = updatedEvent.EventTitle,
+                EventDescription = updatedEvent.EventDescription,
+                StartTime = updatedEvent.StartTime,
+                EndTime = updatedEvent.EndTime,
+                AmountBudget = updatedEvent.AmountBudget,
+                IsPublic = updatedEvent.IsPublic,
+                TimePublic = updatedEvent.TimePublic,
+                Status = updatedEvent.Status,
+                CampusId = updatedEvent.CampusId,
+                CategoryEventId = updatedEvent.CategoryEventId,
+                Placed = updatedEvent.Placed,
+                CreateBy = updatedEvent.CreateBy,
+                CreatedAt = updatedEvent.CreatedAt
+            };
+
+            return new ResponseDTO(201, "Save draft successfully!", updatedEvent);
+        }
+        catch (Exception ex)
+        {
+            return new ResponseDTO(500, "Error orcurs while save draft event!", ex.Message);
+        }
+    }
+    public async Task<ResponseDTO> GetSaveDraft(Guid createBy)
+    {
+        try
+        {
+            var eventDetail = await _eventRepository.GetSaveDraft(createBy);
+            if (eventDetail == null)
+            {
+                return new ResponseDTO(404, "Don't exist any save draft!", eventDetail);
+            }
+            return new ResponseDTO(200, "Get save draft successfully!", eventDetail);
+        }
+        catch (Exception ex)
+        {
+            return new ResponseDTO(500, "Error orcurs while getting save draft!", ex.Message);
         }
     }
 }

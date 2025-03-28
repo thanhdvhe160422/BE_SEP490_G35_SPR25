@@ -25,7 +25,5 @@ public partial class SubTask
 
     public virtual User CreateByNavigation { get; set; } = null!;
 
-    public virtual ICollection<InvoiceImagesSubTask> InvoiceImagesSubTasks { get; set; } = new List<InvoiceImagesSubTask>();
-
     public virtual Task Task { get; set; } = null!;
 }

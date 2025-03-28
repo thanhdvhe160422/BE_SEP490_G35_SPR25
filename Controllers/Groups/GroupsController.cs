@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Planify_BackEnd.DTOs.Groups;
 using Planify_BackEnd.Services.Groups;
-using static Planify_BackEnd.DTOs.Events.EventDetailResponseDTO;
 
 namespace Planify_BackEnd.Controllers.Groups
 {

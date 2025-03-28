@@ -45,5 +45,19 @@ namespace Planify_BackEnd.Repositories.Address
                 return false;
             }
         }
+
+        public int CreateAddress(Models.Address address)
+        {
+            try
+            {
+                _context.Add(address);
+                _context.SaveChanges();
+                return address.Id;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
     }
 }

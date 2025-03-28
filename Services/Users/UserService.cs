@@ -1,8 +1,9 @@
-﻿using Planify_BackEnd.DTOs.Campus;
+﻿using Planify_BackEnd.DTOs;
+using Planify_BackEnd.DTOs.Campus;
 using Planify_BackEnd.DTOs.Roles;
 using Planify_BackEnd.DTOs.Users;
 using Planify_BackEnd.Models;
-using static Planify_BackEnd.DTOs.Events.EventDetailResponseDTO;
+using Planify_BackEnd.Repositories;
 
 namespace Planify_BackEnd.Services.Users
 {
@@ -13,6 +14,129 @@ namespace Planify_BackEnd.Services.Users
         {
             _userRepository = userRepository;
         }
+        public async Task<ResponseDTO> UpdateManagerAsync(UserUpdateDTO user, Guid id)
+        {
+            try
+            {
+                var updateUser = await _userRepository.UpdateManagerAsync( id, user);
+
+                if (updateUser == null)
+                {
+                    return new ResponseDTO(400, "User not found!", null);
+                }
+                return new ResponseDTO(200, "User updated successfully!", updateUser);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseDTO(500, "Error occurs while updating user!", ex.Message);
+            }
+        }
+        public async Task<ResponseDTO> CreateManagerAsync(UserCreateDTO user)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(user.FirstName))
+                {
+                    return new ResponseDTO(400, "First name is required.", null);
+                }
+                var newUser = new Models.User
+                {
+                    Id = user.Id,
+                    UserName = user.UserName,
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Password = user.Password,
+                    DateOfBirth = user.DateOfBirth,
+                    PhoneNumber = user.PhoneNumber,
+                    AddressId = user.AddressId,
+                    AvatarId = user.AvatarId,
+                    CreatedAt = user.CreatedAt,
+                    CampusId = user.CampusId,
+                    Status = 1,
+                    Gender = user.Gender,
+                };
+                try
+                {
+                    await _userRepository.CreateManagerAsync(newUser);
+                }
+                catch (Exception dbEx)
+                {
+                    return new ResponseDTO(500, "Database error while creating user!", dbEx.Message);
+                }
+                return new ResponseDTO(201, "Campus Manager creates successfully!", newUser);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public async Task<IEnumerable<UserListDTO>> GetListUserAsync(int page, int pageSize)
+        {
+            var users = await _userRepository.GetListUserAsync(page, pageSize);
+
+            var userDTOs = users.Select(c => new UserListDTO
+            {
+                Id = c.Id,
+                UserName = c.UserName,
+                Email = c.Email,
+                FirstName = c.FirstName,
+                LastName = c.LastName,
+                Password = c.Password,
+                DateOfBirth = c.DateOfBirth,
+                PhoneNumber = c.PhoneNumber,
+                AddressId = c.AddressId,
+                AvatarId = c.AvatarId,
+                CreatedAt = c.CreatedAt,
+                CampusId = c.CampusId,
+                Status = c.Status,
+                Gender = c.Gender
+            }).ToList();
+            return userDTOs;
+        }
+        public async Task<UserDetailDTO> GetUserDetailAsync(Guid id)
+        {
+            var c = await _userRepository.GetUserDetailAsync(id);
+            if (c == null)
+            {
+                return null; 
+            }
+
+            var userDTO = new UserDetailDTO
+            {
+                Id = c.Id,
+                UserName = c.UserName,
+                Email = c.Email,
+                FirstName = c.FirstName,
+                LastName = c.LastName,
+                Password = c.Password,
+                DateOfBirth = c.DateOfBirth,
+                PhoneNumber = c.PhoneNumber,
+                Address = c.Address.AddressDetail,
+                AvatarId = c.AvatarId,
+                CreatedAt = c.CreatedAt,
+                CampusName = c.Campus.CampusName,
+                Status = c.Status,
+                Gender = c.Gender ? "Male" : "Female"
+              
+            };
+
+            return userDTO;
+        }
+        public async Task<ResponseDTO> UpdateUserStatusAsync(Guid id, int newStatus)
+        {
+            try
+            {
+                var updateUser = await _userRepository.UpdateUserStatusAsync(id, newStatus);
+
+                return new ResponseDTO(200, "User status updated successfully!", updateUser);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseDTO(500, "Error occurs while updating user atus!", ex.Message);
+            }
+        }
+
         public async Task<IEnumerable<UserListDTO>> GetListImplementer(int eventId, int page, int pageSize)
         {
             var users = await _userRepository.GetListImplementer(eventId, page, pageSize);

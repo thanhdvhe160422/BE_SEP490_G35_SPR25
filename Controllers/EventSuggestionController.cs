@@ -49,7 +49,6 @@ namespace Planify_BackEnd.Controllers
                                 t.StartTime,
                                 t.Deadline,
                                 t.AmountBudget,
-                                t.Progress,
                                 t.Status,
                                 SubTasks = _dbContext.SubTasks.Where(st => st.TaskId == t.Id)
                                     .Select(st => new
@@ -66,33 +65,48 @@ namespace Planify_BackEnd.Controllers
                     .Take(5)
                     .ToListAsync();
 
+                string fullPrompt;
 
                 if (!pastEvents.Any())
                 {
-                    return Ok(new { Suggestion = "Không có dữ liệu lịch sử phù hợp để đưa ra gợi ý." });
+                    // Nếu không có dữ liệu lịch sử, tạo prompt để sinh sự kiện mới
+                    fullPrompt = $"Không có dữ liệu lịch sử. Hãy tạo một sự kiện mới thực tế và phù hợp cho trường Đại học FPT.\n" +
+                                $"Yêu cầu: {request.Prompt}\n" +
+                                $"Trả về kết quả bằng tiếng Việt, thời gian phải luôn ở tương lai, ngân sách chuẩn thực tế và dưới dạng JSON chỉ với các trường: " +
+                                $"EventTitle (string), EventDescription (string), StartTime (string, định dạng 'yyyy-MM-dd HH:mm'), " +
+                                $"EndTime (string, định dạng 'yyyy-MM-dd HH:mm'), CategoryEventId (int) = {request.CategoryEventId}, AmountBudget (decimal), " +
+                                $"Tasks (mảng chứa TaskName (string), TaskDescription (string), StartTime (string), Deadline (string), " +
+                                $"AmountBudget (decimal), SubTasks (mảng chứa SubTaskName (string), SubTaskDescription (string), " +
+                                $"StartTime (string), Deadline (string), AmountBudget (decimal))). " +
+                                $"Phản hồi phải cung cấp chi tiết đầy đủ và mô tả kỹ lưỡng kế hoạch. " +
+                                $"Đây là sự kiện tổ chức cho trường Đại học FPT.";
                 }
-
-                string eventData = "Dữ liệu lịch sử:\n";
-                foreach (var ev in pastEvents)
+                else
                 {
-                    eventData += $"- Sự kiện: {ev.EventTitle}\n";
-                    eventData += $"  Mô tả: {ev.EventDescription}\n";
-                    eventData += $"  Thời gian: {ev.StartTime} - {ev.EndTime} ({ev.DurationHours:F2} giờ)\n";
-                    eventData += $"  Thể loại: {ev.CategoryEventId}, Ngân sách: {ev.AmountBudget}\n";
-                    eventData += "  Nhiệm vụ:\n";
-                    foreach (var task in ev.Tasks)
+                    // Nếu có dữ liệu lịch sử, giữ nguyên logic cũ
+                    string eventData = "Dữ liệu lịch sử:\n";
+                    foreach (var ev in pastEvents)
                     {
-                        eventData += $"    - {task.TaskName}: {task.TaskDescription}, Ngân sách: {task.AmountBudget}, Thời gian: {task.StartTime} - {task.Deadline}\n";
-                        eventData += "      SubTasks:\n";
-                        foreach (var subTask in task.SubTasks)
+                        eventData += $"- Sự kiện: {ev.EventTitle}\n";
+                        eventData += $"  Mô tả: {ev.EventDescription}\n";
+                        eventData += $"  Thời gian: {ev.StartTime} - {ev.EndTime} ({ev.DurationHours:F2} giờ)\n";
+                        eventData += $"  Thể loại: {ev.CategoryEventId}, Ngân sách: {ev.AmountBudget}\n";
+                        eventData += "  Nhiệm vụ:\n";
+                        foreach (var task in ev.Tasks)
                         {
-                            eventData += $"        - {subTask.SubTaskName}: {subTask.SubTaskDescription}, Ngân sách: {subTask.AmountBudget}, Thời gian: {subTask.StartTime} - {subTask.Deadline}\n";
+                            eventData += $"    - {task.TaskName}: {task.TaskDescription}, Ngân sách: {task.AmountBudget}, Thời gian: {task.StartTime} - {task.Deadline}\n";
+                            eventData += "      SubTasks:\n";
+                            foreach (var subTask in task.SubTasks)
+                            {
+                                eventData += $"        - {subTask.SubTaskName}: {subTask.SubTaskDescription}, Ngân sách: {subTask.AmountBudget}, Thời gian: {subTask.StartTime} - {subTask.Deadline}\n";
+                            }
                         }
+                        eventData += "\n";
                     }
-                    eventData += "\n";
+
+                    fullPrompt = $"{eventData}\nYêu cầu: {request.Prompt}\nTrả về kết quả bằng tiếng Việt, thời gian phải luôn ở tương lai và dưới dạng JSON chỉ với các trường: EventTitle (string), EventDescription (string), StartTime (string, định dạng 'yyyy-MM-dd HH:mm'), EndTime (string, định dạng 'yyyy-MM-dd HH:mm'), CategoryEventId (int), AmountBudget (decimal), Tasks (mảng chứa TaskName (string), TaskDescription (string), StartTime (string), Deadline (string), AmountBudget (decimal), SubTasks (mảng chứa SubTaskName (string), SubTaskDescription (string), StartTime (string), Deadline (string), AmountBudget (decimal))). Phản hồi phải cung cấp chi tiết đầy đủ và mô tả kỹ lưỡng kế hoạch. Đây là sự kiện tổ chức cho trường Đại học FPT.";
                 }
 
-                string fullPrompt = $"{eventData}\nYêu cầu: {request.Prompt}\nTrả về kết quả bằng tiếng Việt, thời gian phải luôn ở tương lai và dưới dạng JSON chỉ với các trường: EventTitle (string), EventDescription (string), StartTime (string, định dạng 'yyyy-MM-dd HH:mm'), EndTime (string, định dạng 'yyyy-MM-dd HH:mm'), CategoryEventId (int), AmountBudget (decimal), Tasks (mảng chứa TaskName (string), TaskDescription (string), StartTime (string), Deadline (string), AmountBudget (decimal), SubTasks (mảng chứa SubTaskName (string), SubTaskDescription (string), StartTime (string), Deadline (string), AmountBudget (decimal))). Phản hồi phải cung cấp chi tiết đầy đủ và mô tả kỹ lưỡng kế hoạch. Đây là sự kiện tổ chức cho trường Đại học FPT.";
                 string suggestion = await _chatGPTService.GetSuggestion(fullPrompt);
 
                 try

@@ -16,12 +16,12 @@ namespace Planify_BackEnd.Controllers
             _joinProjectService = joinProjectService;
         }
         [HttpGet("get-list-event-joined")]
+        [Authorize(Roles = "Implementer")]
         public async Task<IActionResult> GetAllJoinedProjects(int page, int pageSize)
         {
             try
             {
-                //var userId =Guid.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value) ;
-                var userId = Guid.Parse("9FAE9DE7-6490-4B89-B9D3-088F97B71869");
+                var userId =Guid.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value) ;
                 var response = await _joinProjectService.GetAllJoinedProjects(userId, page, pageSize);
                 return Ok(response);
             }

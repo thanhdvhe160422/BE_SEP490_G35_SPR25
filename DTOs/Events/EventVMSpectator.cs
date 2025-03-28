@@ -31,6 +31,7 @@ namespace Planify_BackEnd.DTOs.Events
         public int? CategoryEventId { get; set; }
 
         public string? Placed { get; set; } = null!;
+        public bool? isFavorite { get; set; }
 
         public CampusDTO? CampusDTO { get; set; }
 

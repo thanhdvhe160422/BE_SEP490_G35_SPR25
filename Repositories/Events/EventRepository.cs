@@ -1,9 +1,8 @@
-﻿
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories;
-using static Planify_BackEnd.DTOs.Events.EventDetailResponseDTO;
 
 
 public class EventRepository : IEventRepository
@@ -82,36 +81,69 @@ public class EventRepository : IEventRepository
         try
         {
             var eventDetail = await _context.Events
-            .Where(e => e.Id == eventId)
-            .Select(e => new EventDetailDto
-            {
-                Id = e.Id,
-                EventTitle = e.EventTitle,
-                EventDescription = e.EventDescription,
-                StartTime = e.StartTime,
-                EndTime = e.EndTime,
-                AmountBudget = e.AmountBudget,
-                IsPublic = e.IsPublic,
-                TimePublic = e.TimePublic,
-                Status = e.Status,
-                Placed = e.Placed,
-                CreatedAt = e.CreatedAt,
-                CampusName = e.Campus.CampusName,
-                CategoryEventName = e.CategoryEvent.CategoryEventName,
-                CreatedBy = new UserDto
+                .Where(e => e.Id == eventId)
+                .Select(e => new EventDetailDto
                 {
-                    Id = e.CreateByNavigation.Id,
-                    FirstName = e.CreateByNavigation.FirstName,
-                    LastName = e.CreateByNavigation.LastName,
-                    Email = e.CreateByNavigation.Email
-                },
-                EventMedia = e.EventMedia.Select(em => new EventMediaDto
-                {
-                    Id = em.Id,
-                    MediaUrl = em.Media.MediaUrl
-                }).ToList().ToList()
-            })
-            .FirstOrDefaultAsync();
+                    Id = e.Id,
+                    EventTitle = e.EventTitle,
+                    EventDescription = e.EventDescription,
+                    StartTime = e.StartTime,
+                    EndTime = e.EndTime,
+                    AmountBudget = e.AmountBudget,
+                    IsPublic = e.IsPublic,
+                    TimePublic = e.TimePublic,
+                    Status = e.Status,
+                    Placed = e.Placed,
+                    CreatedAt = e.CreatedAt,
+                    CampusName = e.Campus.CampusName,
+                    CategoryEventName = e.CategoryEvent.CategoryEventName,
+                    CreatedBy = new UserDto
+                    {
+                        Id = e.CreateByNavigation.Id,
+                        FirstName = e.CreateByNavigation.FirstName,
+                        LastName = e.CreateByNavigation.LastName,
+                        Email = e.CreateByNavigation.Email
+                    },
+                    EventMedia = e.EventMedia.Select(em => new EventMediaDto
+                    {
+                        Id = em.Id,
+                        MediaUrl = em.Media.MediaUrl
+                    }).ToList(),
+                    Tasks = e.Tasks.Select(t => new TaskDetailDto
+                    {
+                        Id = t.Id,
+                        TaskName = t.TaskName,
+                        TaskDescription = t.TaskDescription,
+                        StartTime = t.StartTime,
+                        Deadline = t.Deadline,
+                        AmountBudget = t.AmountBudget,
+                        CreatedAt = t.CreateDate,
+                        CreatedBy = new UserDto
+                        {
+                            Id = t.CreateByNavigation.Id,
+                            FirstName = t.CreateByNavigation.FirstName,
+                            LastName = t.CreateByNavigation.LastName,
+                            Email = t.CreateByNavigation.Email
+                        },
+                        SubTasks = t.SubTasks.Select(st => new SubTaskDetailDto
+                        {
+                            Id = st.Id,
+                            SubTaskName = st.SubTaskName,
+                            SubTaskDescription = st.SubTaskDescription,
+                            StartTime = st.StartTime,
+                            Deadline = st.Deadline,
+                            AmountBudget = st.AmountBudget,
+                            CreatedBy = new UserDto
+                            {
+                                Id = st.CreateByNavigation.Id,
+                                FirstName = st.CreateByNavigation.FirstName,
+                                LastName = st.CreateByNavigation.LastName,
+                                Email = st.CreateByNavigation.Email
+                            }
+                        }).ToList()
+                    }).ToList()
+                })
+                .FirstOrDefaultAsync();
 
             return eventDetail;
         }
@@ -182,41 +214,122 @@ public class EventRepository : IEventRepository
         }
     }
 
-    public async Task<IEnumerable<Event>> SearchEventAsync(int page, int pageSize, string? title, 
+    public async Task<PageResultDTO<Event>> SearchEventAsync(int page, int pageSize, string? title, 
         DateTime? startTime, DateTime? endTime, decimal? minBudget, decimal? maxBudget, int? isPublic, 
-        int? status, int? CategoryEventId, string? placed)
+        int? status, int? CategoryEventId, string? placed, Guid userId, int campusId)
     {
         try
         {
-            var query = _context.Events.AsQueryable();
-            if (!string.IsNullOrEmpty(title))
-                query = query.Where(e => e.EventTitle.Contains(title));
-            if (!string.IsNullOrEmpty(placed))
-                query = query.Where(e => e.Placed.Contains(placed));
-            if (startTime.HasValue)
-                query = query.Where(e => e.StartTime >= startTime);
-            if (endTime.HasValue)
-                query = query.Where(e => e.EndTime <= endTime);
-            if (minBudget.HasValue)
-                query = query.Where(e => e.AmountBudget >= minBudget);
-            if (maxBudget.HasValue)
-                query = query.Where(e => e.AmountBudget <= maxBudget);
-            if (isPublic.HasValue)
-                query = query.Where(e => e.IsPublic == isPublic);
-            if (status.HasValue)
-                query = query.Where(e => e.Status == status);
-            if (CategoryEventId.HasValue)
-                query = query.Where(e => e.CategoryEventId == CategoryEventId); 
-            var paginatedResult = await query
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
-            return paginatedResult;
+            var count = _context.Events
+                .Include(e => e.Campus)
+                .Include(e => e.CategoryEvent)
+                .Include(e => e.EventMedia).ThenInclude(em => em.Media)
+                .Include(e => e.FavouriteEvents)
+                .Where(e => e.Status != -1 && e.IsPublic == 1)
+                .Where(e => e.FavouriteEvents.Any(fe => fe.UserId == userId) || !e.FavouriteEvents.Any())
+                .Where(e => e.CampusId==campusId &&
+                    (string.IsNullOrEmpty(title) || e.EventTitle.Contains(title)) &&
+                    (!startTime.HasValue || e.StartTime >= startTime) &&
+                    (!endTime.HasValue || e.EndTime <= endTime) &&
+                    (!minBudget.HasValue || e.AmountBudget >= minBudget) &&
+                    (!maxBudget.HasValue || e.AmountBudget <= maxBudget) &&
+                    (!isPublic.HasValue || e.IsPublic == isPublic) &&
+                    (!status.HasValue || e.Status == status) &&
+                    (!CategoryEventId.HasValue || e.CategoryEventId == CategoryEventId) &&
+                    (string.IsNullOrEmpty(placed) || e.Placed.Contains(placed))
+                    ).AsEnumerable()
+                    .OrderBy(e =>
+                        e.StartTime <= DateTime.Now && DateTime.Now <= e.EndTime ? 0:1)
+                    .ThenBy(e =>
+                        e.StartTime > DateTime.Now ? 0 : 1)
+                    .ThenBy(e =>
+                        e.EndTime < DateTime.Now ? 0 : 1)
+                    .Count();
+            if (count == 0) new PageResultDTO<Event>(new List<Event>(), count, page, pageSize);
+            var events = _context.Events
+                .Include(e => e.Campus)
+                .Include(e => e.CategoryEvent)
+                .Include(e => e.EventMedia).ThenInclude(em => em.Media)
+                .Include(e => e.FavouriteEvents)
+                .Where(e => e.Status != -1 && e.IsPublic == 1)
+                .Where(e => e.FavouriteEvents.Any(fe => fe.UserId == userId) || !e.FavouriteEvents.Any())
+                .Where(e =>
+                    (string.IsNullOrEmpty(title) || e.EventTitle.Contains(title)) &&
+                    (!startTime.HasValue || e.StartTime >= startTime) &&
+                    (!endTime.HasValue || e.EndTime <= endTime) &&
+                    (!minBudget.HasValue || e.AmountBudget >= minBudget) &&
+                    (!maxBudget.HasValue || e.AmountBudget <= maxBudget) &&
+                    (!isPublic.HasValue || e.IsPublic == isPublic) &&
+                    (!status.HasValue || e.Status == status) &&
+                    (!CategoryEventId.HasValue || e.CategoryEventId == CategoryEventId) &&
+                    (string.IsNullOrEmpty(placed) || e.Placed.Contains(placed))
+                ).AsEnumerable()
+                .OrderBy(e =>
+                    e.StartTime <= DateTime.Now && DateTime.Now <= e.EndTime ? 0 : 1)
+                .ThenBy(e =>
+                    e.StartTime > DateTime.Now ? 0 : 1)
+                .ThenBy(e =>
+                    e.EndTime < DateTime.Now ? 0 : 1)
+                .Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            PageResultDTO<Event> result = new PageResultDTO<Event>(events, count, page, pageSize);
+            return result;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            Console.WriteLine("event repository - search event: " + ex.Message);
-            return new List<Event>();
+            throw new Exception(ex.Message);
+        }
+    }
+    public async Task<Event> CreateSaveDraft(Event saveEvent)
+    {
+        try
+        {
+            await _context.Events.AddAsync(saveEvent);
+            await _context.SaveChangesAsync();
+            return saveEvent;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+    public async Task<Event> UpdateSaveDraft(Event saveEvent)
+    {
+        try
+        {
+            var updateSaveDraft = await _context.Events.FirstOrDefaultAsync(ev => ev.Id == saveEvent.Id);
+            updateSaveDraft.Id = saveEvent.Id;
+            updateSaveDraft.AmountBudget = saveEvent.AmountBudget;
+            updateSaveDraft.CampusId = saveEvent.CampusId;
+            updateSaveDraft.CategoryEventId = saveEvent.CategoryEventId;
+            updateSaveDraft.StartTime = saveEvent.StartTime;
+            updateSaveDraft.EndTime = saveEvent.EndTime;
+            updateSaveDraft.EventDescription = saveEvent.EventDescription;
+            updateSaveDraft.EventTitle = saveEvent.EventTitle;
+            updateSaveDraft.IsPublic = saveEvent.IsPublic;
+            updateSaveDraft.Placed = saveEvent.Placed;
+            updateSaveDraft.Status = saveEvent.Status;
+            updateSaveDraft.TimePublic = saveEvent.TimePublic;
+            updateSaveDraft.UpdateBy = saveEvent.UpdateBy;
+            updateSaveDraft.UpdatedAt = DateTime.Now;
+            _context.Events.Update(updateSaveDraft);
+            await _context.SaveChangesAsync();
+            return updateSaveDraft;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+
+    public async Task<Event> GetSaveDraft(Guid createBy)
+    {
+        try
+        {
+            return _context.Events.Where(e=>e.CreateBy.Equals(createBy)&&e.Status==10).OrderBy(e=>e.CreatedAt).FirstOrDefault();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
         }
     }
 }
