@@ -24,5 +24,6 @@ namespace Planify_BackEnd.Repositories
             int? CategoryEventId,
             string? placed);
         System.Threading.Tasks.Task CreateRiskAsync(Risk risk);
+        Task<Event> GetEventByIdAsync(int eventId);
     }
 }

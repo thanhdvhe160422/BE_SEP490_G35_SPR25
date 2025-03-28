@@ -296,5 +296,11 @@ public class EventRepository : IEventRepository
         _context.Risks.Add(risk);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<Event> GetEventByIdAsync(int eventId)
+    {
+        return await _context.Events
+            .FirstOrDefaultAsync(e => e.Id == eventId);
+    }
 }
 
