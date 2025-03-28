@@ -1,4 +1,5 @@
-﻿using Planify_BackEnd.Models;
+﻿using Planify_BackEnd.DTOs.Users;
+using Planify_BackEnd.Models;
 
 public interface IUserRepository
 {
@@ -12,4 +13,6 @@ public interface IUserRepository
     Task<User> CreateEventOrganizer(User user);
     Task<User> UpdateEventOrganizer(User user);
     Task<UserRole> AddUserRole(UserRole role);
+    Task<User> CreateManagerAsync(User user);
+    Task<User> UpdateManagerAsync(Guid id, UserUpdateDTO updateUser);
 }

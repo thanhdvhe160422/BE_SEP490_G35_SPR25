@@ -15,12 +15,8 @@ namespace Planify_BackEnd.DTOs.Tasks
         public DateTime StartTime { get; set; }
         [Required]
         public DateTime Deadline { get; set; }
-        [Required]
-        public int GroupId { get; set; }
 
         public decimal AmountBudget { get; set; }
-
-        public double Progress { get; set; }
 
         public Guid OrganizerId { get; set; } // Nguoi tao tasks
 

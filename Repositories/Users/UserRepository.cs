@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Planify_BackEnd.DTOs.Users;
 using Planify_BackEnd.Models;
 
 public class UserRepository : IUserRepository
@@ -9,7 +10,54 @@ public class UserRepository : IUserRepository
     {
         _context = context;
     }
-
+    public async Task<User> UpdateManagerAsync(Guid id, UserUpdateDTO updateUser)
+    {
+        try
+        {
+            var existingUser = await _context.Users.FindAsync(id);
+            if (existingUser == null)
+            {
+                return null;
+            }
+            existingUser.AddressId = updateUser.AddressId;
+            existingUser.FirstName = updateUser.FirstName;
+            existingUser.LastName = updateUser.LastName;
+            existingUser.UserName = updateUser.UserName;
+            existingUser.Status = updateUser.Status;
+            existingUser.DateOfBirth = updateUser.DateOfBirth;
+            existingUser.Gender = updateUser.Gender;
+            existingUser.CampusId = updateUser.CampusId;
+            existingUser.Email = updateUser.Email;
+            existingUser.PhoneNumber = updateUser.PhoneNumber;
+            existingUser.AvatarId = updateUser.AvatarId;
+            existingUser.Password = updateUser.Password;
+            _context.Users.Update(existingUser);
+                await _context.SaveChangesAsync();
+                return existingUser;
+            }
+            catch (Exception ex)
+        {
+            throw new Exception("An unexpected error occurred.", ex);
+        }
+    }
+    public async Task<User> CreateManagerAsync(User user)
+    {
+        try
+        {
+            await _context.UserRoles.AddAsync(new UserRole
+            {
+                UserId = user.Id,
+                RoleId = 2
+            });
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
+            return user;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
     public async Task<IEnumerable<User>> GetListUserAsync(int page, int pageSize)
     {
         try

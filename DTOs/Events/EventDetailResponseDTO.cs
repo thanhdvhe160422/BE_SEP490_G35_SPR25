@@ -16,7 +16,15 @@
             public string CampusName { get; set; }
             public string CategoryEventName { get; set; }
             public UserDto CreatedBy { get; set; }
-            public List<EventMediaDto> EventMedia { get; set; }
+
+            public string? MeasuringSuccess { get; set; }
+
+            public string? Goals { get; set; }
+
+            public string? MonitoringProcess { get; set; }
+
+            public int? SizeParticipants { get; set; }
+        public List<EventMediaDto> EventMedia { get; set; }
             public List<TaskDetailDto> Tasks { get; set; }
         }
 
