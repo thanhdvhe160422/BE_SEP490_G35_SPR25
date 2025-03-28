@@ -253,7 +253,7 @@ public class EventRepository : IEventRepository
                 .Include(e => e.FavouriteEvents)
                 .Where(e => e.Status != -1 && e.IsPublic == 1)
                 .Where(e => e.FavouriteEvents.Any(fe => fe.UserId == userId) || !e.FavouriteEvents.Any())
-                .Where(e =>
+                .Where(e => e.CampusId == campusId &&
                     (string.IsNullOrEmpty(title) || e.EventTitle.Contains(title)) &&
                     (!startTime.HasValue || e.StartTime >= startTime) &&
                     (!endTime.HasValue || e.EndTime <= endTime) &&

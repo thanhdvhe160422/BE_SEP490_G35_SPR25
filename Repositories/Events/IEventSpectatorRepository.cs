@@ -6,8 +6,8 @@ namespace Planify_BackEnd.Repositories.Events
 {
     public interface IEventSpectatorRepository
     {
-        PageResultDTO<Event> GetEvents(int page, int pageSize, Guid userId);
+        PageResultDTO<Event> GetEvents(int page, int pageSize, Guid userId, int campusId);
         Event GetEventById(int id,Guid userId);
-        PageResultDTO<Event> SearchEvent(int page, int pageSize, string? name, DateTime? startDate, DateTime? endDate, string? placed, Guid userId);
+        PageResultDTO<Event> SearchEvent(int page, int pageSize, string? name, DateTime? startDate, DateTime? endDate, string? placed, Guid userId, int campusId);
     }
 }
