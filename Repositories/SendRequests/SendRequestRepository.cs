@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Planify_BackEnd.DTOs.SendRequests;
 using Planify_BackEnd.Models;
 using System;
 
@@ -13,9 +14,22 @@ namespace Planify_BackEnd.Repositories.SendRequests
             _context = context;
         }
 
-        public async Task<List<SendRequest>> GetRequestsAsync()
+        public async Task<List<SendRequestWithEventDTO>> GetRequestsAsync()
         {
-            return await _context.SendRequests.ToListAsync();
+            return await _context.SendRequests
+                .Include(sr => sr.Event)
+                .Select(sr => new SendRequestWithEventDTO
+                {
+                    Id = sr.Id,
+                    EventId = sr.EventId,
+                    Reason = sr.Reason,
+                    Status = sr.Status,
+                    ManagerId = sr.ManagerId,
+                    EventTitle = sr.Event.EventTitle,
+                    EventStartTime = sr.Event.StartTime,
+                    EventEndTime = sr.Event.EndTime
+                })
+                .ToListAsync();
         }
 
         public async Task<SendRequest> GetRequestByIdAsync(int id)
