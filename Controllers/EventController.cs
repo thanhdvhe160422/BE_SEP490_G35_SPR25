@@ -40,9 +40,13 @@ namespace Planify_BackEnd.Controllers
         {
             try
             {
-                var campusId = int.Parse(User.FindFirst("campusId")?.Value);
-                
-                var response =  _eventService.GetAllEvent(campusId, page,  pageSize);
+               
+                var campusClaim = int.Parse(User.Claims.FirstOrDefault(c => c.Type == "campusId").Value);
+                var response =  _eventService.GetAllEvent(campusClaim, page,  pageSize);
+                if (response.TotalCount == 0)
+                {
+                    return NotFound("Cannot found any event");
+                }
                 return Ok(response);
             }
             catch (Exception ex)

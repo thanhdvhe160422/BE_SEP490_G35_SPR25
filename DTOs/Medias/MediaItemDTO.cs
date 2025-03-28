@@ -4,7 +4,7 @@
     {
         public int Id { get; set; }
 
-        public string MediaUrl { get; set; } = null!;
+        public string MediaUrl { get; set; } = null;
 
     }
 }
