@@ -11,6 +11,7 @@ using Planify_BackEnd.Repositories.Categories;
 using Planify_BackEnd.Repositories.Tasks;
 using Microsoft.Extensions.Logging;
 using Planify_BackEnd.DTOs.Medias;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 public class EventService : IEventService
 {
@@ -33,46 +34,60 @@ public class EventService : IEventService
         _subTaskRepository = subTaskRepository;
         _taskRepository = taskRepository;
     }
-    public async Task<IEnumerable<EventGetListResponseDTO>> GetAllEventAsync(int campusId, int page, int pageSize)
+    public PageResultDTO<EventGetListResponseDTO> GetAllEvent(int campusId, int page, int pageSize)
     {
-        var events = await _eventRepository.GetAllEventAsync(campusId,page, pageSize);
-        var eventDTOs = events.Select(e => new EventGetListResponseDTO
+        try
         {
-            Id = e.Id,
-            EventTitle = e.EventTitle,
-            EventDescription = e.EventDescription,
-            StartTime = e.StartTime,
-            EndTime = e.EndTime,
-            AmountBudget = e.AmountBudget,
-            IsPublic = e.IsPublic,
-            TimePublic = e.TimePublic,
-            Status = e.Status,
-            CampusId = e.CampusId,
-            CategoryEventId = e.CategoryEventId,
-            Placed = e.Placed,
-            CreateBy = e.CreateBy,
-            CreatedAt = e.CreatedAt,
-            ManagerId = e.ManagerId,
-            MeasuringSuccess = e.MeasuringSuccess,
-            Goals = e.Goals,
-            MonitoringProcess = e.MonitoringProcess,
-            SizeParticipants = e.SizeParticipants,
-            EventMedias = e.EventMedia == null ? null : e.EventMedia.Select(em => new Planify_BackEnd.DTOs.Medias.EventMediumViewMediaModel
+            PageResultDTO<Event> events = _eventRepository.GetAllEvent(campusId, page, pageSize);
+            if (events.TotalCount == 0)
+
+                return new PageResultDTO<EventGetListResponseDTO>(new List<EventGetListResponseDTO>(), 0, page, pageSize);
+            List<EventGetListResponseDTO> eventList = new List<EventGetListResponseDTO>();
+            foreach (var item in events.Items)
             {
-                Id = em.Id,
-                EventId = em.Id,
-                MediaId = em.Id,
-                Status = em.Status,
-                MediaDTO = new Planify_BackEnd.DTOs.Medias.MediaItemDTO
+                EventGetListResponseDTO eventDTO = new EventGetListResponseDTO
                 {
-                    Id = em.Media.Id,
-                    MediaUrl = em.Media.MediaUrl
-                },
-            }).ToList()
-
-        }).ToList();
-
-        return eventDTOs;
+                    Id = item.Id,
+                    EventTitle = item.EventTitle,
+                    EventDescription = item.EventDescription,
+                    StartTime = item.StartTime,
+                    EndTime = item.EndTime,
+                    AmountBudget = item.AmountBudget,
+                    IsPublic = item.IsPublic,
+                    TimePublic = item.TimePublic,
+                    Status = item.Status,
+                    CampusId = item.CampusId,
+                    CategoryEventId = item.CategoryEventId,
+                    Placed = item.Placed,
+                    CreateBy = item.CreateBy,
+                    CreatedAt = item.CreatedAt,
+                    ManagerId = item.ManagerId,
+                    MeasuringSuccess = item.MeasuringSuccess,
+                    Goals = item.Goals,
+                    MonitoringProcess = item.MonitoringProcess,
+                    SizeParticipants = item.SizeParticipants,
+                    EventMedias = item.EventMedia == null ? null : item.EventMedia.Select(em => new Planify_BackEnd.DTOs.Medias.EventMediumViewMediaModel
+                    {
+                        Id = em.Id,
+                        EventId = em.Id,
+                        MediaId = em.Id,
+                        Status = em.Status,
+                        MediaDTO = new Planify_BackEnd.DTOs.Medias.MediaItemDTO
+                        {
+                            Id = em.Media.Id,
+                            MediaUrl = em.Media.MediaUrl
+                        },
+                    }).ToList()
+                };
+                eventList.Add(eventDTO);
+                
+            }
+            return new PageResultDTO<EventGetListResponseDTO>(eventList, events.TotalCount, page, pageSize);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
     }
 
     public async Task<ResponseDTO> CreateEventAsync(EventCreateRequestDTO eventDTO, Guid organizerId)

@@ -41,7 +41,8 @@ namespace Planify_BackEnd.Controllers
             try
             {
                 var campusId = int.Parse(User.FindFirst("campusId")?.Value);
-                var response = await _eventService.GetAllEventAsync(campusId, page,  pageSize);
+                
+                var response =  _eventService.GetAllEvent(campusId, page,  pageSize);
                 return Ok(response);
             }
             catch (Exception ex)
