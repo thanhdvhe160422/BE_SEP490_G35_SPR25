@@ -14,14 +14,14 @@ public class EventRepository : IEventRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<Event>> GetAllEventAsync(int page, int pageSize)
+    public async Task<IEnumerable<Event>> GetAllEventAsync(int campusId, int page, int pageSize)
     {
         try
         {
             var now = DateTime.UtcNow;
 
             return await _context.Events
-                .Where(e => e.Status != -1)
+                .Where(e => e.Status != -1 && e.CampusId == campusId)
                 .Include(e => e.EventMedia)
                 .ThenInclude(em => em.Media)
                 .OrderBy(e => e.StartTime <= now && now <= e.EndTime ? 0 : // Running
