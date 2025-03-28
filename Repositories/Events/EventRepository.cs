@@ -14,13 +14,22 @@ public class EventRepository : IEventRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<Event>> GetAllEventAsync(int campusId, int page, int pageSize)
+    public PageResultDTO<Event> GetAllEvent(int campusId, int page, int pageSize)
     {
         try
         {
             var now = DateTime.UtcNow;
 
-            return await _context.Events
+            var count = _context.Events
+                .Where(e => e.Status != -1 && e.CampusId == campusId)
+                .Include(e => e.EventMedia)
+                .ThenInclude(em => em.Media)
+                .OrderBy(e => e.StartTime <= now && now <= e.EndTime ? 0 : // Running
+                           e.StartTime > now ? 1 : // Not Started Yet
+                           2) // Closed 
+                .Count();
+            if (count == 0) new PageResultDTO<Event>(new List<Event>(), count, page, pageSize);
+            var events = _context.Events
                 .Where(e => e.Status != -1 && e.CampusId == campusId)
                 .Include(e => e.EventMedia)
                 .ThenInclude(em => em.Media)
@@ -29,7 +38,9 @@ public class EventRepository : IEventRepository
                            2) // Closed 
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .ToListAsync();
+                .ToList();
+            PageResultDTO<Event> result = new PageResultDTO<Event>(events, count, page, pageSize);
+             return result;
         }
         catch (Exception ex)
         {
