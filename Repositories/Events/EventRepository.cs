@@ -14,17 +14,35 @@ public class EventRepository : IEventRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<Event>> GetAllEventAsync(int page, int pageSize)
+    public PageResultDTO<Event> GetAllEvent(int campusId, int page, int pageSize)
     {
         try
         {
-            return await _context.Events
-                .Where(e => e.Status != -1)
-                .Include(e => e.EventMedia) 
-                .ThenInclude(em => em.Media) 
+            var now = DateTime.UtcNow;
+
+            var count = _context.Events
+                .Where(e => e.Status != -1 && e.CampusId == campusId)
+                .Include(e => e.EventMedia)
+                .ThenInclude(em => em.Media)
+                .OrderBy(e => e.StartTime <= now && now <= e.EndTime ? 0 : // Running
+                           e.StartTime > now ? 1 : // Not Started Yet
+                           2) // Closed 
+                .Count();
+            if (count == 0)
+                return new PageResultDTO<Event>(new List<Event>(), count, page, pageSize);
+
+            var events = _context.Events
+                .Where(e => e.Status != -1 && e.CampusId == campusId)
+                .Include(e => e.EventMedia)
+                .ThenInclude(em => em.Media)
+                .OrderBy(e => e.StartTime <= now && now <= e.EndTime ? 0 : // Running
+                           e.StartTime > now ? 1 : // Not Started Yet
+                           2) // Closed 
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .ToListAsync();
+                .ToList();
+            PageResultDTO<Event> result = new PageResultDTO<Event>(events, count, page, pageSize);
+             return result;
         }
         catch (Exception ex)
         {
@@ -71,7 +89,7 @@ public class EventRepository : IEventRepository
         }
     }
 
-    public async Task<EventDetailDto?> GetEventDetailAsync(int eventId)
+    public async Task<EventDetailDto> GetEventDetailAsync(int eventId)
     {
         if (eventId <= 0)
         {
@@ -95,6 +113,11 @@ public class EventRepository : IEventRepository
                     Status = e.Status,
                     Placed = e.Placed,
                     CreatedAt = e.CreatedAt,
+                    UpdatedAt = e.UpdatedAt,
+                    MeasuringSuccess = e.MeasuringSuccess,
+                    Goals = e.Goals,
+                    MonitoringProcess = e.MonitoringProcess,
+                    SizeParticipants = e.SizeParticipants,
                     CampusName = e.Campus.CampusName,
                     CategoryEventName = e.CategoryEvent.CategoryEventName,
                     CreatedBy = new UserDto
@@ -104,10 +127,44 @@ public class EventRepository : IEventRepository
                         LastName = e.CreateByNavigation.LastName,
                         Email = e.CreateByNavigation.Email
                     },
+                    Manager = e.Manager != null ? new UserDto
+                    {
+                        Id = e.Manager.Id,
+                        FirstName = e.Manager.FirstName,
+                        LastName = e.Manager.LastName,
+                        Email = e.Manager.Email
+                    } : null,
+                    UpdatedBy = e.UpdateByNavigation != null ? new UserDto
+                    {
+                        Id = e.UpdateByNavigation.Id,
+                        FirstName = e.UpdateByNavigation.FirstName,
+                        LastName = e.UpdateByNavigation.LastName,
+                        Email = e.UpdateByNavigation.Email
+                    } : null,
                     EventMedia = e.EventMedia.Select(em => new EventMediaDto
                     {
                         Id = em.Id,
                         MediaUrl = em.Media.MediaUrl
+                    }).ToList(),
+                    FavouriteEvents = e.FavouriteEvents.Select(fe => new FavouriteEventDto
+                    {
+                        UserId = fe.UserId,
+                        UserFullName = $"{fe.User.FirstName} {fe.User.LastName}"
+                    }).ToList(),
+                    JoinProjects = e.JoinProjects.Select(jp => new JoinProjectDto
+                    {
+                        UserId = jp.UserId,
+                        UserFullName = $"{jp.User.FirstName} {jp.User.LastName}",
+                        TimeJoinProject = jp.TimeJoinProject,
+                        TimeOutProject = jp.TimeOutProject
+                    }).ToList(),
+                    Risks = e.Risks.Select(r => new RiskDto
+                    {
+                        Id = r.Id,
+                        Name = r.Name,
+                        Reason = r.Reason,
+                        Solution = r.Solution,
+                        Description = r.Description
                     }).ToList(),
                     Tasks = e.Tasks.Select(t => new TaskDetailDto
                     {
@@ -149,7 +206,7 @@ public class EventRepository : IEventRepository
         }
         catch (Exception ex)
         {
-            throw new Exception("An unexpected error occurred.", ex);
+            throw new Exception("An unexpected error occurred while retrieving event details.", ex);
         }
     }
 
@@ -216,7 +273,7 @@ public class EventRepository : IEventRepository
 
     public async Task<PageResultDTO<Event>> SearchEventAsync(int page, int pageSize, string? title, 
         DateTime? startTime, DateTime? endTime, decimal? minBudget, decimal? maxBudget, int? isPublic, 
-        int? status, int? CategoryEventId, string? placed, Guid userId)
+        int? status, int? CategoryEventId, string? placed, Guid userId, int campusId)
     {
         try
         {
@@ -227,7 +284,7 @@ public class EventRepository : IEventRepository
                 .Include(e => e.FavouriteEvents)
                 .Where(e => e.Status != -1 && e.IsPublic == 1)
                 .Where(e => e.FavouriteEvents.Any(fe => fe.UserId == userId) || !e.FavouriteEvents.Any())
-                .Where(e =>
+                .Where(e => e.CampusId==campusId &&
                     (string.IsNullOrEmpty(title) || e.EventTitle.Contains(title)) &&
                     (!startTime.HasValue || e.StartTime >= startTime) &&
                     (!endTime.HasValue || e.EndTime <= endTime) &&
@@ -237,8 +294,14 @@ public class EventRepository : IEventRepository
                     (!status.HasValue || e.Status == status) &&
                     (!CategoryEventId.HasValue || e.CategoryEventId == CategoryEventId) &&
                     (string.IsNullOrEmpty(placed) || e.Placed.Contains(placed))
-                )
-                .OrderBy(e => e.Status).Count();
+                    ).AsEnumerable()
+                    .OrderBy(e =>
+                        e.StartTime <= DateTime.Now && DateTime.Now <= e.EndTime ? 0:1)
+                    .ThenBy(e =>
+                        e.StartTime > DateTime.Now ? 0 : 1)
+                    .ThenBy(e =>
+                        e.EndTime < DateTime.Now ? 0 : 1)
+                    .Count();
             if (count == 0) new PageResultDTO<Event>(new List<Event>(), count, page, pageSize);
             var events = _context.Events
                 .Include(e => e.Campus)
@@ -247,7 +310,7 @@ public class EventRepository : IEventRepository
                 .Include(e => e.FavouriteEvents)
                 .Where(e => e.Status != -1 && e.IsPublic == 1)
                 .Where(e => e.FavouriteEvents.Any(fe => fe.UserId == userId) || !e.FavouriteEvents.Any())
-                .Where(e =>
+                .Where(e => e.CampusId == campusId &&
                     (string.IsNullOrEmpty(title) || e.EventTitle.Contains(title)) &&
                     (!startTime.HasValue || e.StartTime >= startTime) &&
                     (!endTime.HasValue || e.EndTime <= endTime) &&
@@ -257,8 +320,13 @@ public class EventRepository : IEventRepository
                     (!status.HasValue || e.Status == status) &&
                     (!CategoryEventId.HasValue || e.CategoryEventId == CategoryEventId) &&
                     (string.IsNullOrEmpty(placed) || e.Placed.Contains(placed))
-                )
-                .OrderBy(e => e.Status)
+                ).AsEnumerable()
+                .OrderBy(e =>
+                    e.StartTime <= DateTime.Now && DateTime.Now <= e.EndTime ? 0 : 1)
+                .ThenBy(e =>
+                    e.StartTime > DateTime.Now ? 0 : 1)
+                .ThenBy(e =>
+                    e.EndTime < DateTime.Now ? 0 : 1)
                 .Skip((page - 1) * pageSize).Take(pageSize).ToList();
             PageResultDTO<Event> result = new PageResultDTO<Event>(events, count, page, pageSize);
             return result;
@@ -320,6 +388,23 @@ public class EventRepository : IEventRepository
         {
             throw new Exception(ex.Message);
         }
+    }
+    public async System.Threading.Tasks.Task CreateRiskAsync(Risk risk)
+    {
+        _context.Risks.Add(risk);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<Event> GetEventByIdAsync(int eventId)
+    {
+        return await _context.Events
+            .FirstOrDefaultAsync(e => e.Id == eventId);
+    }
+
+    public async System.Threading.Tasks.Task CreateCostBreakdownAsync(CostBreakdown costBreakdown)
+    {
+        _context.CostBreakdowns.Add(costBreakdown);
+        await _context.SaveChangesAsync();
     }
 }
 

@@ -11,7 +11,7 @@ public partial class SendRequest
 
     public Guid? ManagerId { get; set; }
 
-    public string Reason { get; set; } = null!;
+    public string? Reason { get; set; } = null!;
 
     public int Status { get; set; }
 

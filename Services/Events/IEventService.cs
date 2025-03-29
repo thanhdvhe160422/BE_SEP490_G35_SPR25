@@ -6,7 +6,7 @@ namespace Planify_BackEnd.Services.Events
 {
     public interface IEventService
     {
-        Task<IEnumerable<EventGetListResponseDTO>> GetAllEventAsync(int page, int pageSize);
+        PageResultDTO<EventGetListResponseDTO> GetAllEvent(int campusId, int page, int pageSize);
         Task<ResponseDTO> CreateEventAsync(EventCreateRequestDTO eventDTO, Guid organizerId);
         Task<ResponseDTO> UploadImageAsync(UploadImageRequestDTO imageDTO);
         Task<ResponseDTO> GetEventDetailAsync(int eventId);
@@ -20,7 +20,8 @@ namespace Planify_BackEnd.Services.Events
             int? status,
             int? CategoryEventId,
             string? placed,
-            Guid userId);
+            Guid userId,
+            int campusId);
 
         Task<ResponseDTO> CreateSaveDraft(EventCreateRequestDTO eventDTO, Guid organizerId);
         Task<ResponseDTO> UpdateSaveDraft(EventDTO eventDTO);

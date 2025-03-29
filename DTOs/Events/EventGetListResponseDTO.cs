@@ -39,7 +39,35 @@ namespace Planify_BackEnd.DTOs.Events
         public int? CategoryEventId { get; set; }
 
         public string? Placed { get; set; }
+        public string? MeasuringSuccess { get; set; }
+
+        public string? Goals { get; set; }
+
+        public string? MonitoringProcess { get; set; }
+
+        public int? SizeParticipants { get; set; }
 
         public ICollection<EventMediumViewMediaModel> EventMedias { get; set; } = new List<EventMediumViewMediaModel>();
+
+        public bool? isFavorite { get; set; }
+        public string? StatusMessage
+        {
+            get
+            {
+                if (StartTime.HasValue && StartTime.Value <= DateTime.Now && EndTime.HasValue && EndTime.Value >= DateTime.Now)
+                {
+                    return "Running";
+                }
+                else if (StartTime.HasValue && StartTime.Value > DateTime.Now)
+                {
+                    return "Not Start Yet";
+                }
+                else if (EndTime.HasValue && EndTime.Value < DateTime.Now)
+                {
+                    return "Closed";
+                }
+                return string.Empty;
+            }
+        }
     }
 }

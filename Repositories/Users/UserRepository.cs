@@ -245,4 +245,12 @@ public class UserRepository : IUserRepository
             throw new Exception(ex.Message);
         }
     }
+
+    public async Task<User> GetUserByUsernameAsync(string username)
+    {
+        return await _context.Users
+            .Include(u => u.Campus)
+            .Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
+            .FirstOrDefaultAsync(u => u.UserName == username);
+    }
 }
