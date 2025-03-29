@@ -1,6 +1,7 @@
 ﻿
 using Google.Apis.Drive.v3.Data;
 using Microsoft.EntityFrameworkCore;
+using Planify_BackEnd.DTOs;
 using Planify_BackEnd.Models;
 
 namespace Planify_BackEnd.Repositories.Tasks
@@ -176,17 +177,27 @@ namespace Planify_BackEnd.Repositories.Tasks
             }
         }
 
-        public async Task<List<Models.Task>> SearchTaskByImplementerId(Guid implementerId, DateTime startDate, DateTime endDate)
+        public async Task<PageResultDTO<Models.Task>> SearchTaskByImplementerId(int page, int pageSize, Guid implementerId, DateTime startDate, DateTime endDate)
         {
             try
             {
-                return await _context.JoinTasks
+                var count = _context.JoinTasks
                        .Where(jt => jt.UserId == implementerId &&
                                    jt.Task.StartTime <= endDate &&
                                    (jt.Task.Deadline >= startDate || jt.Task.Deadline == null))
                        .Select(jt => jt.Task)
                     .OrderBy(e => e.StartTime)
+                    .Skip((page - 1) * pageSize).Take(pageSize)
+                    .Count();
+                var result = await _context.JoinTasks
+                       .Where(jt => jt.UserId == implementerId &&
+                                   jt.Task.StartTime <= endDate &&
+                                   (jt.Task.Deadline >= startDate || jt.Task.Deadline == null))
+                       .Select(jt => jt.Task)
+                    .OrderBy(e => e.StartTime)
+                    .Skip((page-1)*pageSize).Take(pageSize)
                     .ToListAsync();
+                return new PageResultDTO<Models.Task>(result,count,page,pageSize);
             }
             catch (Exception ex)
             {
