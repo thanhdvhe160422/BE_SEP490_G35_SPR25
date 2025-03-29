@@ -400,5 +400,11 @@ public class EventRepository : IEventRepository
         return await _context.Events
             .FirstOrDefaultAsync(e => e.Id == eventId);
     }
+
+    public async System.Threading.Tasks.Task CreateCostBreakdownAsync(CostBreakdown costBreakdown)
+    {
+        _context.CostBreakdowns.Add(costBreakdown);
+        await _context.SaveChangesAsync();
+    }
 }
 

@@ -96,39 +96,50 @@ public class EventService : IEventService
     {
         try
         {
+            if (eventDTO == null)
+                return new ResponseDTO(400, "Dữ liệu không hợp lệ", null);
+
             if (string.IsNullOrWhiteSpace(eventDTO.EventTitle))
-            {
                 return new ResponseDTO(400, "Event title is required.", null);
-            }
 
             if (eventDTO.StartTime >= eventDTO.EndTime)
-            {
                 return new ResponseDTO(400, "Start time must be earlier than end time.", null);
-            }
+
+            if (eventDTO.SizeParticipants < 0)
+                return new ResponseDTO(400, "Size of participants cannot be negative.", null);
 
             var campusIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("campusId")?.Value;
-            if (string.IsNullOrEmpty(campusIdClaim))
-            {
+            if (string.IsNullOrEmpty(campusIdClaim) || !int.TryParse(campusIdClaim, out int campusId))
                 return new ResponseDTO(400, "Invalid campus ID.", null);
-            }
-            int campusId = int.Parse(campusIdClaim);
 
             var category = await _eventRepository.GetCategoryEventAsync(eventDTO.CategoryEventId, campusId);
             if (category == null)
-            {
                 return new ResponseDTO(400, "Category does not exist or does not belong to this campus.", null);
+
+            // Tính tổng AmountBudget từ CostBreakdowns
+            decimal totalBudget = 0;
+            if (eventDTO.CostBreakdowns != null && eventDTO.CostBreakdowns.Count > 0)
+            {
+                foreach (var costBreakdown in eventDTO.CostBreakdowns)
+                {
+                    if (costBreakdown.Quantity.HasValue && costBreakdown.PriceByOne.HasValue)
+                    {
+                        totalBudget += costBreakdown.Quantity.Value * costBreakdown.PriceByOne.Value;
+                    }
+                }
             }
 
+            // Tạo Event mới
             var newEvent = new Event
             {
                 EventTitle = eventDTO.EventTitle,
                 EventDescription = eventDTO.EventDescription,
                 StartTime = eventDTO.StartTime,
                 EndTime = eventDTO.EndTime,
-                AmountBudget = eventDTO.AmountBudget,
+                AmountBudget = totalBudget, // Gán AmountBudget từ tổng CostBreakdowns
                 IsPublic = 0,
                 TimePublic = null,
-                Status = 0,
+                Status = 1,
                 CampusId = campusId,
                 CategoryEventId = eventDTO.CategoryEventId,
                 Placed = eventDTO.Placed,
@@ -137,15 +148,29 @@ public class EventService : IEventService
                 MeasuringSuccess = eventDTO.MeasuringSuccess,
                 Goals = eventDTO.Goals,
                 MonitoringProcess = eventDTO.MonitoringProcess,
-                SizeParticipants = eventDTO.SizeParticipants
+                SizeParticipants = eventDTO.SizeParticipants,
+                PromotionalPlan = eventDTO.PromotionalPlan,
+                TargetAudience = eventDTO.TargetAudience,
+                SloganEvent = eventDTO.SloganEvent
             };
 
+            // Tạo Event
             await _eventRepository.CreateEventAsync(newEvent);
 
+            // Tạo Tasks và SubTasks
             if (eventDTO.Tasks != null && eventDTO.Tasks.Count > 0)
             {
                 foreach (var task in eventDTO.Tasks)
                 {
+                    if (string.IsNullOrWhiteSpace(task.TaskName))
+                        return new ResponseDTO(400, "Task name is required.", null);
+
+                    if (task.StartTime.HasValue && task.Deadline.HasValue && task.StartTime >= task.Deadline)
+                        return new ResponseDTO(400, $"Start time of task '{task.TaskName}' must be earlier than deadline.", null);
+
+                    if (task.Budget < 0)
+                        return new ResponseDTO(400, $"Budget of task '{task.TaskName}' cannot be negative.", null);
+
                     var newTask = new Planify_BackEnd.Models.Task
                     {
                         EventId = newEvent.Id,
@@ -163,6 +188,15 @@ public class EventService : IEventService
                     {
                         foreach (var subTask in task.SubTasks)
                         {
+                            if (string.IsNullOrWhiteSpace(subTask.SubTaskName))
+                                return new ResponseDTO(400, "SubTask name is required.", null);
+
+                            if (subTask.StartTime.HasValue && subTask.Deadline.HasValue && subTask.StartTime >= subTask.Deadline)
+                                return new ResponseDTO(400, $"Start time of subtask '{subTask.SubTaskName}' must be earlier than deadline.", null);
+
+                            if (subTask.Budget < 0)
+                                return new ResponseDTO(400, $"Budget of subtask '{subTask.SubTaskName}' cannot be negative.", null);
+
                             var newSubTask = new SubTask
                             {
                                 TaskId = newTask.Id,
@@ -179,14 +213,13 @@ public class EventService : IEventService
                 }
             }
 
+            // Tạo Risks
             if (eventDTO.Risks != null && eventDTO.Risks.Count > 0)
             {
                 foreach (var risk in eventDTO.Risks)
                 {
                     if (string.IsNullOrWhiteSpace(risk.Name))
-                    {
                         return new ResponseDTO(400, "Risk name is required.", null);
-                    }
 
                     var newRisk = new Risk
                     {
@@ -200,10 +233,36 @@ public class EventService : IEventService
                 }
             }
 
+            // Tạo CostBreakdowns
+            if (eventDTO.CostBreakdowns != null && eventDTO.CostBreakdowns.Count > 0)
+            {
+                foreach (var costBreakdown in eventDTO.CostBreakdowns)
+                {
+                    if (string.IsNullOrWhiteSpace(costBreakdown.Name))
+                        return new ResponseDTO(400, "Cost breakdown name is required.", null);
+
+                    if (costBreakdown.Quantity.HasValue && costBreakdown.Quantity < 0)
+                        return new ResponseDTO(400, $"Quantity of cost breakdown '{costBreakdown.Name}' cannot be negative.", null);
+
+                    if (costBreakdown.PriceByOne.HasValue && costBreakdown.PriceByOne < 0)
+                        return new ResponseDTO(400, $"Price by one of cost breakdown '{costBreakdown.Name}' cannot be negative.", null);
+
+                    var newCostBreakdown = new CostBreakdown
+                    {
+                        EventId = newEvent.Id,
+                        Name = costBreakdown.Name,
+                        Quantity = costBreakdown.Quantity,
+                        PriceByOne = costBreakdown.PriceByOne
+                    };
+                    await _eventRepository.CreateCostBreakdownAsync(newCostBreakdown);
+                }
+            }
+
             return new ResponseDTO(201, "Event created successfully!", newEvent);
         }
         catch (Exception ex)
         {
+            Console.WriteLine($"Error creating event: {ex.Message}\nStackTrace: {ex.StackTrace}");
             return new ResponseDTO(500, "An error occurred while creating the event.", ex.Message);
         }
     }
@@ -389,51 +448,81 @@ public class EventService : IEventService
 
         try
         {
+            if (eventDTO == null)
+                return new ResponseDTO(400, "Dữ liệu không hợp lệ", null);
+
             if (string.IsNullOrWhiteSpace(eventDTO.EventTitle))
-            {
                 return new ResponseDTO(400, "Event title is required.", null);
-            }
 
             if (eventDTO.StartTime >= eventDTO.EndTime)
-            {
                 return new ResponseDTO(400, "Start time must be earlier than end time.", null);
-            }
+
+            if (eventDTO.SizeParticipants < 0)
+                return new ResponseDTO(400, "Size of participants cannot be negative.", null);
 
             var campusIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("campusId")?.Value;
-            if (string.IsNullOrEmpty(campusIdClaim))
-            {
+            if (string.IsNullOrEmpty(campusIdClaim) || !int.TryParse(campusIdClaim, out int campusId))
                 return new ResponseDTO(400, "Invalid campus ID.", null);
-            }
 
-            var category = await _eventRepository.GetCategoryEventAsync(eventDTO.CategoryEventId, int.Parse(campusIdClaim));
+            var category = await _eventRepository.GetCategoryEventAsync(eventDTO.CategoryEventId, campusId);
             if (category == null)
+                return new ResponseDTO(400, "Category does not exist or does not belong to this campus.", null);
+
+            // Tính tổng AmountBudget từ CostBreakdowns
+            decimal totalBudget = 0;
+            if (eventDTO.CostBreakdowns != null && eventDTO.CostBreakdowns.Count > 0)
             {
-                return new ResponseDTO(400, "Category is not existed.", null);
+                foreach (var costBreakdown in eventDTO.CostBreakdowns)
+                {
+                    if (costBreakdown.Quantity.HasValue && costBreakdown.PriceByOne.HasValue)
+                    {
+                        totalBudget += costBreakdown.Quantity.Value * costBreakdown.PriceByOne.Value;
+                    }
+                }
             }
 
+            // Tạo Event mới
             var newEvent = new Event
             {
                 EventTitle = eventDTO.EventTitle,
                 EventDescription = eventDTO.EventDescription,
                 StartTime = eventDTO.StartTime,
                 EndTime = eventDTO.EndTime,
-                AmountBudget = eventDTO.AmountBudget,
+                AmountBudget = totalBudget, // Gán AmountBudget từ tổng CostBreakdowns
                 IsPublic = 0,
                 TimePublic = null,
-                Status = 10,
-                CampusId = int.Parse(campusIdClaim),
+                Status = 0,
+                CampusId = campusId,
                 CategoryEventId = eventDTO.CategoryEventId,
                 Placed = eventDTO.Placed,
                 CreateBy = organizerId,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                MeasuringSuccess = eventDTO.MeasuringSuccess,
+                Goals = eventDTO.Goals,
+                MonitoringProcess = eventDTO.MonitoringProcess,
+                SizeParticipants = eventDTO.SizeParticipants,
+                PromotionalPlan = eventDTO.PromotionalPlan,
+                TargetAudience = eventDTO.TargetAudience,
+                SloganEvent = eventDTO.SloganEvent
             };
 
-            await _eventRepository.CreateSaveDraft(newEvent);
+            // Tạo Event
+            await _eventRepository.CreateEventAsync(newEvent);
 
+            // Tạo Tasks và SubTasks
             if (eventDTO.Tasks != null && eventDTO.Tasks.Count > 0)
             {
                 foreach (var task in eventDTO.Tasks)
                 {
+                    if (string.IsNullOrWhiteSpace(task.TaskName))
+                        return new ResponseDTO(400, "Task name is required.", null);
+
+                    if (task.StartTime.HasValue && task.Deadline.HasValue && task.StartTime >= task.Deadline)
+                        return new ResponseDTO(400, $"Start time of task '{task.TaskName}' must be earlier than deadline.", null);
+
+                    if (task.Budget < 0)
+                        return new ResponseDTO(400, $"Budget of task '{task.TaskName}' cannot be negative.", null);
+
                     var newTask = new Planify_BackEnd.Models.Task
                     {
                         EventId = newEvent.Id,
@@ -444,7 +533,6 @@ public class EventService : IEventService
                         AmountBudget = task.Budget,
                         CreateBy = organizerId,
                         CreateDate = DateTime.UtcNow
-
                     };
                     await _taskRepository.CreateTaskAsync(newTask);
 
@@ -452,6 +540,15 @@ public class EventService : IEventService
                     {
                         foreach (var subTask in task.SubTasks)
                         {
+                            if (string.IsNullOrWhiteSpace(subTask.SubTaskName))
+                                return new ResponseDTO(400, "SubTask name is required.", null);
+
+                            if (subTask.StartTime.HasValue && subTask.Deadline.HasValue && subTask.StartTime >= subTask.Deadline)
+                                return new ResponseDTO(400, $"Start time of subtask '{subTask.SubTaskName}' must be earlier than deadline.", null);
+
+                            if (subTask.Budget < 0)
+                                return new ResponseDTO(400, $"Budget of subtask '{subTask.SubTaskName}' cannot be negative.", null);
+
                             var newSubTask = new SubTask
                             {
                                 TaskId = newTask.Id,
@@ -460,7 +557,7 @@ public class EventService : IEventService
                                 StartTime = subTask.StartTime ?? newTask.StartTime,
                                 Deadline = subTask.Deadline,
                                 AmountBudget = subTask.Budget,
-                                CreateBy = organizerId,
+                                CreateBy = organizerId
                             };
                             await _subTaskRepository.CreateSubTaskAsync(newSubTask);
                         }
@@ -468,11 +565,57 @@ public class EventService : IEventService
                 }
             }
 
+            // Tạo Risks
+            if (eventDTO.Risks != null && eventDTO.Risks.Count > 0)
+            {
+                foreach (var risk in eventDTO.Risks)
+                {
+                    if (string.IsNullOrWhiteSpace(risk.Name))
+                        return new ResponseDTO(400, "Risk name is required.", null);
+
+                    var newRisk = new Risk
+                    {
+                        EventId = newEvent.Id,
+                        Name = risk.Name,
+                        Reason = risk.Reason,
+                        Solution = risk.Solution,
+                        Description = risk.Description
+                    };
+                    await _eventRepository.CreateRiskAsync(newRisk);
+                }
+            }
+
+            // Tạo CostBreakdowns
+            if (eventDTO.CostBreakdowns != null && eventDTO.CostBreakdowns.Count > 0)
+            {
+                foreach (var costBreakdown in eventDTO.CostBreakdowns)
+                {
+                    if (string.IsNullOrWhiteSpace(costBreakdown.Name))
+                        return new ResponseDTO(400, "Cost breakdown name is required.", null);
+
+                    if (costBreakdown.Quantity.HasValue && costBreakdown.Quantity < 0)
+                        return new ResponseDTO(400, $"Quantity of cost breakdown '{costBreakdown.Name}' cannot be negative.", null);
+
+                    if (costBreakdown.PriceByOne.HasValue && costBreakdown.PriceByOne < 0)
+                        return new ResponseDTO(400, $"Price by one of cost breakdown '{costBreakdown.Name}' cannot be negative.", null);
+
+                    var newCostBreakdown = new CostBreakdown
+                    {
+                        EventId = newEvent.Id,
+                        Name = costBreakdown.Name,
+                        Quantity = costBreakdown.Quantity,
+                        PriceByOne = costBreakdown.PriceByOne
+                    };
+                    await _eventRepository.CreateCostBreakdownAsync(newCostBreakdown);
+                }
+            }
+
             return new ResponseDTO(201, "Save draft successfully!", newEvent);
         }
         catch (Exception ex)
         {
-            return new ResponseDTO(500, "Error orcurs while save draft event!", ex.Message);
+            Console.WriteLine($"Error creating event: {ex.Message}\nStackTrace: {ex.StackTrace}");
+            return new ResponseDTO(500, "An error occurred while creating the event.", ex.Message);
         }
     }
     public async Task<ResponseDTO> UpdateSaveDraft(EventDTO eventDTO)
