@@ -117,7 +117,7 @@ namespace Planify_BackEnd.Controllers
         /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize(Roles = "Event Organizer")]
-        public async Task<IActionResult> UpdateEvent(int id,[FromBody] EventDTO eventDTO)
+        public async Task<IActionResult> UpdateEvent(int id,[FromBody] EventUpdateDTO eventDTO)
         {
             try
             {
@@ -125,23 +125,14 @@ namespace Planify_BackEnd.Controllers
                 {
                     return BadRequest("Not allow update id");
                 }
-                //var getDetail = await _eventService.GetEventDetailAsync(id);
-                //Event eventDetails = getDetail.Result as Event;
-                //var userId = User.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value;
-                //if (!userId.Equals(eventDetails.ManagerId))
-                //{
-                //    return Unauthorized();
-                //}
-                var campus = await _campusService.GetCampusByName(eventDTO.CampusName);
-                if (campus == null || campus.Id == 0) return NotFound("Cannot found any campus with name: " + eventDTO.CampusName);
-                var category = await _categoryService.GetCategoryByName(eventDTO.CategoryEventName, campus.Id);
-                if (category == null || category.Id == 0) return NotFound("Cannot found any category with name: " + eventDTO.CategoryEventName + ", campus: " + eventDTO.CampusName);
+
+                var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                var campusClaim = User.Claims.FirstOrDefault(c => c.Type == "campusId");
+                eventDTO.UpdateBy = userId;
+                eventDTO.CampusId = int.Parse(campusClaim.Value);
                 var response = await _eventService.UpdateEventAsync(eventDTO);
-                if (response == null || response.Id == 0)
-                {
-                    return BadRequest("Cannot update event!");
-                }
-                return Ok(response);
+                
+                return StatusCode(response.Status, response);
             }catch(Exception ex)
             {
                 return BadRequest(ex.Message);
