@@ -11,7 +11,7 @@ namespace Planify_BackEnd.Services.Tasks
         Task<List<TaskSearchResponeDTO>> SearchTaskOrderByStartDateAsync(int page, int pageSize, string? name, DateTime startDate, DateTime endDate);
         Task<ResponseDTO> UpdateTaskAsync(int taskId, TaskUpdateRequestDTO taskDTO);
         Task<ResponseDTO> DeleteTaskAsync(int taskId);
-        Task<List<TaskSearchResponeDTO>> GetAllTasksAsync(int eventId);
+        PageResultDTO<TaskSearchResponeDTO> GetAllTasks(int eventId, int page, int pageSize);
         public TaskDetailVM GetTaskById(int taskId);
         Task<bool> changeStatus(int taskId, int status);
         Task<PageResultDTO<TaskSearchResponeDTO>> SearchTaskByImplementerId(int page, int pageSize,Guid implementerId, DateTime startDate, DateTime endDate);
