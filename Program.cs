@@ -37,6 +37,7 @@ using Planify_BackEnd.Services.JoinGroups;
 using Planify_BackEnd.Services.Medias;
 using Planify_BackEnd.Repositories.Medias;
 using Planify_BackEnd.Services.ChatGPT;
+using Planify_BackEnd.Repositories.Risk;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -93,6 +94,8 @@ builder.Services.AddScoped<IUserservice, UserService>();
 builder.Services.AddScoped<GoogleDriveService>();
 builder.Services.AddScoped<IMediumService, MediumService>();
 builder.Services.AddScoped<IChatGPTService, ChatGPTService>();
+builder.Services.AddScoped<IRiskService, RiskService>();
+builder.Services.AddScoped<ICostService, CostService>();
 // Thêm Repository
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<IEventSpectatorRepository, EventSpectatorRepository>();
@@ -106,6 +109,8 @@ builder.Services.AddScoped<IProvinceRepository, ProvinceRepository>();
 builder.Services.AddScoped<ISendRequestRepository, SendRequestRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IMediumRepository, MediumRepository>();
+builder.Services.AddScoped<IRiskRepository, RiskRepository>();
+builder.Services.AddScoped<ICostRepository, CostRepository>();
 // Thêm Authorization
 builder.Services.AddAuthorization();
 // Cấu hình JSON tránh lỗi vòng lặp
