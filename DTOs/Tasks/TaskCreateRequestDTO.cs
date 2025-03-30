@@ -7,10 +7,11 @@ namespace Planify_BackEnd.DTOs.Tasks
     {
         [Required]
         public string TaskName { get; set; }
+        [Required]
+        public int EventId { get; set; }
 
         public string TaskDescription { get; set; }
 
-        public DateTime CreateDate { get; set; }
         [Required]
         public DateTime StartTime { get; set; }
         [Required]
@@ -18,7 +19,6 @@ namespace Planify_BackEnd.DTOs.Tasks
 
         public decimal AmountBudget { get; set; }
 
-        public Guid OrganizerId { get; set; } // Nguoi tao tasks
 
         public TaskCreateRequestDTO() { }
     }

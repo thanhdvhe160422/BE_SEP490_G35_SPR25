@@ -31,25 +31,27 @@ namespace Planify_BackEnd.Services.Tasks
                 {
                     return new ResponseDTO(400, "Task name is required.", null);
                 }
-
+                
                 if (taskDTO.StartTime >= taskDTO.Deadline)
                 {
                     return new ResponseDTO(400, "Start time must be earlier than deadline.", null);
                 }
-                var newTask = new TaskModel
-                {  
-                    TaskName = taskDTO.TaskName,
-                    TaskDescription = taskDTO.TaskDescription,
-                    StartTime = taskDTO.StartTime,
-                    Deadline = taskDTO.Deadline,
-                    AmountBudget = taskDTO.AmountBudget,
-                    Status = 1,
-                    CreateBy = organizerId,
-                    CreateDate = DateTime.UtcNow
-                };
                 try
                 {
+                    var newTask = new TaskModel
+                    {
+                        EventId = taskDTO.EventId,
+                        TaskName = taskDTO.TaskName,
+                        TaskDescription = taskDTO.TaskDescription,
+                        StartTime = taskDTO.StartTime,
+                        Deadline = taskDTO.Deadline,
+                        AmountBudget = taskDTO.AmountBudget,
+                        Status = 1,
+                        CreateBy = organizerId,
+                        CreateDate = DateTime.UtcNow
+                    };
                     await _taskRepository.CreateTaskAsync(newTask);
+                    return new ResponseDTO(201, "Task creates successfully!", newTask);
                 }
                 catch (Exception dbEx)
                 {
@@ -57,7 +59,7 @@ namespace Planify_BackEnd.Services.Tasks
                 }
 
 
-                return new ResponseDTO(201, "Task creates successfully!", newTask);
+               
             }
             catch (Exception ex)
             {
@@ -137,8 +139,8 @@ namespace Planify_BackEnd.Services.Tasks
                     StartTime = taskDTO.StartTime,
                     Deadline = taskDTO.Deadline,
                     AmountBudget = taskDTO.AmountBudget,
-                    //GroupId = taskDTO.GroupId,
-                    Status = taskDTO.Status
+                    EventId = taskDTO.EventId
+                    
                 });
 
                 if (existingTask == null)
