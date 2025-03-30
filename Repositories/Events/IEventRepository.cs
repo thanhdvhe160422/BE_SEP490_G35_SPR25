@@ -1,4 +1,5 @@
-﻿using Planify_BackEnd.DTOs;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.Models;
 
@@ -31,5 +32,6 @@ namespace Planify_BackEnd.Repositories
         System.Threading.Tasks.Task CreateRiskAsync(Risk risk);
         Task<Event> GetEventByIdAsync(int eventId);
         System.Threading.Tasks.Task CreateCostBreakdownAsync(CostBreakdown costBreakdown);
+        Task<IDbContextTransaction> BeginTransactionAsync();
     }
 }
