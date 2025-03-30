@@ -143,7 +143,7 @@ namespace Planify_BackEnd.Controllers
             }
         }
         [HttpPut("{taskId}/status/{status}")]
-        [Authorize(Roles = "Implementer")]
+        [Authorize(Roles = "Event Organizer, Implementer")]
         public async Task<IActionResult> ChangeStatus(int taskId, int status)
         {
             try
