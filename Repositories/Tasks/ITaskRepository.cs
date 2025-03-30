@@ -9,7 +9,7 @@ namespace Planify_BackEnd.Repositories.Tasks
 
         Task<Models.Task?> UpdateTaskAsync(int taskId, Models.Task updatedTask);
         Task<bool> DeleteTaskAsync(int taskId);
-        Task<List<Models.Task>> GetAllTasksAsync(int eventId);
+        PageResultDTO<Models.Task> GetAllTasks(int eventId, int page, int pageSize);
 
         bool IsTaskExists(int taskId);
         bool UpdateActualTaskAmount(int taskId, decimal amount);

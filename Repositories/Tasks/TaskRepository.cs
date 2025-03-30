@@ -1,6 +1,7 @@
 ﻿
 using Google.Apis.Drive.v3.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Planify_BackEnd.DTOs;
 using Planify_BackEnd.Models;
 
@@ -50,11 +51,24 @@ namespace Planify_BackEnd.Repositories.Tasks
             }
         }
 
-        public async Task<List<Models.Task>> GetAllTasksAsync(int eventId)
+        public  PageResultDTO<Models.Task> GetAllTasks(int eventId, int page, int pageSize)
         {
             try
             {
-                return await _context.Tasks.Where(t => t.EventId == eventId).ToListAsync();
+                var count = _context.Tasks.Where(t => t.EventId == eventId).Count();
+                if (count == 0)
+                    return new PageResultDTO<Models.Task>(new List<Models.Task>(), count, page, pageSize);
+                var tasks = _context.Tasks
+                    //.Include(t => t.CreateByNavigation)
+                    //.Include(t => t.Event)
+                    //.Include(t => t.SubTasks).ThenInclude(st => st.CreateByNavigation)
+                    .Where(t => t.EventId == eventId)
+                    //.OrderBy(t => t.StartTime)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+                PageResultDTO<Models.Task> result = new PageResultDTO<Models.Task>(tasks, count, page, pageSize);
+                return result;
             }
             catch (Exception ex)
             {
