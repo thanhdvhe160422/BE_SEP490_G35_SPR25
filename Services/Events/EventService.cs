@@ -330,18 +330,16 @@ public class EventService : IEventService
         }
     }
 
-    public async Task<EventDetailDto> UpdateEventAsync(EventDTO e)
+    public async Task<ResponseDTO> UpdateEventAsync(EventUpdateDTO e)
     {
         try
         {
-            var campus = await _campusRepository.GetCampusByName(e.CampusName);
-            var category = await _categoryRepository.GetCategoryByName(e.CategoryEventName, campus.Id);
             Event updateEvent = new Event
             {
                 Id = e.Id,
                 AmountBudget = e.AmountBudget,
-                CampusId = campus.Id,
-                CategoryEventId = category.Id,
+                CampusId = e.CampusId,
+                CategoryEventId = e.CategoryEventId,
                 StartTime = e.StartTime,
                 EndTime = e.EndTime,
                 EventDescription = e.EventDescription,
@@ -371,6 +369,7 @@ public class EventService : IEventService
                 Status = updatedEvent.Status,
                 Placed = updatedEvent.Placed,
                 CreatedAt = updatedEvent.CreatedAt,
+                UpdatedAt = updatedEvent.UpdatedAt,
                 CampusName = updatedEvent.Campus.CampusName,
                 CategoryEventName = updatedEvent.CategoryEvent.CategoryEventName,
                 MeasuringSuccess = updatedEvent.MeasuringSuccess,
@@ -384,17 +383,24 @@ public class EventService : IEventService
                     LastName = updatedEvent.CreateByNavigation.LastName,
                     Email = updatedEvent.CreateByNavigation.Email
                 },
+                UpdatedBy = new UserDto
+                {
+                    Id = updatedEvent.UpdateByNavigation.Id,
+                    FirstName = updatedEvent.UpdateByNavigation.FirstName,
+                    LastName = updatedEvent.UpdateByNavigation.LastName,
+                    Email = updatedEvent.UpdateByNavigation.Email
+                },
                 EventMedia = updatedEvent.EventMedia.Select(em => new EventMediaDto
                 {
                     Id = em.Id,
                     MediaUrl = em.Media.MediaUrl
                 }).ToList()
             };
-            return eventDetailResponseDTO;
+            return new ResponseDTO(200, "Update event successfully!", eventDetailResponseDTO);
         }
         catch (Exception ex)
         {
-            throw new Exception(ex.Message);
+            return new ResponseDTO(500, "Error update event!", ex.Message);
         }
     }
 
@@ -636,70 +642,70 @@ public class EventService : IEventService
             return new ResponseDTO(500, "Đã xảy ra lỗi khi lưu bản nháp.", ex.Message);
         }
     }
-    public async Task<ResponseDTO> UpdateSaveDraft(EventDTO eventDTO)
-    {
+    //public async Task<ResponseDTO> UpdateSaveDraft(EventUpdateDTO eventDTO)
+    //{
 
-        try
-        {
-            var campus = await _campusRepository.GetCampusByName(eventDTO.CampusName);
-            //var category = await _categoryRepository.GetCategoryByName(eventDTO.CategoryEventName, campus.Id);
-            Event updateEvent = new Event
-            {
-                Id = eventDTO.Id,
-                AmountBudget = eventDTO.AmountBudget,
-                CampusId = campus.Id,
-                CategoryEventId = (int)eventDTO.CategoryEventId,
-                StartTime = eventDTO.StartTime,
-                EndTime = eventDTO.EndTime,
-                EventDescription = eventDTO.EventDescription,
-                EventTitle = eventDTO.EventTitle,
-                IsPublic = eventDTO.IsPublic,
-                Placed = eventDTO.Placed,
-                Status = eventDTO.Status,
-                TimePublic = eventDTO.TimePublic,
-                UpdateBy = eventDTO.UpdateBy,
-                UpdatedAt = DateTime.Now
-            };
-            Event updatedEvent = await _eventRepository.UpdateSaveDraft(updateEvent);
-            var e = new Event
-            {
-                EventTitle = updatedEvent.EventTitle,
-                EventDescription = updatedEvent.EventDescription,
-                StartTime = updatedEvent.StartTime,
-                EndTime = updatedEvent.EndTime,
-                AmountBudget = updatedEvent.AmountBudget,
-                IsPublic = updatedEvent.IsPublic,
-                TimePublic = updatedEvent.TimePublic,
-                Status = updatedEvent.Status,
-                CampusId = updatedEvent.CampusId,
-                CategoryEventId = updatedEvent.CategoryEventId,
-                Placed = updatedEvent.Placed,
-                CreateBy = updatedEvent.CreateBy,
-                CreatedAt = updatedEvent.CreatedAt
-            };
+    //    try
+    //    {
+    //        var campus = await _campusRepository.GetCampusByName(eventDTO.CampusName);
+    //        //var category = await _categoryRepository.GetCategoryByName(eventDTO.CategoryEventName, campus.Id);
+    //        Event updateEvent = new Event
+    //        {
+    //            Id = eventDTO.Id,
+    //            AmountBudget = eventDTO.AmountBudget,
+    //            CampusId = campus.Id,
+    //            CategoryEventId = (int)eventDTO.CategoryEventId,
+    //            StartTime = eventDTO.StartTime,
+    //            EndTime = eventDTO.EndTime,
+    //            EventDescription = eventDTO.EventDescription,
+    //            EventTitle = eventDTO.EventTitle,
+    //            IsPublic = eventDTO.IsPublic,
+    //            Placed = eventDTO.Placed,
+    //            Status = eventDTO.Status,
+    //            TimePublic = eventDTO.TimePublic,
+    //            UpdateBy = eventDTO.UpdateBy,
+    //            UpdatedAt = DateTime.Now
+    //        };
+    //        Event updatedEvent = await _eventRepository.UpdateSaveDraft(updateEvent);
+    //        var e = new Event
+    //        {
+    //            EventTitle = updatedEvent.EventTitle,
+    //            EventDescription = updatedEvent.EventDescription,
+    //            StartTime = updatedEvent.StartTime,
+    //            EndTime = updatedEvent.EndTime,
+    //            AmountBudget = updatedEvent.AmountBudget,
+    //            IsPublic = updatedEvent.IsPublic,
+    //            TimePublic = updatedEvent.TimePublic,
+    //            Status = updatedEvent.Status,
+    //            CampusId = updatedEvent.CampusId,
+    //            CategoryEventId = updatedEvent.CategoryEventId,
+    //            Placed = updatedEvent.Placed,
+    //            CreateBy = updatedEvent.CreateBy,
+    //            CreatedAt = updatedEvent.CreatedAt
+    //        };
 
-            return new ResponseDTO(201, "Save draft successfully!", updatedEvent);
-        }
-        catch (Exception ex)
-        {
-            return new ResponseDTO(500, "Error orcurs while save draft event!", ex.Message);
-        }
-    }
-    public async Task<ResponseDTO> GetSaveDraft(Guid createBy)
-    {
-        try
-        {
-            var eventDetail = await _eventRepository.GetSaveDraft(createBy);
-            if (eventDetail == null)
-            {
-                return new ResponseDTO(404, "Don't exist any save draft!", eventDetail);
-            }
-            return new ResponseDTO(200, "Get save draft successfully!", eventDetail);
-        }
-        catch (Exception ex)
-        {
-            return new ResponseDTO(500, "Error orcurs while getting save draft!", ex.Message);
-        }
-    }
+    //        return new ResponseDTO(201, "Save draft successfully!", updatedEvent);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return new ResponseDTO(500, "Error orcurs while save draft event!", ex.Message);
+    //    }
+    //}
+    //public async Task<ResponseDTO> GetSaveDraft(Guid createBy)
+    //{
+    //    try
+    //    {
+    //        var eventDetail = await _eventRepository.GetSaveDraft(createBy);
+    //        if (eventDetail == null)
+    //        {
+    //            return new ResponseDTO(404, "Don't exist any save draft!", eventDetail);
+    //        }
+    //        return new ResponseDTO(200, "Get save draft successfully!", eventDetail);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return new ResponseDTO(500, "Error orcurs while getting save draft!", ex.Message);
+    //    }
+    //}
 }
 
