@@ -93,7 +93,7 @@ namespace Planify_BackEnd.Services.Tasks
         {
             try
             {
-                PageResultDTO<Models.Task> tasks =  _taskRepository.GetAllTasks(eventId, page, pageSize);
+                var tasks =  _taskRepository.GetAllTasks(eventId, page, pageSize);
                 if (tasks.TotalCount == 0)
 
                     return new PageResultDTO<TaskSearchResponeDTO>(new List<TaskSearchResponeDTO>(), 0, page, pageSize);
