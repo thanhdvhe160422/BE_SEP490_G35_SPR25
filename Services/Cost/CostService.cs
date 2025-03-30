@@ -42,7 +42,6 @@ public class CostService : ICostService
         existingCost.Name = costDto.Name;
         existingCost.Quantity = costDto.Quantity;
         existingCost.PriceByOne = costDto.PriceByOne;
-        existingCost.EventId = costDto.EventId;
 
         var updatedCost = await _costRepository.UpdateCostAsync(existingCost);
         return new CostBreakdownDTO

@@ -42,7 +42,6 @@ public class RiskService : IRiskService
             throw new Exception($"Risk with ID {riskDto.Id} not found");
         }
 
-        existingRisk.EventId = riskDto.EventId;
         existingRisk.Name = riskDto.Name;
         existingRisk.Reason = riskDto.Reason;
         existingRisk.Solution = riskDto.Solution;
