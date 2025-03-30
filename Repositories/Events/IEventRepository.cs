@@ -30,5 +30,6 @@ namespace Planify_BackEnd.Repositories
         Task<Event> GetSaveDraft(Guid createBy);
         System.Threading.Tasks.Task CreateRiskAsync(Risk risk);
         Task<Event> GetEventByIdAsync(int eventId);
+        System.Threading.Tasks.Task CreateCostBreakdownAsync(CostBreakdown costBreakdown);
     }
 }

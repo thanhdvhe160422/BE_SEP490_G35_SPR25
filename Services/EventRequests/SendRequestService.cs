@@ -27,7 +27,7 @@ namespace Planify_BackEnd.Services.EventRequests
         public async Task<ResponseDTO> GetRequestsAsync()
         {
             var requests = await _requestRepository.GetRequestsAsync();
-            return new ResponseDTO(200, "Lấy danh sách yêu cầu thành công", requests ?? new List<SendRequest>());
+            return new ResponseDTO(200, "Lấy danh sách yêu cầu thành công", requests);
         }
 
         public async Task<ResponseDTO> CreateRequestAsync(SendRequestDTO requestDTO)

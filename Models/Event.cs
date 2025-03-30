@@ -47,9 +47,17 @@ public partial class Event
 
     public int? SizeParticipants { get; set; }
 
+    public string? PromotionalPlan { get; set; }
+
+    public string? TargetAudience { get; set; }
+
+    public string? SloganEvent { get; set; }
+
     public virtual Campus Campus { get; set; } = null!;
 
     public virtual CategoryEvent CategoryEvent { get; set; } = null!;
+
+    public virtual ICollection<CostBreakdown> CostBreakdowns { get; set; } = new List<CostBreakdown>();
 
     public virtual User CreateByNavigation { get; set; } = null!;
 
