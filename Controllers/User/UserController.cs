@@ -53,12 +53,16 @@ namespace Planify_BackEnd.Controllers.User
             }
         }
         [HttpGet("get-list-user")]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetListUserAsync(int page, int pageSize)
         {
             try
             {
-                var response = await _userService.GetListUserAsync(page, pageSize);
+                var response =  _userService.GetListUser(page, pageSize);
+                if (response.TotalCount == 0)
+                {
+                    return NotFound("Cannot found any user");
+                }
                 return Ok(response);
             }
             catch (Exception ex)

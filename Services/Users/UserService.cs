@@ -71,28 +71,44 @@ namespace Planify_BackEnd.Services.Users
                 throw new Exception(ex.Message);
             }
         }
-        public async Task<IEnumerable<UserListDTO>> GetListUserAsync(int page, int pageSize)
+        public PageResultDTO<UserListDTO> GetListUser(int page, int pageSize)
         {
-            var users = await _userRepository.GetListUserAsync(page, pageSize);
-
-            var userDTOs = users.Select(c => new UserListDTO
+            try
             {
-                Id = c.Id,
-                UserName = c.UserName,
-                Email = c.Email,
-                FirstName = c.FirstName,
-                LastName = c.LastName,
-                Password = c.Password,
-                DateOfBirth = c.DateOfBirth,
-                PhoneNumber = c.PhoneNumber,
-                AddressId = c.AddressId,
-                AvatarId = c.AvatarId,
-                CreatedAt = c.CreatedAt,
-                CampusId = c.CampusId,
-                Status = c.Status,
-                Gender = c.Gender
-            }).ToList();
-            return userDTOs;
+                var users = _userRepository.GetListUser(page, pageSize);
+                if (users.TotalCount == 0)
+                {
+                    return new PageResultDTO<UserListDTO>(new List<UserListDTO>(), 0, page, pageSize);
+                }
+                List<UserListDTO> result = new List<UserListDTO>();
+                foreach (var c in users.Items)
+                {
+                    UserListDTO user = new UserListDTO
+                    {
+                        Id = c.Id,
+                        UserName = c.UserName,
+                        Email = c.Email,
+                        FirstName = c.FirstName,
+                        LastName = c.LastName,
+                        Password = c.Password,
+                        DateOfBirth = c.DateOfBirth,
+                        PhoneNumber = c.PhoneNumber,
+                        AddressId = c.AddressId,
+                        AvatarId = c.AvatarId,
+                        CreatedAt = c.CreatedAt,
+                        CampusId = c.CampusId,
+                        Status = c.Status,
+                        Gender = c.Gender
+                    };
+                    result.Add(user);
+                }
+                return new PageResultDTO<UserListDTO>(result, users.TotalCount, page, pageSize);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+           
         }
         public async Task<UserDetailDTO> GetUserDetailAsync(Guid id)
         {
