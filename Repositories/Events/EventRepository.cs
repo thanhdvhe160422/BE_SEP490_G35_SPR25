@@ -100,6 +100,18 @@ public class EventRepository : IEventRepository
         try
         {
             var eventDetail = await _context.Events
+                .Include(e => e.Campus)
+                .Include(e => e.CategoryEvent)
+                .Include(e => e.CreateByNavigation)
+                .Include(e => e.Manager)
+                .Include(e => e.UpdateByNavigation)
+                .Include(e => e.EventMedia).ThenInclude(em => em.Media)
+                .Include(e => e.FavouriteEvents).ThenInclude(fe => fe.User)
+                .Include(e => e.JoinProjects).ThenInclude(jp => jp.User)
+                .Include(e => e.Risks)
+                .Include(e => e.Tasks).ThenInclude(t => t.CreateByNavigation)
+                .Include(e => e.Tasks).ThenInclude(t => t.SubTasks).ThenInclude(st => st.CreateByNavigation)
+                .Include(e => e.CostBreakdowns)
                 .Where(e => e.Id == eventId)
                 .Select(e => new EventDetailDto
                 {
@@ -119,8 +131,8 @@ public class EventRepository : IEventRepository
                     Goals = e.Goals,
                     MonitoringProcess = e.MonitoringProcess,
                     SizeParticipants = e.SizeParticipants,
-                    CampusName = e.Campus.CampusName,
-                    CategoryEventName = e.CategoryEvent.CategoryEventName,
+                    CampusName = e.Campus != null ? e.Campus.CampusName : null,
+                    CategoryEventName = e.CategoryEvent != null ? e.CategoryEvent.CategoryEventName : null,
                     CreatedBy = new UserDto
                     {
                         Id = e.CreateByNavigation.Id,
@@ -145,19 +157,21 @@ public class EventRepository : IEventRepository
                     EventMedia = e.EventMedia.Select(em => new EventMediaDto
                     {
                         Id = em.Id,
-                        MediaUrl = em.Media.MediaUrl
+                        MediaUrl = em.Media != null ? em.Media.MediaUrl : null
                     }).ToList(),
                     FavouriteEvents = e.FavouriteEvents.Select(fe => new FavouriteEventDto
                     {
                         UserId = fe.UserId,
                         UserFullName = $"{fe.User.FirstName} {fe.User.LastName}"
                     }).ToList(),
-                    JoinProjects = e.JoinProjects.Select(jp => new JoinProjectDto
-                    {
-                        UserId = jp.UserId,
-                        UserFullName = $"{jp.User.FirstName} {jp.User.LastName}",
-                        TimeJoinProject = jp.TimeJoinProject,
-                    }).Where(e => e.TimeOutProject == null).ToList(),
+                    JoinProjects = e.JoinProjects
+                        .Where(jp => jp.TimeOutProject == null)
+                        .Select(jp => new JoinProjectDto
+                        {
+                            UserId = jp.UserId,
+                            UserFullName = $"{jp.User.FirstName} {jp.User.LastName}",
+                            TimeJoinProject = jp.TimeJoinProject
+                        }).ToList(),
                     Risks = e.Risks.Select(r => new RiskDto
                     {
                         Id = r.Id,
@@ -209,11 +223,16 @@ public class EventRepository : IEventRepository
                 })
                 .FirstOrDefaultAsync();
 
+            if (eventDetail == null)
+            {
+                throw new Exception($"Không tìm thấy sự kiện với ID {eventId}.");
+            }
+
             return eventDetail;
         }
         catch (Exception ex)
         {
-            throw new Exception("An unexpected error occurred while retrieving event details.", ex);
+            throw new Exception($"Đã xảy ra lỗi khi lấy chi tiết sự kiện với eventId {eventId}. Chi tiết: {ex.Message}, StackTrace: {ex.StackTrace}", ex);
         }
     }
 

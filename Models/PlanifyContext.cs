@@ -392,6 +392,21 @@ public partial class PlanifyContext : DbContext
                 .HasConstraintName("FK__Ward__DistrictID__7A672E12");
         });
 
+        modelBuilder.Entity<CostBreakdown>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__CostBreakdown__3214EC07123456");
+
+            entity.ToTable("CostBreakdown");
+
+            entity.Property(e => e.Name).HasMaxLength(255);
+            entity.Property(e => e.PriceByOne).HasColumnType("money");
+
+            entity.HasOne(d => d.Event)
+                .WithMany(p => p.CostBreakdowns)
+                .HasForeignKey(d => d.EventId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK__CostBreakdown__EventId__7A672A59");
+        });
         OnModelCreatingPartial(modelBuilder);
     }
 
