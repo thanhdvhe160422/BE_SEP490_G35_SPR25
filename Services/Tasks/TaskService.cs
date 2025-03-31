@@ -275,5 +275,24 @@ namespace Planify_BackEnd.Services.Tasks
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<ResponseDTO> DeleteTaskV2(int taskId)
+        {
+            try
+            {
+                var isDeleted = await _taskRepository.DeleteTaskV2(taskId);
+                if (!isDeleted)
+                {
+                    return new ResponseDTO(404, "Task not found or already deleted.", null);
+                }
+
+                return new ResponseDTO(200, "Task deleted successfully!", null);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseDTO(500, "Error occurs while deleting task!", ex.Message);
+            }
+        }
+
     }
 }
