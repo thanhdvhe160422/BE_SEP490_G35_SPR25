@@ -37,14 +37,14 @@ namespace Planify_BackEnd.DTOs.Events
 
         public string SloganEvent { get; set; }
 
-        public List<TaskCreateDTO> Tasks { get; set; }
+        public List<TaskCreateEventDTO> Tasks { get; set; }
 
-        public List<RiskCreateDTO> Risks { get; set; }
+        public List<RiskCreateEventDTO> Risks { get; set; }
 
-        public List<CostBreakdownCreateDTO> CostBreakdowns { get; set; }
+        public List<CostBreakdownCreateEventDTO> CostBreakdowns { get; set; }
     }
 
-    public class TaskCreateDTO
+    public class TaskCreateEventDTO
     {
         [Required]
         public string TaskName { get; set; }
@@ -58,10 +58,10 @@ namespace Planify_BackEnd.DTOs.Events
         [Range(0, double.MaxValue)]
         public decimal Budget { get; set; }
 
-        public List<SubTaskCreateDTO> SubTasks { get; set; }
+        public List<SubTaskCreateEventDTO> SubTasks { get; set; }
     }
 
-    public class SubTaskCreateDTO
+    public class SubTaskCreateEventDTO
     {
         [Required]
         public string SubTaskName { get; set; }
@@ -76,7 +76,7 @@ namespace Planify_BackEnd.DTOs.Events
         public decimal Budget { get; set; }
     }
 
-    public class RiskCreateDTO
+    public class RiskCreateEventDTO
     {
         [Required]
         public string Name { get; set; }
@@ -88,7 +88,7 @@ namespace Planify_BackEnd.DTOs.Events
         public string Description { get; set; }
     }
 
-    public class CostBreakdownCreateDTO
+    public class CostBreakdownCreateEventDTO
     {
         [Required]
         public string Name { get; set; }

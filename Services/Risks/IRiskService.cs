@@ -1,8 +1,9 @@
-﻿using Planify_BackEnd.DTOs.Risk;
+﻿using Planify_BackEnd.DTOs;
+using Planify_BackEnd.DTOs.Risk;
 
 public interface IRiskService
 {
-    Task<RiskDTO> CreateRiskAsync(RiskDTO riskDto);
-    Task<RiskDTO> UpdateRiskAsync(RiskDTO riskDto);
-    Task DeleteRiskAsync(int id);
+    Task<ResponseDTO> CreateRiskAsync(RiskCreateDTO riskDto);
+    Task<ResponseDTO> UpdateRiskAsync(RiskUpdateDTO riskDto);
+    Task<ResponseDTO> DeleteRiskAsync(int id);
 }

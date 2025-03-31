@@ -1,4 +1,5 @@
-﻿using Planify_BackEnd.DTOs.Risk;
+﻿using Planify_BackEnd.DTOs;
+using Planify_BackEnd.DTOs.Risk;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories.Risk;
 
@@ -11,7 +12,7 @@ public class RiskService : IRiskService
         _riskRepository = riskRepository;
     }
 
-    public async Task<RiskDTO> CreateRiskAsync(RiskDTO riskDto)
+    public async Task<ResponseDTO> CreateRiskAsync(RiskCreateDTO riskDto)
     {
         var risk = new Risk
         {
@@ -23,23 +24,15 @@ public class RiskService : IRiskService
         };
 
         var createdRisk = await _riskRepository.CreateRiskAsync(risk);
-        return new RiskDTO
-        {
-            Id = createdRisk.Id,
-            EventId = createdRisk.EventId,
-            Name = createdRisk.Name,
-            Reason = createdRisk.Reason,
-            Solution = createdRisk.Solution,
-            Description = createdRisk.Description
-        };
+        return new ResponseDTO(201,"Create Risk Successfully",createdRisk);
     }
 
-    public async Task<RiskDTO> UpdateRiskAsync(RiskDTO riskDto)
+    public async Task<ResponseDTO> UpdateRiskAsync(RiskUpdateDTO riskDto)
     {
         var existingRisk = await _riskRepository.GetRiskByIdAsync(riskDto.Id);
         if (existingRisk == null)
         {
-            throw new Exception($"Risk with ID {riskDto.Id} not found");
+            return new ResponseDTO(404, $"Risk with ID {riskDto.Id} not found", null);
         }
 
         existingRisk.Name = riskDto.Name;
@@ -48,25 +41,18 @@ public class RiskService : IRiskService
         existingRisk.Description = riskDto.Description;
 
         var updatedRisk = await _riskRepository.UpdateRiskAsync(existingRisk);
-        return new RiskDTO
-        {
-            Id = updatedRisk.Id,
-            EventId = updatedRisk.EventId,
-            Name = updatedRisk.Name,
-            Reason = updatedRisk.Reason,
-            Solution = updatedRisk.Solution,
-            Description = updatedRisk.Description
-        };
+        return new ResponseDTO(200, "Update Rish Successfully", updatedRisk);
     }
 
-    public async System.Threading.Tasks.Task DeleteRiskAsync(int id)
+    public async Task<ResponseDTO> DeleteRiskAsync(int id)
     {
         var existingRisk = await _riskRepository.GetRiskByIdAsync(id);
         if (existingRisk == null)
         {
-            throw new Exception($"Risk with ID {id} not found");
+            return new ResponseDTO(404, $"Risk with ID {id} not found", null);
         }
 
         await _riskRepository.DeleteRiskAsync(id);
+        return new ResponseDTO(200, "Delete Rish Successfully", null);
     }
 }
