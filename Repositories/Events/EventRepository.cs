@@ -157,8 +157,7 @@ public class EventRepository : IEventRepository
                         UserId = jp.UserId,
                         UserFullName = $"{jp.User.FirstName} {jp.User.LastName}",
                         TimeJoinProject = jp.TimeJoinProject,
-                        TimeOutProject = jp.TimeOutProject
-                    }).ToList(),
+                    }).Where(e => e.TimeOutProject == null).ToList(),
                     Risks = e.Risks.Select(r => new RiskDto
                     {
                         Id = r.Id,
