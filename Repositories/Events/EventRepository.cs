@@ -100,18 +100,6 @@ public class EventRepository : IEventRepository
         try
         {
             var eventDetail = await _context.Events
-                .Include(e => e.Campus)
-                .Include(e => e.CategoryEvent)
-                .Include(e => e.CreateByNavigation)
-                .Include(e => e.Manager)
-                .Include(e => e.UpdateByNavigation)
-                .Include(e => e.EventMedia).ThenInclude(em => em.Media)
-                .Include(e => e.FavouriteEvents).ThenInclude(fe => fe.User)
-                .Include(e => e.JoinProjects).ThenInclude(jp => jp.User)
-                .Include(e => e.Risks)
-                .Include(e => e.Tasks).ThenInclude(t => t.CreateByNavigation)
-                .Include(e => e.Tasks).ThenInclude(t => t.SubTasks).ThenInclude(st => st.CreateByNavigation)
-                .Include(e => e.CostBreakdowns)
                 .Where(e => e.Id == eventId)
                 .Select(e => new EventDetailDto
                 {
@@ -131,8 +119,8 @@ public class EventRepository : IEventRepository
                     Goals = e.Goals,
                     MonitoringProcess = e.MonitoringProcess,
                     SizeParticipants = e.SizeParticipants,
-                    CampusName = e.Campus != null ? e.Campus.CampusName : null,
-                    CategoryEventName = e.CategoryEvent != null ? e.CategoryEvent.CategoryEventName : null,
+                    CampusName = e.Campus.CampusName,
+                    CategoryEventName = e.CategoryEvent.CategoryEventName,
                     CreatedBy = new UserDto
                     {
                         Id = e.CreateByNavigation.Id,
@@ -181,7 +169,7 @@ public class EventRepository : IEventRepository
                         Description = r.Description
                     }).ToList(),
                     Tasks = e.Tasks
-                        .Where(t => t.Status == 1 && t.Status == 0)
+                        .Where(t => t.Status == 1 || t.Status == 0)
                         .Select(t => new TaskDetailDto
                         {
                             Id = t.Id,
@@ -199,7 +187,7 @@ public class EventRepository : IEventRepository
                                 Email = t.CreateByNavigation.Email
                             },
                             SubTasks = t.SubTasks
-                                .Where(st => st.Status == 1 && st.Status == 0)
+                                .Where(st => st.Status == 1 || st.Status == 0)
                                 .Select(st => new SubTaskDetailDto
                                 {
                                     Id = st.Id,
