@@ -54,7 +54,8 @@ namespace Planify_BackEnd.Services.EventRequests
                 var request = new SendRequest
                 {
                     EventId = requestDTO.EventId,
-                    Status = 0 // Chờ duyệt
+                    Status = 0, // Chờ duyệt
+                    Reason = "N/A"
                 };
 
                 request = await _requestRepository.CreateRequestAsync(request);

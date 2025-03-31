@@ -37,6 +37,7 @@ namespace Planify_BackEnd.Repositories.Tasks
                 if (string.IsNullOrEmpty(name)) name = "";
 
                 return await _context.Tasks
+                    .Include(t => t.Event)
                     .Where(e => e.TaskName.Contains(name.Trim()) &&
                                 e.StartTime >= startDate &&
                                 e.Deadline <= endDate &&

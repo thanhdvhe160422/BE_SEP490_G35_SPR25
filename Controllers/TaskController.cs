@@ -52,7 +52,7 @@ namespace Planify_BackEnd.Controllers
         /// <param name="endDate"></param>
         /// <returns></returns>
         [HttpGet("search")]
-        [Authorize(Roles = "Event Organizer")]
+       // [Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> SearchTasksAsync(int page, int pageSize, string? name, DateTime startDate, DateTime endDate)
         {
             try
