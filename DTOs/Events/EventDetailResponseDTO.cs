@@ -28,6 +28,7 @@
         public List<JoinProjectDto> JoinProjects { get; set; }
         public List<RiskDto> Risks { get; set; }
         public List<TaskDetailDto> Tasks { get; set; }
+        public List<CostBreakdownDto> CostBreakdowns { get; set; }
     }
 
     public class UserDto
@@ -89,5 +90,13 @@
         public DateTime? Deadline { get; set; }
         public decimal AmountBudget { get; set; }
         public UserDto CreatedBy { get; set; }
+    }
+    public class CostBreakdownDto
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public int? Quantity { get; set; }
+        public decimal? PriceByOne { get; set; }
+        public decimal? TotalCost => Quantity * PriceByOne;
     }
 }
