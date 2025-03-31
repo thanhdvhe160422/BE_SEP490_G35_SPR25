@@ -80,6 +80,7 @@ namespace Planify_BackEnd.Services.Tasks
                     StartTime = item.StartTime,
                     Deadline = item.Deadline,
                     EventId = item.EventId,
+                    EventName = item.Event.EventTitle,
                     AmountBudget = item.AmountBudget,
                     Status = item.Status
                 }).ToList();
