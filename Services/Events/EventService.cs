@@ -101,31 +101,34 @@ public class EventService : IEventService
 
     public async Task<ResponseDTO> CreateEventAsync(EventCreateRequestDTO eventDTO, Guid organizerId)
     {
+        using var transaction = await _eventRepository.BeginTransactionAsync();
         try
         {
             if (eventDTO == null)
                 return new ResponseDTO(400, "Dữ liệu không hợp lệ", null);
 
             if (string.IsNullOrWhiteSpace(eventDTO.EventTitle))
-                return new ResponseDTO(400, "Event title is required.", null);
+                return new ResponseDTO(400, "Tên sự kiện là bắt buộc.", null);
+
+            if (eventDTO.StartTime < DateTime.UtcNow.AddMonths(2))
+                return new ResponseDTO(400, "Thời gian bắt đầu phải cách thời gian hiện tại ít nhất 2 tháng.", null);
 
             if (eventDTO.StartTime >= eventDTO.EndTime)
-                return new ResponseDTO(400, "Start time must be earlier than end time.", null);
+                return new ResponseDTO(400, "Thời gian bắt đầu phải sớm hơn thời gian kết thúc.", null);
 
             if (eventDTO.SizeParticipants < 0)
-                return new ResponseDTO(400, "Size of participants cannot be negative.", null);
+                return new ResponseDTO(400, "Số lượng người tham gia không thể âm.", null);
 
             var campusIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("campusId")?.Value;
             if (string.IsNullOrEmpty(campusIdClaim) || !int.TryParse(campusIdClaim, out int campusId))
-                return new ResponseDTO(400, "Invalid campus ID.", null);
+                return new ResponseDTO(400, "ID campus không hợp lệ.", null);
 
             var category = await _eventRepository.GetCategoryEventAsync(eventDTO.CategoryEventId, campusId);
             if (category == null)
-                return new ResponseDTO(400, "Category does not exist or does not belong to this campus.", null);
+                return new ResponseDTO(400, "Danh mục không tồn tại hoặc không thuộc campus này.", null);
 
-            // Tính tổng AmountBudget từ CostBreakdowns
             decimal totalBudget = 0;
-            if (eventDTO.CostBreakdowns != null && eventDTO.CostBreakdowns.Count > 0)
+            if (eventDTO.CostBreakdowns != null && eventDTO.CostBreakdowns.Any())
             {
                 foreach (var costBreakdown in eventDTO.CostBreakdowns)
                 {
@@ -136,14 +139,14 @@ public class EventService : IEventService
                 }
             }
 
-            // Tạo Event mới
+            // Tạo sự kiện mới
             var newEvent = new Event
             {
                 EventTitle = eventDTO.EventTitle,
                 EventDescription = eventDTO.EventDescription,
                 StartTime = eventDTO.StartTime,
                 EndTime = eventDTO.EndTime,
-                AmountBudget = totalBudget, // Gán AmountBudget từ tổng CostBreakdowns
+                AmountBudget = totalBudget,
                 IsPublic = 0,
                 TimePublic = null,
                 Status = 1,
@@ -161,22 +164,21 @@ public class EventService : IEventService
                 SloganEvent = eventDTO.SloganEvent
             };
 
-            // Tạo Event
             await _eventRepository.CreateEventAsync(newEvent);
 
-            // Tạo Tasks và SubTasks
-            if (eventDTO.Tasks != null && eventDTO.Tasks.Count > 0)
+            // Tạo các Task và SubTask
+            if (eventDTO.Tasks != null && eventDTO.Tasks.Any())
             {
                 foreach (var task in eventDTO.Tasks)
                 {
                     if (string.IsNullOrWhiteSpace(task.TaskName))
-                        return new ResponseDTO(400, "Task name is required.", null);
+                        return new ResponseDTO(400, "Tên task là bắt buộc.", null);
 
-                    if (task.StartTime.HasValue && task.Deadline.HasValue && task.StartTime >= task.Deadline)
-                        return new ResponseDTO(400, $"Start time of task '{task.TaskName}' must be earlier than deadline.", null);
+                    if (task.Deadline.HasValue && task.Deadline <= DateTime.UtcNow)
+                        return new ResponseDTO(400, $"Hạn chót của task '{task.TaskName}' phải sau thời gian hiện tại.", null);
 
                     if (task.Budget < 0)
-                        return new ResponseDTO(400, $"Budget of task '{task.TaskName}' cannot be negative.", null);
+                        return new ResponseDTO(400, $"Ngân sách của task '{task.TaskName}' không thể âm.", null);
 
                     var newTask = new Planify_BackEnd.Models.Task
                     {
@@ -187,22 +189,23 @@ public class EventService : IEventService
                         Deadline = task.Deadline,
                         AmountBudget = task.Budget,
                         CreateBy = organizerId,
-                        CreateDate = DateTime.UtcNow
+                        CreateDate = DateTime.UtcNow,
+                        Status = 1
                     };
                     await _taskRepository.CreateTaskAsync(newTask);
 
-                    if (task.SubTasks != null && task.SubTasks.Count > 0)
+                    if (task.SubTasks != null && task.SubTasks.Any())
                     {
                         foreach (var subTask in task.SubTasks)
                         {
                             if (string.IsNullOrWhiteSpace(subTask.SubTaskName))
-                                return new ResponseDTO(400, "SubTask name is required.", null);
+                                return new ResponseDTO(400, "Tên subtask là bắt buộc.", null);
 
                             if (subTask.StartTime.HasValue && subTask.Deadline.HasValue && subTask.StartTime >= subTask.Deadline)
-                                return new ResponseDTO(400, $"Start time of subtask '{subTask.SubTaskName}' must be earlier than deadline.", null);
+                                return new ResponseDTO(400, $"Thời gian bắt đầu của subtask '{subTask.SubTaskName}' phải sớm hơn hạn chót.", null);
 
                             if (subTask.Budget < 0)
-                                return new ResponseDTO(400, $"Budget of subtask '{subTask.SubTaskName}' cannot be negative.", null);
+                                return new ResponseDTO(400, $"Ngân sách của subtask '{subTask.SubTaskName}' không thể âm.", null);
 
                             var newSubTask = new SubTask
                             {
@@ -212,7 +215,8 @@ public class EventService : IEventService
                                 StartTime = subTask.StartTime ?? newTask.StartTime,
                                 Deadline = subTask.Deadline,
                                 AmountBudget = subTask.Budget,
-                                CreateBy = organizerId
+                                CreateBy = organizerId,
+                                Status = 1
                             };
                             await _subTaskRepository.CreateSubTaskAsync(newSubTask);
                         }
@@ -220,13 +224,13 @@ public class EventService : IEventService
                 }
             }
 
-            // Tạo Risks
-            if (eventDTO.Risks != null && eventDTO.Risks.Count > 0)
+            // Tạo các rủi ro
+            if (eventDTO.Risks != null && eventDTO.Risks.Any())
             {
                 foreach (var risk in eventDTO.Risks)
                 {
                     if (string.IsNullOrWhiteSpace(risk.Name))
-                        return new ResponseDTO(400, "Risk name is required.", null);
+                        return new ResponseDTO(400, "Tên rủi ro là bắt buộc.", null);
 
                     var newRisk = new Risk
                     {
@@ -240,19 +244,19 @@ public class EventService : IEventService
                 }
             }
 
-            // Tạo CostBreakdowns
-            if (eventDTO.CostBreakdowns != null && eventDTO.CostBreakdowns.Count > 0)
+            // Tạo các chi phí
+            if (eventDTO.CostBreakdowns != null && eventDTO.CostBreakdowns.Any())
             {
                 foreach (var costBreakdown in eventDTO.CostBreakdowns)
                 {
                     if (string.IsNullOrWhiteSpace(costBreakdown.Name))
-                        return new ResponseDTO(400, "Cost breakdown name is required.", null);
+                        return new ResponseDTO(400, "Tên chi phí là bắt buộc.", null);
 
                     if (costBreakdown.Quantity.HasValue && costBreakdown.Quantity < 0)
-                        return new ResponseDTO(400, $"Quantity of cost breakdown '{costBreakdown.Name}' cannot be negative.", null);
+                        return new ResponseDTO(400, $"Số lượng của chi phí '{costBreakdown.Name}' không thể âm.", null);
 
                     if (costBreakdown.PriceByOne.HasValue && costBreakdown.PriceByOne < 0)
-                        return new ResponseDTO(400, $"Price by one of cost breakdown '{costBreakdown.Name}' cannot be negative.", null);
+                        return new ResponseDTO(400, $"Đơn giá của chi phí '{costBreakdown.Name}' không thể âm.", null);
 
                     var newCostBreakdown = new CostBreakdown
                     {
@@ -265,12 +269,14 @@ public class EventService : IEventService
                 }
             }
 
-            return new ResponseDTO(201, "Event created successfully!", newEvent);
+            await transaction.CommitAsync();
+            return new ResponseDTO(201, "Tạo sự kiện thành công!", newEvent);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error creating event: {ex.Message}\nStackTrace: {ex.StackTrace}");
-            return new ResponseDTO(500, "An error occurred while creating the event.", ex.Message);
+            await transaction.RollbackAsync();
+            Console.WriteLine($"Lỗi khi tạo sự kiện: {ex.Message}\nStackTrace: {ex.StackTrace}");
+            return new ResponseDTO(500, "Đã xảy ra lỗi khi tạo sự kiện.", ex.Message);
         }
     }
 
@@ -324,18 +330,16 @@ public class EventService : IEventService
         }
     }
 
-    public async Task<EventDetailDto> UpdateEventAsync(EventDTO e)
+    public async Task<ResponseDTO> UpdateEventAsync(EventUpdateDTO e)
     {
         try
         {
-            var campus = await _campusRepository.GetCampusByName(e.CampusName);
-            var category = await _categoryRepository.GetCategoryByName(e.CategoryEventName, campus.Id);
             Event updateEvent = new Event
             {
                 Id = e.Id,
                 AmountBudget = e.AmountBudget,
-                CampusId = campus.Id,
-                CategoryEventId = category.Id,
+                CampusId = e.CampusId,
+                CategoryEventId = e.CategoryEventId,
                 StartTime = e.StartTime,
                 EndTime = e.EndTime,
                 EventDescription = e.EventDescription,
@@ -365,6 +369,7 @@ public class EventService : IEventService
                 Status = updatedEvent.Status,
                 Placed = updatedEvent.Placed,
                 CreatedAt = updatedEvent.CreatedAt,
+                UpdatedAt = updatedEvent.UpdatedAt,
                 CampusName = updatedEvent.Campus.CampusName,
                 CategoryEventName = updatedEvent.CategoryEvent.CategoryEventName,
                 MeasuringSuccess = updatedEvent.MeasuringSuccess,
@@ -378,17 +383,24 @@ public class EventService : IEventService
                     LastName = updatedEvent.CreateByNavigation.LastName,
                     Email = updatedEvent.CreateByNavigation.Email
                 },
+                UpdatedBy = new UserDto
+                {
+                    Id = updatedEvent.UpdateByNavigation.Id,
+                    FirstName = updatedEvent.UpdateByNavigation.FirstName,
+                    LastName = updatedEvent.UpdateByNavigation.LastName,
+                    Email = updatedEvent.UpdateByNavigation.Email
+                },
                 EventMedia = updatedEvent.EventMedia.Select(em => new EventMediaDto
                 {
                     Id = em.Id,
                     MediaUrl = em.Media.MediaUrl
                 }).ToList()
             };
-            return eventDetailResponseDTO;
+            return new ResponseDTO(200, "Update event successfully!", eventDetailResponseDTO);
         }
         catch (Exception ex)
         {
-            throw new Exception(ex.Message);
+            return new ResponseDTO(500, "Error update event!", ex.Message);
         }
     }
 
@@ -452,32 +464,34 @@ public class EventService : IEventService
 
     public async Task<ResponseDTO> CreateSaveDraft(EventCreateRequestDTO eventDTO, Guid organizerId)
     {
-
+        using var transaction = await _eventRepository.BeginTransactionAsync();
         try
         {
             if (eventDTO == null)
                 return new ResponseDTO(400, "Dữ liệu không hợp lệ", null);
 
             if (string.IsNullOrWhiteSpace(eventDTO.EventTitle))
-                return new ResponseDTO(400, "Event title is required.", null);
+                return new ResponseDTO(400, "Tên sự kiện là bắt buộc.", null);
+
+            if (eventDTO.StartTime < DateTime.UtcNow.AddMonths(2))
+                return new ResponseDTO(400, "Thời gian bắt đầu phải cách thời gian hiện tại ít nhất 2 tháng.", null);
 
             if (eventDTO.StartTime >= eventDTO.EndTime)
-                return new ResponseDTO(400, "Start time must be earlier than end time.", null);
+                return new ResponseDTO(400, "Thời gian bắt đầu phải sớm hơn thời gian kết thúc.", null);
 
             if (eventDTO.SizeParticipants < 0)
-                return new ResponseDTO(400, "Size of participants cannot be negative.", null);
+                return new ResponseDTO(400, "Số lượng người tham gia không thể âm.", null);
 
             var campusIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("campusId")?.Value;
             if (string.IsNullOrEmpty(campusIdClaim) || !int.TryParse(campusIdClaim, out int campusId))
-                return new ResponseDTO(400, "Invalid campus ID.", null);
+                return new ResponseDTO(400, "ID campus không hợp lệ.", null);
 
             var category = await _eventRepository.GetCategoryEventAsync(eventDTO.CategoryEventId, campusId);
             if (category == null)
-                return new ResponseDTO(400, "Category does not exist or does not belong to this campus.", null);
+                return new ResponseDTO(400, "Danh mục không tồn tại hoặc không thuộc campus này.", null);
 
-            // Tính tổng AmountBudget từ CostBreakdowns
             decimal totalBudget = 0;
-            if (eventDTO.CostBreakdowns != null && eventDTO.CostBreakdowns.Count > 0)
+            if (eventDTO.CostBreakdowns != null && eventDTO.CostBreakdowns.Any())
             {
                 foreach (var costBreakdown in eventDTO.CostBreakdowns)
                 {
@@ -488,17 +502,16 @@ public class EventService : IEventService
                 }
             }
 
-            // Tạo Event mới
             var newEvent = new Event
             {
                 EventTitle = eventDTO.EventTitle,
                 EventDescription = eventDTO.EventDescription,
                 StartTime = eventDTO.StartTime,
                 EndTime = eventDTO.EndTime,
-                AmountBudget = totalBudget, // Gán AmountBudget từ tổng CostBreakdowns
+                AmountBudget = totalBudget,
                 IsPublic = 0,
                 TimePublic = null,
-                Status = 0,
+                Status = 0, // Bản nháp
                 CampusId = campusId,
                 CategoryEventId = eventDTO.CategoryEventId,
                 Placed = eventDTO.Placed,
@@ -513,22 +526,22 @@ public class EventService : IEventService
                 SloganEvent = eventDTO.SloganEvent
             };
 
-            // Tạo Event
+            // Lưu sự kiện
             await _eventRepository.CreateEventAsync(newEvent);
 
             // Tạo Tasks và SubTasks
-            if (eventDTO.Tasks != null && eventDTO.Tasks.Count > 0)
+            if (eventDTO.Tasks != null && eventDTO.Tasks.Any())
             {
                 foreach (var task in eventDTO.Tasks)
                 {
                     if (string.IsNullOrWhiteSpace(task.TaskName))
-                        return new ResponseDTO(400, "Task name is required.", null);
+                        return new ResponseDTO(400, "Tên task là bắt buộc.", null);
 
-                    if (task.StartTime.HasValue && task.Deadline.HasValue && task.StartTime >= task.Deadline)
-                        return new ResponseDTO(400, $"Start time of task '{task.TaskName}' must be earlier than deadline.", null);
+                    if (task.Deadline > DateTime.UtcNow)
+                        return new ResponseDTO(400, $"Deadline of task '{task.TaskName}' must be after now.", null);
 
                     if (task.Budget < 0)
-                        return new ResponseDTO(400, $"Budget of task '{task.TaskName}' cannot be negative.", null);
+                        return new ResponseDTO(400, $"Ngân sách của task '{task.TaskName}' không thể âm.", null);
 
                     var newTask = new Planify_BackEnd.Models.Task
                     {
@@ -539,22 +552,23 @@ public class EventService : IEventService
                         Deadline = task.Deadline,
                         AmountBudget = task.Budget,
                         CreateBy = organizerId,
-                        CreateDate = DateTime.UtcNow
+                        CreateDate = DateTime.UtcNow,
+                        Status = 1
                     };
                     await _taskRepository.CreateTaskAsync(newTask);
 
-                    if (task.SubTasks != null && task.SubTasks.Count > 0)
+                    if (task.SubTasks != null && task.SubTasks.Any())
                     {
                         foreach (var subTask in task.SubTasks)
                         {
                             if (string.IsNullOrWhiteSpace(subTask.SubTaskName))
-                                return new ResponseDTO(400, "SubTask name is required.", null);
+                                return new ResponseDTO(400, "Tên subtask là bắt buộc.", null);
 
                             if (subTask.StartTime.HasValue && subTask.Deadline.HasValue && subTask.StartTime >= subTask.Deadline)
-                                return new ResponseDTO(400, $"Start time of subtask '{subTask.SubTaskName}' must be earlier than deadline.", null);
+                                return new ResponseDTO(400, $"Thời gian bắt đầu của subtask '{subTask.SubTaskName}' phải sớm hơn thời hạn.", null);
 
                             if (subTask.Budget < 0)
-                                return new ResponseDTO(400, $"Budget of subtask '{subTask.SubTaskName}' cannot be negative.", null);
+                                return new ResponseDTO(400, $"Ngân sách của subtask '{subTask.SubTaskName}' không thể âm.", null);
 
                             var newSubTask = new SubTask
                             {
@@ -564,7 +578,8 @@ public class EventService : IEventService
                                 StartTime = subTask.StartTime ?? newTask.StartTime,
                                 Deadline = subTask.Deadline,
                                 AmountBudget = subTask.Budget,
-                                CreateBy = organizerId
+                                CreateBy = organizerId,
+                                Status = 1
                             };
                             await _subTaskRepository.CreateSubTaskAsync(newSubTask);
                         }
@@ -573,12 +588,12 @@ public class EventService : IEventService
             }
 
             // Tạo Risks
-            if (eventDTO.Risks != null && eventDTO.Risks.Count > 0)
+            if (eventDTO.Risks != null && eventDTO.Risks.Any())
             {
                 foreach (var risk in eventDTO.Risks)
                 {
                     if (string.IsNullOrWhiteSpace(risk.Name))
-                        return new ResponseDTO(400, "Risk name is required.", null);
+                        return new ResponseDTO(400, "Tên rủi ro là bắt buộc.", null);
 
                     var newRisk = new Risk
                     {
@@ -593,18 +608,18 @@ public class EventService : IEventService
             }
 
             // Tạo CostBreakdowns
-            if (eventDTO.CostBreakdowns != null && eventDTO.CostBreakdowns.Count > 0)
-            {
+            if (eventDTO.CostBreakdowns != null && eventDTO.CostBreakdowns.Any())
+        {
                 foreach (var costBreakdown in eventDTO.CostBreakdowns)
                 {
                     if (string.IsNullOrWhiteSpace(costBreakdown.Name))
-                        return new ResponseDTO(400, "Cost breakdown name is required.", null);
+                        return new ResponseDTO(400, "Tên chi phí là bắt buộc.", null);
 
                     if (costBreakdown.Quantity.HasValue && costBreakdown.Quantity < 0)
-                        return new ResponseDTO(400, $"Quantity of cost breakdown '{costBreakdown.Name}' cannot be negative.", null);
+                        return new ResponseDTO(400, $"Số lượng của chi phí '{costBreakdown.Name}' không thể âm.", null);
 
                     if (costBreakdown.PriceByOne.HasValue && costBreakdown.PriceByOne < 0)
-                        return new ResponseDTO(400, $"Price by one of cost breakdown '{costBreakdown.Name}' cannot be negative.", null);
+                        return new ResponseDTO(400, $"Đơn giá của chi phí '{costBreakdown.Name}' không thể âm.", null);
 
                     var newCostBreakdown = new CostBreakdown
                     {
@@ -617,78 +632,80 @@ public class EventService : IEventService
                 }
             }
 
-            return new ResponseDTO(201, "Save draft successfully!", newEvent);
+            await transaction.CommitAsync();
+            return new ResponseDTO(201, "Lưu bản nháp thành công!", newEvent);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error creating event: {ex.Message}\nStackTrace: {ex.StackTrace}");
-            return new ResponseDTO(500, "An error occurred while creating the event.", ex.Message);
+            await transaction.RollbackAsync();
+            Console.WriteLine($"Lỗi khi lưu bản nháp: {ex.Message}\nStackTrace: {ex.StackTrace}");
+            return new ResponseDTO(500, "Đã xảy ra lỗi khi lưu bản nháp.", ex.Message);
         }
     }
-    public async Task<ResponseDTO> UpdateSaveDraft(EventDTO eventDTO)
-    {
+    //public async Task<ResponseDTO> UpdateSaveDraft(EventUpdateDTO eventDTO)
+    //{
 
-        try
-        {
-            var campus = await _campusRepository.GetCampusByName(eventDTO.CampusName);
-            //var category = await _categoryRepository.GetCategoryByName(eventDTO.CategoryEventName, campus.Id);
-            Event updateEvent = new Event
-            {
-                Id = eventDTO.Id,
-                AmountBudget = eventDTO.AmountBudget,
-                CampusId = campus.Id,
-                CategoryEventId = (int)eventDTO.CategoryEventId,
-                StartTime = eventDTO.StartTime,
-                EndTime = eventDTO.EndTime,
-                EventDescription = eventDTO.EventDescription,
-                EventTitle = eventDTO.EventTitle,
-                IsPublic = eventDTO.IsPublic,
-                Placed = eventDTO.Placed,
-                Status = eventDTO.Status,
-                TimePublic = eventDTO.TimePublic,
-                UpdateBy = eventDTO.UpdateBy,
-                UpdatedAt = DateTime.Now
-            };
-            Event updatedEvent = await _eventRepository.UpdateSaveDraft(updateEvent);
-            var e = new Event
-            {
-                EventTitle = updatedEvent.EventTitle,
-                EventDescription = updatedEvent.EventDescription,
-                StartTime = updatedEvent.StartTime,
-                EndTime = updatedEvent.EndTime,
-                AmountBudget = updatedEvent.AmountBudget,
-                IsPublic = updatedEvent.IsPublic,
-                TimePublic = updatedEvent.TimePublic,
-                Status = updatedEvent.Status,
-                CampusId = updatedEvent.CampusId,
-                CategoryEventId = updatedEvent.CategoryEventId,
-                Placed = updatedEvent.Placed,
-                CreateBy = updatedEvent.CreateBy,
-                CreatedAt = updatedEvent.CreatedAt
-            };
+    //    try
+    //    {
+    //        var campus = await _campusRepository.GetCampusByName(eventDTO.CampusName);
+    //        //var category = await _categoryRepository.GetCategoryByName(eventDTO.CategoryEventName, campus.Id);
+    //        Event updateEvent = new Event
+    //        {
+    //            Id = eventDTO.Id,
+    //            AmountBudget = eventDTO.AmountBudget,
+    //            CampusId = campus.Id,
+    //            CategoryEventId = (int)eventDTO.CategoryEventId,
+    //            StartTime = eventDTO.StartTime,
+    //            EndTime = eventDTO.EndTime,
+    //            EventDescription = eventDTO.EventDescription,
+    //            EventTitle = eventDTO.EventTitle,
+    //            IsPublic = eventDTO.IsPublic,
+    //            Placed = eventDTO.Placed,
+    //            Status = eventDTO.Status,
+    //            TimePublic = eventDTO.TimePublic,
+    //            UpdateBy = eventDTO.UpdateBy,
+    //            UpdatedAt = DateTime.Now
+    //        };
+    //        Event updatedEvent = await _eventRepository.UpdateSaveDraft(updateEvent);
+    //        var e = new Event
+    //        {
+    //            EventTitle = updatedEvent.EventTitle,
+    //            EventDescription = updatedEvent.EventDescription,
+    //            StartTime = updatedEvent.StartTime,
+    //            EndTime = updatedEvent.EndTime,
+    //            AmountBudget = updatedEvent.AmountBudget,
+    //            IsPublic = updatedEvent.IsPublic,
+    //            TimePublic = updatedEvent.TimePublic,
+    //            Status = updatedEvent.Status,
+    //            CampusId = updatedEvent.CampusId,
+    //            CategoryEventId = updatedEvent.CategoryEventId,
+    //            Placed = updatedEvent.Placed,
+    //            CreateBy = updatedEvent.CreateBy,
+    //            CreatedAt = updatedEvent.CreatedAt
+    //        };
 
-            return new ResponseDTO(201, "Save draft successfully!", updatedEvent);
-        }
-        catch (Exception ex)
-        {
-            return new ResponseDTO(500, "Error orcurs while save draft event!", ex.Message);
-        }
-    }
-    public async Task<ResponseDTO> GetSaveDraft(Guid createBy)
-    {
-        try
-        {
-            var eventDetail = await _eventRepository.GetSaveDraft(createBy);
-            if (eventDetail == null)
-            {
-                return new ResponseDTO(404, "Don't exist any save draft!", eventDetail);
-            }
-            return new ResponseDTO(200, "Get save draft successfully!", eventDetail);
-        }
-        catch (Exception ex)
-        {
-            return new ResponseDTO(500, "Error orcurs while getting save draft!", ex.Message);
-        }
-    }
+    //        return new ResponseDTO(201, "Save draft successfully!", updatedEvent);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return new ResponseDTO(500, "Error orcurs while save draft event!", ex.Message);
+    //    }
+    //}
+    //public async Task<ResponseDTO> GetSaveDraft(Guid createBy)
+    //{
+    //    try
+    //    {
+    //        var eventDetail = await _eventRepository.GetSaveDraft(createBy);
+    //        if (eventDetail == null)
+    //        {
+    //            return new ResponseDTO(404, "Don't exist any save draft!", eventDetail);
+    //        }
+    //        return new ResponseDTO(200, "Get save draft successfully!", eventDetail);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return new ResponseDTO(500, "Error orcurs while getting save draft!", ex.Message);
+    //    }
+    //}
 }
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.Models;
@@ -227,6 +228,13 @@ public class EventRepository : IEventRepository
             updateEvent.Placed = e.Placed;
             updateEvent.Status = e.Status;
             updateEvent.TimePublic = e.TimePublic;
+            updateEvent.MeasuringSuccess = e.MeasuringSuccess;
+            updateEvent.Goals = e.Goals;
+            updateEvent.MonitoringProcess = e.MonitoringProcess;
+            updateEvent.SizeParticipants = e.SizeParticipants;
+            updateEvent.PromotionalPlan = e.PromotionalPlan;
+            updateEvent.TargetAudience = e.TargetAudience;
+            updateEvent.SloganEvent = e.SloganEvent;
             updateEvent.UpdateBy = e.UpdateBy;
             updateEvent.UpdatedAt = DateTime.Now;
             _context.Events.Update(updateEvent);
@@ -235,13 +243,13 @@ public class EventRepository : IEventRepository
                 .Include(ue=>ue.Campus)
                 .Include(ue=>ue.CategoryEvent)
                 .Include(ue=>ue.CreateByNavigation)
+                .Include(ue => ue.UpdateByNavigation)
                 .Include(ue=>ue.EventMedia).ThenInclude(em=>em.Media)
                 .FirstOrDefault(ue => ue.Id == e.Id);
             return updatedEvent;
         }catch(Exception ex)
         {
-            Console.WriteLine("event repository - update event: " + ex.Message);
-            return new Event();
+            throw new Exception(ex.Message);
         }
     }
 
@@ -266,8 +274,7 @@ public class EventRepository : IEventRepository
             return true;
         }catch(Exception ex)
         {
-            Console.WriteLine("event repository - delete event: "+ex.Message);
-            return false;
+            throw new Exception(ex.Message);
         }
     }
 
@@ -405,6 +412,10 @@ public class EventRepository : IEventRepository
     {
         _context.CostBreakdowns.Add(costBreakdown);
         await _context.SaveChangesAsync();
+    }
+    public async Task<IDbContextTransaction> BeginTransactionAsync()
+    {
+        return await _context.Database.BeginTransactionAsync();
     }
 }
 
