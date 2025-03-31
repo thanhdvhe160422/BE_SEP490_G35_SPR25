@@ -54,7 +54,7 @@ namespace Planify_BackEnd.Controllers
         }
 
         [HttpPost("add-implementers")]
-        //[Authorize(Roles = "Event Organizer")]
+        [Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> AddImplementersToEvent([FromBody] AddImplementersToEventDTO request)
         {
             var response = await _joinProjectService.AddImplementersToEventAsync(request);
