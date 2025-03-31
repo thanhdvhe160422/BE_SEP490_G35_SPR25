@@ -31,25 +31,27 @@ namespace Planify_BackEnd.Services.Tasks
                 {
                     return new ResponseDTO(400, "Task name is required.", null);
                 }
-
+                
                 if (taskDTO.StartTime >= taskDTO.Deadline)
                 {
                     return new ResponseDTO(400, "Start time must be earlier than deadline.", null);
                 }
-                var newTask = new TaskModel
-                {  
-                    TaskName = taskDTO.TaskName,
-                    TaskDescription = taskDTO.TaskDescription,
-                    StartTime = taskDTO.StartTime,
-                    Deadline = taskDTO.Deadline,
-                    AmountBudget = taskDTO.AmountBudget,
-                    Status = 1,
-                    CreateBy = organizerId,
-                    CreateDate = DateTime.UtcNow
-                };
                 try
                 {
+                    var newTask = new TaskModel
+                    {
+                        EventId = taskDTO.EventId,
+                        TaskName = taskDTO.TaskName,
+                        TaskDescription = taskDTO.TaskDescription,
+                        StartTime = taskDTO.StartTime,
+                        Deadline = taskDTO.Deadline,
+                        AmountBudget = taskDTO.AmountBudget,
+                        Status = 1,
+                        CreateBy = organizerId,
+                        CreateDate = DateTime.UtcNow
+                    };
                     await _taskRepository.CreateTaskAsync(newTask);
+                    return new ResponseDTO(201, "Task creates successfully!", newTask);
                 }
                 catch (Exception dbEx)
                 {
@@ -57,7 +59,7 @@ namespace Planify_BackEnd.Services.Tasks
                 }
 
 
-                return new ResponseDTO(201, "Task creates successfully!", newTask);
+               
             }
             catch (Exception ex)
             {
@@ -77,7 +79,8 @@ namespace Planify_BackEnd.Services.Tasks
                     TaskDescription = item.TaskDescription,
                     StartTime = item.StartTime,
                     Deadline = item.Deadline,
-                    //GroupId = item.GroupId,
+                    EventId = item.EventId,
+                    EventName = item.Event.EventTitle,
                     AmountBudget = item.AmountBudget,
                     Status = item.Status
                 }).ToList();
@@ -93,7 +96,7 @@ namespace Planify_BackEnd.Services.Tasks
         {
             try
             {
-                PageResultDTO<Models.Task> tasks =  _taskRepository.GetAllTasks(eventId, page, pageSize);
+                var tasks =  _taskRepository.GetAllTasks(eventId, page, pageSize);
                 if (tasks.TotalCount == 0)
 
                     return new PageResultDTO<TaskSearchResponeDTO>(new List<TaskSearchResponeDTO>(), 0, page, pageSize);
@@ -137,8 +140,8 @@ namespace Planify_BackEnd.Services.Tasks
                     StartTime = taskDTO.StartTime,
                     Deadline = taskDTO.Deadline,
                     AmountBudget = taskDTO.AmountBudget,
-                    //GroupId = taskDTO.GroupId,
-                    Status = taskDTO.Status
+                    EventId = taskDTO.EventId
+                    
                 });
 
                 if (existingTask == null)
@@ -273,5 +276,24 @@ namespace Planify_BackEnd.Services.Tasks
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<ResponseDTO> DeleteTaskV2(int taskId)
+        {
+            try
+            {
+                var isDeleted = await _taskRepository.DeleteTaskV2(taskId);
+                if (!isDeleted)
+                {
+                    return new ResponseDTO(404, "Task not found or already deleted.", null);
+                }
+
+                return new ResponseDTO(200, "Task deleted successfully!", null);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseDTO(500, "Error occurs while deleting task!", ex.Message);
+            }
+        }
+
     }
 }

@@ -52,7 +52,7 @@ namespace Planify_BackEnd.Controllers
         /// <param name="endDate"></param>
         /// <returns></returns>
         [HttpGet("search")]
-        [Authorize(Roles = "Event Organizer")]
+       // [Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> SearchTasksAsync(int page, int pageSize, string? name, DateTime startDate, DateTime endDate)
         {
             try
@@ -143,7 +143,7 @@ namespace Planify_BackEnd.Controllers
             }
         }
         [HttpPut("{taskId}/status/{status}")]
-        [Authorize(Roles = "Implementer")]
+        [Authorize(Roles = "Event Organizer, Implementer")]
         public async Task<IActionResult> ChangeStatus(int taskId, int status)
         {
             try
@@ -191,6 +191,13 @@ namespace Planify_BackEnd.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+        [HttpPut("delete/v2/{taskId}")]
+        [Authorize(Roles = "Event Organizer, Implementer")]
+        public async Task<IActionResult> DeleteTaskV2(int taskId)
+        {
+            var response = await _taskService.DeleteTaskV2(taskId);
+            return StatusCode(response.Status, response);
         }
     }
 }

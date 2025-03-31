@@ -10,7 +10,7 @@ namespace Planify_BackEnd.Services.Events
         Task<ResponseDTO> CreateEventAsync(EventCreateRequestDTO eventDTO, Guid organizerId);
         Task<ResponseDTO> UploadImageAsync(UploadImageRequestDTO imageDTO);
         Task<ResponseDTO> GetEventDetailAsync(int eventId);
-        Task<EventDetailDto> UpdateEventAsync(EventDTO e);
+        Task<ResponseDTO> UpdateEventAsync(EventUpdateDTO e);
         Task<bool> DeleteEventAsync(int eventId);
         Task<PageResultDTO<EventGetListResponseDTO>> SearchEventAsync(int page, int pageSize,
             string? title,
@@ -23,8 +23,8 @@ namespace Planify_BackEnd.Services.Events
             Guid userId,
             int campusId);
 
-        Task<ResponseDTO> CreateSaveDraft(EventCreateRequestDTO eventDTO, Guid organizerId);
-        Task<ResponseDTO> UpdateSaveDraft(EventDTO eventDTO);
-        Task<ResponseDTO> GetSaveDraft(Guid createBy);
+        //Task<ResponseDTO> CreateSaveDraft(EventCreateRequestDTO eventDTO, Guid organizerId);
+        //Task<ResponseDTO> UpdateSaveDraft(EventUpdateDTO eventDTO);
+        //Task<ResponseDTO> GetSaveDraft(Guid createBy);
     }
 }

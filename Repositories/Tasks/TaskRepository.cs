@@ -37,9 +37,11 @@ namespace Planify_BackEnd.Repositories.Tasks
                 if (string.IsNullOrEmpty(name)) name = "";
 
                 return await _context.Tasks
+                    .Include(t => t.Event)
                     .Where(e => e.TaskName.Contains(name.Trim()) &&
                                 e.StartTime >= startDate &&
-                                e.Deadline <= endDate)
+                                e.Deadline <= endDate &&
+                                e.Status == 1)
                     .OrderBy(e => e.StartTime)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
@@ -55,14 +57,14 @@ namespace Planify_BackEnd.Repositories.Tasks
         {
             try
             {
-                var count = _context.Tasks.Where(t => t.EventId == eventId).Count();
+                var count = _context.Tasks.Where(t => t.EventId == eventId && t.Status==1).Count();
                 if (count == 0)
                     return new PageResultDTO<Models.Task>(new List<Models.Task>(), count, page, pageSize);
                 var tasks = _context.Tasks
                     //.Include(t => t.CreateByNavigation)
                     //.Include(t => t.Event)
                     //.Include(t => t.SubTasks).ThenInclude(st => st.CreateByNavigation)
-                    .Where(t => t.EventId == eventId)
+                    .Where(t => t.EventId == eventId && t.Status==1)
                     //.OrderBy(t => t.StartTime)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
@@ -111,9 +113,8 @@ namespace Planify_BackEnd.Repositories.Tasks
                 existingTask.TaskDescription = updatedTask.TaskDescription;
                 existingTask.StartTime = updatedTask.StartTime;
                 existingTask.Deadline = updatedTask.Deadline;
-                existingTask.Status = updatedTask.Status;
                 existingTask.AmountBudget = updatedTask.AmountBudget;
-
+                existingTask.EventId = updatedTask.EventId;
                 _context.Tasks.Update(existingTask);
                 await _context.SaveChangesAsync();
                 return existingTask;
@@ -198,7 +199,8 @@ namespace Planify_BackEnd.Repositories.Tasks
                 var count = _context.JoinTasks
                        .Where(jt => jt.UserId == implementerId &&
                                    jt.Task.StartTime <= endDate &&
-                                   (jt.Task.Deadline >= startDate || jt.Task.Deadline == null))
+                                   (jt.Task.Deadline >= startDate || jt.Task.Deadline == null) &&
+                                   jt.Task.Status == 1)
                        .Select(jt => jt.Task)
                     .OrderBy(e => e.StartTime)
                     .Skip((page - 1) * pageSize).Take(pageSize)
@@ -206,7 +208,8 @@ namespace Planify_BackEnd.Repositories.Tasks
                 var result = await _context.JoinTasks
                        .Where(jt => jt.UserId == implementerId &&
                                    jt.Task.StartTime <= endDate &&
-                                   (jt.Task.Deadline >= startDate || jt.Task.Deadline == null))
+                                   (jt.Task.Deadline >= startDate || jt.Task.Deadline == null) &&
+                                   jt.Task.Status==1)
                        .Select(jt => jt.Task)
                     .OrderBy(e => e.StartTime)
                     .Skip((page-1)*pageSize).Take(pageSize)
@@ -216,6 +219,22 @@ namespace Planify_BackEnd.Repositories.Tasks
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<bool> DeleteTaskV2(int taskId)
+        {
+            try
+            {
+                var task = _context.Tasks.FirstOrDefault(t => t.Id == taskId);
+                task.Status = -1;
+                _context.Update(task);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
             }
         }
     }

@@ -2,7 +2,7 @@
 
 namespace Planify_BackEnd.DTOs.Events
 {
-    public class EventDTO
+    public class EventUpdateDTO
     {
         public int Id { get; set; }
 
@@ -22,12 +22,19 @@ namespace Planify_BackEnd.DTOs.Events
 
         public int Status { get; set; }
 
-        public string CampusName { get; set; }
+        public Guid? ManagerId { get; set; }
 
-        public string CategoryEventName { get; set; }
+        public int CampusId { get; set; }
+
+        public int CategoryEventId { get; set; }
 
         public string Placed { get; set; }
-        public int? CategoryEventId { get; set; }
+
+        public DateTime CreatedAt { get; set; }
+
+        public Guid CreateBy { get; set; }
+
+        public DateTime? UpdatedAt { get; set; }
 
         public Guid? UpdateBy { get; set; }
 
@@ -38,5 +45,11 @@ namespace Planify_BackEnd.DTOs.Events
         public string? MonitoringProcess { get; set; }
 
         public int? SizeParticipants { get; set; }
+
+        public string? PromotionalPlan { get; set; }
+
+        public string? TargetAudience { get; set; }
+
+        public string? SloganEvent { get; set; }
     }
 }

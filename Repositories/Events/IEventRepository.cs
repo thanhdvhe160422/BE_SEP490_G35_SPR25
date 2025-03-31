@@ -1,4 +1,5 @@
-﻿using Planify_BackEnd.DTOs;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.Models;
 
@@ -28,8 +29,9 @@ namespace Planify_BackEnd.Repositories
         Task<Event> CreateSaveDraft(Event saveEvent);
         Task<Event> UpdateSaveDraft(Event saveEvent);
         Task<Event> GetSaveDraft(Guid createBy);
-        System.Threading.Tasks.Task CreateRiskAsync(Risk risk);
+        System.Threading.Tasks.Task CreateRiskAsync(Models.Risk risk);
         Task<Event> GetEventByIdAsync(int eventId);
         System.Threading.Tasks.Task CreateCostBreakdownAsync(CostBreakdown costBreakdown);
+        Task<IDbContextTransaction> BeginTransactionAsync();
     }
 }
