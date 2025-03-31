@@ -408,11 +408,24 @@ public class EventRepository : IEventRepository
             .FirstOrDefaultAsync(e => e.Id == eventId);
     }
 
+    //public async System.Threading.Tasks.Task CreateCostBreakdownAsync(CostBreakdown costBreakdown)
+    //{
+    //    _context.CostBreakdowns.Add(costBreakdown);
+    //    await _context.SaveChangesAsync();
+    //}
+
+
     public async System.Threading.Tasks.Task CreateCostBreakdownAsync(CostBreakdown costBreakdown)
     {
-        _context.CostBreakdowns.Add(costBreakdown);
-        await _context.SaveChangesAsync();
+        var sql = "INSERT INTO CostBreakdown (EventId, Name, PriceByOne, Quantity) VALUES (@p0, @p1, @p2, @p3)";
+
+        await _context.Database.ExecuteSqlRawAsync(sql,
+            costBreakdown.EventId,
+            costBreakdown.Name,
+            costBreakdown.PriceByOne,
+            costBreakdown.Quantity);
     }
+
     public async Task<IDbContextTransaction> BeginTransactionAsync()
     {
         return await _context.Database.BeginTransactionAsync();

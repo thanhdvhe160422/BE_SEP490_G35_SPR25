@@ -149,7 +149,7 @@ public class EventService : IEventService
                 AmountBudget = totalBudget,
                 IsPublic = 0,
                 TimePublic = null,
-                Status = 1,
+                Status = 0,
                 CampusId = campusId,
                 CategoryEventId = eventDTO.CategoryEventId,
                 Placed = eventDTO.Placed,
@@ -243,7 +243,7 @@ public class EventService : IEventService
                     await _eventRepository.CreateRiskAsync(newRisk);
                 }
             }
-
+            Console.WriteLine("sang "+eventDTO.CostBreakdowns.Count());
             // Tạo các chi phí
             if (eventDTO.CostBreakdowns != null && eventDTO.CostBreakdowns.Any())
             {
@@ -265,7 +265,8 @@ public class EventService : IEventService
                         Quantity = costBreakdown.Quantity,
                         PriceByOne = costBreakdown.PriceByOne
                     };
-                    await _eventRepository.CreateCostBreakdownAsync(newCostBreakdown);
+                    Console.WriteLine("thanh :"+newCostBreakdown.EventId);
+                   await _eventRepository.CreateCostBreakdownAsync(newCostBreakdown);
                 }
             }
 
