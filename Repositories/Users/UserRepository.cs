@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Users;
 using Planify_BackEnd.Models;
 
@@ -58,21 +59,27 @@ public class UserRepository : IUserRepository
             throw new Exception(ex.Message);
         }
     }
-    public async Task<IEnumerable<User>> GetListUserAsync(int page, int pageSize)
+    public PageResultDTO<User> GetListUser(int page, int pageSize)
     {
         try
         {
-            return await _context.Users
+            var count = _context.Users.Count();
+            if (count == 0)
+            {
+                return new PageResultDTO<User>(new List<User>(), count, page, pageSize);
+            }
+            var data = _context.Users
                 .Include(r => r.UserRoles)
                 .ThenInclude(u => u.Role)
                 .Include(c => c.Campus)
                 .Include(a => a.Address)
                 .Skip((page - 1) * pageSize).Take(pageSize)
-                .ToListAsync();
-        }
-        catch (Exception ex)
+                .ToList();
+            return new PageResultDTO<User>(data, count, page, pageSize);
+
+        } catch (Exception ex)
         {
-            Console.WriteLine($"Error in GetListUserAsync: {ex.Message}");
+            Console.WriteLine($"Error in GetListUser: {ex.Message}");
             return null;
         }
     }

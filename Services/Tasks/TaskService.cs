@@ -8,6 +8,9 @@ using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories.Tasks;
 using TaskModel = Planify_BackEnd.Models.Task;
 using Planify_BackEnd.DTOs.Groups;
+using Microsoft.Extensions.Logging;
+using Planify_BackEnd.DTOs.Events;
+using System.Threading.Tasks;
 namespace Planify_BackEnd.Services.Tasks
 {
     public class TaskService : ITaskService
@@ -86,27 +89,39 @@ namespace Planify_BackEnd.Services.Tasks
             }
         }
 
-        public async Task<List<TaskSearchResponeDTO>> GetAllTasksAsync(int groupId)
+        public PageResultDTO<TaskSearchResponeDTO> GetAllTasks(int eventId, int page, int pageSize)
         {
             try
             {
-                var tasks = await _taskRepository.GetAllTasksAsync(groupId);
-                return tasks.Select(item => new TaskSearchResponeDTO
+                var tasks =  _taskRepository.GetAllTasks(eventId, page, pageSize);
+                if (tasks.TotalCount == 0)
+
+                    return new PageResultDTO<TaskSearchResponeDTO>(new List<TaskSearchResponeDTO>(), 0, page, pageSize);
+                List<TaskSearchResponeDTO> taskList = new List<TaskSearchResponeDTO>();
+                foreach (var item in tasks.Items)
                 {
-                    Id = item.Id,
-                    TaskName = item.TaskName,
-                    TaskDescription = item.TaskDescription,
-                    StartTime = item.StartTime,
-                    Deadline = item.Deadline,
-                    EventId = item.EventId,
-                    AmountBudget = item.AmountBudget,
-                    Status = item.Status
-                }).ToList();
-            }
+                    TaskSearchResponeDTO task = new TaskSearchResponeDTO
+                    {
+                        Id = item.Id,
+                        TaskName = item.TaskName,
+                        TaskDescription = item.TaskDescription,
+                        StartTime = item.StartTime,
+                        Deadline = item.Deadline,
+                        EventId = item.EventId,
+                        AmountBudget = item.AmountBudget,
+                        Status = item.Status,
+                    };
+
+              
+                taskList.Add(task);
+
+                }
+                    return new PageResultDTO<TaskSearchResponeDTO>(taskList, tasks.TotalCount, page, pageSize);
+                }
             catch (Exception ex)
             {
-                Console.WriteLine("task - GetAllTasksAsync: " + ex.Message);
-                return new List<TaskSearchResponeDTO>();
+                 Console.WriteLine(ex.ToString()); 
+            throw;
             }
         }
 
@@ -235,12 +250,12 @@ namespace Planify_BackEnd.Services.Tasks
             }
         }
 
-        public async Task<List<TaskSearchResponeDTO>> SearchTaskByImplementerId(Guid implementerId, DateTime startDate, DateTime endDate)
+        public async Task<PageResultDTO<TaskSearchResponeDTO>> SearchTaskByImplementerId(int page, int pageSize, Guid implementerId, DateTime startDate, DateTime endDate)
         {
             try
             {
-                var tasks = await _taskRepository.SearchTaskByImplementerId(implementerId,startDate, endDate);
-                return tasks.Select(item => new TaskSearchResponeDTO
+                var resultTasks = await _taskRepository.SearchTaskByImplementerId(page,pageSize,implementerId,startDate, endDate);
+                var tastDtos = resultTasks.Items.Select(item => new TaskSearchResponeDTO
                 {
                     Id = item.Id,
                     TaskName = item.TaskName,
@@ -251,10 +266,11 @@ namespace Planify_BackEnd.Services.Tasks
                     AmountBudget = item.AmountBudget,
                     Status = item.Status
                 }).ToList();
+                return new PageResultDTO<TaskSearchResponeDTO>(tastDtos, resultTasks.TotalCount, page, pageSize);
             }
             catch (Exception ex)
             {
-                return new List<TaskSearchResponeDTO>();
+                throw new Exception(ex.Message);
             }
         }
     }

@@ -21,17 +21,17 @@ namespace Planify_BackEnd.Controllers
             _taskService = taskService;
         }
         /// <summary>
-        /// Get all tasks
+        /// Get all tasks by event Id
         /// </summary>
         /// <returns></returns>
         [HttpGet("list/{eventId}")]
-        [Authorize(Roles = "Event Organizer, Implementer")]
-        public async Task<IActionResult> GetAllTasks(int eventId)
+        //[Authorize(Roles = "Event Organizer, Implementer")]
+        public async Task<IActionResult> GetAllTasks(int eventId, int page, int pageSize)
         {
             try
             {
-                var response = await _taskService.GetAllTasksAsync(eventId);
-                if (response == null || response.Count() == 0)
+                var response = _taskService.GetAllTasks(eventId,  page, pageSize);
+                if (response.TotalCount == 0)
                 {
                     return NotFound("Cannot found any task");
                 }
@@ -174,23 +174,23 @@ namespace Planify_BackEnd.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        //[HttpGet("search/v2")]
-        //[Authorize(Roles = "Event Organizer, Implementer")]
-        //public async Task<IActionResult> SearchTasksByGroupId(Guid implementerId, DateTime startDate, DateTime endDate)
-        //{
-        //    try
-        //    {
-        //        var response = await _taskService.SearchTaskByImplementerId(implementerId, startDate, endDate);
-        //        if (response == null || response.Count() == 0)
-        //        {
-        //            return NotFound("Cannot found any task");
-        //        }
-        //        return Ok(response);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
-        //}
+        [HttpGet("search/v2")]
+        [Authorize(Roles = "Event Organizer, Implementer")]
+        public async Task<IActionResult> SearchTasksByGroupId(int page, int pageSize, Guid implementerId, DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                var response = await _taskService.SearchTaskByImplementerId(page, pageSize, implementerId, startDate, endDate);
+                if (response.TotalCount == 0)
+                {
+                    return NotFound("Cannot found any task");
+                }
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

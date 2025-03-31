@@ -34,6 +34,13 @@ public class EventService : IEventService
         _subTaskRepository = subTaskRepository;
         _taskRepository = taskRepository;
     }
+    /// <summary>
+    /// get all event by campusId and paging
+    /// </summary>
+    /// <param name="campusId"></param>
+    /// <param name="page"></param>
+    /// <param name="pageSize"></param>
+    /// <returns></returns>
     public PageResultDTO<EventGetListResponseDTO> GetAllEvent(int campusId, int page, int pageSize)
     {
         try
