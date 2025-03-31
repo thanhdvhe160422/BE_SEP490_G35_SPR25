@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Users;
 using Planify_BackEnd.Models;
@@ -165,16 +166,30 @@ public class UserRepository : IUserRepository
     /// <param name="pageSize"></param>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    public async Task<IEnumerable<User>> GetListImplementer(int eventId, int page, int pageSize)
+    public  PageResultDTO<User> GetListImplementer(int eventId, int page, int pageSize)
     {
         try
         {
-            return await _context.JoinProjects
-                      .Where(jg => jg.EventId == eventId)
-                      .Select(jg => jg.User)
-                      .Distinct()
-                      .Skip((page - 1) * pageSize).Take(pageSize)
-                      .ToListAsync();
+            var count = _context.JoinProjects
+                .Include(jp => jp.User)
+                .Include(jp => jp.Event)
+                .Where(jg => jg.EventId == eventId)
+                .Select(jg => jg.User)
+                .Distinct()
+                .Count();
+            if (count == 0)
+                return new PageResultDTO<User>(new List<User>(), count, page, pageSize);
+            var data = _context.JoinProjects
+                .Include(jp => jp.User)
+                .Include(jp => jp.Event)
+                .Where(jg => jg.EventId == eventId)
+                .Select(jg => jg.User)
+                .Distinct()
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+            PageResultDTO<User> result = new PageResultDTO<User>(data, count, page, pageSize);
+            return result;
         }
         catch (Exception ex)
         {

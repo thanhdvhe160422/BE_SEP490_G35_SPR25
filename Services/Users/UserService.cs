@@ -1,4 +1,5 @@
-﻿using Planify_BackEnd.DTOs;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Campus;
 using Planify_BackEnd.DTOs.Roles;
 using Planify_BackEnd.DTOs.Users;
@@ -153,28 +154,44 @@ namespace Planify_BackEnd.Services.Users
             }
         }
 
-        public async Task<IEnumerable<UserListDTO>> GetListImplementer(int eventId, int page, int pageSize)
+        public PageResultDTO<UserListDTO> GetListImplementer(int eventId, int page, int pageSize)
         {
-            var users = await _userRepository.GetListImplementer(eventId, page, pageSize);
-
-            var userDTOs = users.Select(c => new UserListDTO
+            try
             {
-                Id = c.Id,
-                UserName = c.UserName,
-                Email = c.Email,
-                FirstName = c.FirstName,
-                LastName = c.LastName,
-                Password = c.Password,
-                DateOfBirth = c.DateOfBirth,
-                PhoneNumber = c.PhoneNumber,
-                AddressId = c.AddressId,
-                AvatarId = c.AvatarId,
-                CreatedAt = c.CreatedAt,
-                CampusId = c.CampusId,
-                Status = c.Status,
-                Gender = c.Gender
-            }).ToList();
-            return userDTOs;
+                var users = _userRepository.GetListImplementer(eventId, page, pageSize);
+                if (users.TotalCount == 0)
+                {
+                    return new PageResultDTO<UserListDTO>(new List<UserListDTO>(), 0, page, pageSize);
+                }
+                List<UserListDTO> result = new List<UserListDTO>();
+                foreach (var c in users.Items)
+                {
+                    UserListDTO user = new UserListDTO
+                    {
+                        Id = c.Id,
+                        UserName = c.UserName,
+                        Email = c.Email,
+                        FirstName = c.FirstName,
+                        LastName = c.LastName,
+                        Password = c.Password,
+                        DateOfBirth = c.DateOfBirth,
+                        PhoneNumber = c.PhoneNumber,
+                        AddressId = c.AddressId,
+                        AvatarId = c.AvatarId,
+                        CreatedAt = c.CreatedAt,
+                        CampusId = c.CampusId,
+                        Status = c.Status,
+                        Gender = c.Gender
+                    };
+                    result.Add(user);
+                }
+                return new PageResultDTO<UserListDTO>(result, users.TotalCount, page, pageSize);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
         }
 
         public async Task<List<Models.User>> GetUserByNameOrEmailAsync(string input, int campusId)
