@@ -36,7 +36,7 @@ namespace Planify_BackEnd.Services.Campus
             }
             catch
             {
-                return new CampusDTO();
+                throw new Exception();
             }
         }
     }
