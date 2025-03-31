@@ -192,5 +192,12 @@ namespace Planify_BackEnd.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPut("delete/v2/{taskId}")]
+        [Authorize(Roles = "Event Organizer, Implementer")]
+        public async Task<IActionResult> DeleteTaskV2(int taskId)
+        {
+            var response = await _taskService.DeleteTaskV2(taskId);
+            return StatusCode(response.Status, response);
+        }
     }
 }
