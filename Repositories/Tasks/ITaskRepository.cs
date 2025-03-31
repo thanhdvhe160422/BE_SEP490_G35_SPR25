@@ -16,6 +16,7 @@ namespace Planify_BackEnd.Repositories.Tasks
         public Models.Task GetTaskById(int taskId);
         public Task<bool> changeStatus(int taskId, int status);
         Task<PageResultDTO<Models.Task>> SearchTaskByImplementerId(int page, int pageSize, Guid implementerId, DateTime startDate, DateTime endDate);
+        Task<bool> DeleteTaskV2(int taskId);
 
     }
 }
