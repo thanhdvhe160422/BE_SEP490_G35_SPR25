@@ -15,7 +15,7 @@ public class CostController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = "Event Organizer")]
-    public async Task<IActionResult> CreateCost([FromBody] CostBreakdownDTO costDto)
+    public async Task<IActionResult> CreateCost([FromBody] CostBreakdownCreateDTO costDto)
     {
         var result = await _costService.CreateCostAsync(costDto);
         return Ok(result);
@@ -23,7 +23,7 @@ public class CostController : ControllerBase
 
     [HttpPut("{id}")]
     [Authorize(Roles = "Event Organizer")]
-    public async Task<IActionResult> UpdateCost(int id, [FromBody] CostBreakdownDTO costDto)
+    public async Task<IActionResult> UpdateCost(int id, [FromBody] CostBreakdownUpdateDTO costDto)
     {
         costDto.Id = id;
         var result = await _costService.UpdateCostAsync(costDto);
@@ -34,7 +34,7 @@ public class CostController : ControllerBase
     [Authorize(Roles = "Event Organizer")]
     public async Task<IActionResult> DeleteCost(int id)
     {
-        await _costService.DeleteCostAsync(id);
-        return NoContent();
+        var result = await _costService.DeleteCostAsync(id);
+        return Ok(result);
     }
 }
