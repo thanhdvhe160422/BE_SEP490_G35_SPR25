@@ -198,6 +198,13 @@ public class EventRepository : IEventRepository
                                 Email = st.CreateByNavigation.Email
                             }
                         }).ToList()
+                    }).ToList(),
+                    CostBreakdowns = e.CostBreakdowns.Select(cb => new CostBreakdownDto
+                    {
+                        Id = cb.Id,
+                        Name = cb.Name,
+                        Quantity = cb.Quantity,
+                        PriceByOne = cb.PriceByOne
                     }).ToList()
                 })
                 .FirstOrDefaultAsync();
