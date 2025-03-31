@@ -181,7 +181,7 @@ public class EventRepository : IEventRepository
                         Description = r.Description
                     }).ToList(),
                     Tasks = e.Tasks
-                        .Where(t => t.Status == 1)
+                        .Where(t => t.Status == 1 && t.Status == 0)
                         .Select(t => new TaskDetailDto
                         {
                             Id = t.Id,
@@ -199,7 +199,7 @@ public class EventRepository : IEventRepository
                                 Email = t.CreateByNavigation.Email
                             },
                             SubTasks = t.SubTasks
-                                .Where(st => st.Status == 1)
+                                .Where(st => st.Status == 1 && st.Status == 0)
                                 .Select(st => new SubTaskDetailDto
                                 {
                                     Id = st.Id,
