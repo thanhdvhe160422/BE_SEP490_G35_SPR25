@@ -19,6 +19,7 @@
         public string? MonitoringProcess { get; set; }
         public int? SizeParticipants { get; set; }
         public string CampusName { get; set; }
+        public int CategoryEventId { get; set; }
         public string CategoryEventName { get; set; }
         public UserDto CreatedBy { get; set; }
         public UserDto? Manager { get; set; }

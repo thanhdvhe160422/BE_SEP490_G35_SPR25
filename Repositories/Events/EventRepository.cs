@@ -120,6 +120,7 @@ public class EventRepository : IEventRepository
                     MonitoringProcess = e.MonitoringProcess,
                     SizeParticipants = e.SizeParticipants,
                     CampusName = e.Campus.CampusName,
+                    CategoryEventId = e.CategoryEventId,
                     CategoryEventName = e.CategoryEvent.CategoryEventName,
                     CreatedBy = new UserDto
                     {
