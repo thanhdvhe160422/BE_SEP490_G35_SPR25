@@ -195,7 +195,7 @@ namespace Planify_BackEnd.Repositories.JoinGroups
         public async Task<List<Guid>> GetExistingImplementerIdsAsync(int eventId)
         {
             return await _context.JoinProjects
-                .Where(jp => jp.EventId == eventId && jp.TimeJoinProject == null)
+                .Where(jp => jp.EventId == eventId )//&& jp.TimeJoinProject == null)
                 .Select(jp => jp.UserId)
                 .ToListAsync();
         }
