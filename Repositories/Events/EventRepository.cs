@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.Models;
@@ -411,6 +412,10 @@ public class EventRepository : IEventRepository
     {
         _context.CostBreakdowns.Add(costBreakdown);
         await _context.SaveChangesAsync();
+    }
+    public async Task<IDbContextTransaction> BeginTransactionAsync()
+    {
+        return await _context.Database.BeginTransactionAsync();
     }
 }
 

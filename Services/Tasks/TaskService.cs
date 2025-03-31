@@ -8,6 +8,9 @@ using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories.Tasks;
 using TaskModel = Planify_BackEnd.Models.Task;
 using Planify_BackEnd.DTOs.Groups;
+using Microsoft.Extensions.Logging;
+using Planify_BackEnd.DTOs.Events;
+using System.Threading.Tasks;
 namespace Planify_BackEnd.Services.Tasks
 {
     public class TaskService : ITaskService
@@ -28,25 +31,27 @@ namespace Planify_BackEnd.Services.Tasks
                 {
                     return new ResponseDTO(400, "Task name is required.", null);
                 }
-
+                
                 if (taskDTO.StartTime >= taskDTO.Deadline)
                 {
                     return new ResponseDTO(400, "Start time must be earlier than deadline.", null);
                 }
-                var newTask = new TaskModel
-                {  
-                    TaskName = taskDTO.TaskName,
-                    TaskDescription = taskDTO.TaskDescription,
-                    StartTime = taskDTO.StartTime,
-                    Deadline = taskDTO.Deadline,
-                    AmountBudget = taskDTO.AmountBudget,
-                    Status = 1,
-                    CreateBy = organizerId,
-                    CreateDate = DateTime.UtcNow
-                };
                 try
                 {
+                    var newTask = new TaskModel
+                    {
+                        EventId = taskDTO.EventId,
+                        TaskName = taskDTO.TaskName,
+                        TaskDescription = taskDTO.TaskDescription,
+                        StartTime = taskDTO.StartTime,
+                        Deadline = taskDTO.Deadline,
+                        AmountBudget = taskDTO.AmountBudget,
+                        Status = 1,
+                        CreateBy = organizerId,
+                        CreateDate = DateTime.UtcNow
+                    };
                     await _taskRepository.CreateTaskAsync(newTask);
+                    return new ResponseDTO(201, "Task creates successfully!", newTask);
                 }
                 catch (Exception dbEx)
                 {
@@ -54,7 +59,7 @@ namespace Planify_BackEnd.Services.Tasks
                 }
 
 
-                return new ResponseDTO(201, "Task creates successfully!", newTask);
+               
             }
             catch (Exception ex)
             {
@@ -86,27 +91,39 @@ namespace Planify_BackEnd.Services.Tasks
             }
         }
 
-        public async Task<List<TaskSearchResponeDTO>> GetAllTasksAsync(int groupId)
+        public PageResultDTO<TaskSearchResponeDTO> GetAllTasks(int eventId, int page, int pageSize)
         {
             try
             {
-                var tasks = await _taskRepository.GetAllTasksAsync(groupId);
-                return tasks.Select(item => new TaskSearchResponeDTO
+                var tasks =  _taskRepository.GetAllTasks(eventId, page, pageSize);
+                if (tasks.TotalCount == 0)
+
+                    return new PageResultDTO<TaskSearchResponeDTO>(new List<TaskSearchResponeDTO>(), 0, page, pageSize);
+                List<TaskSearchResponeDTO> taskList = new List<TaskSearchResponeDTO>();
+                foreach (var item in tasks.Items)
                 {
-                    Id = item.Id,
-                    TaskName = item.TaskName,
-                    TaskDescription = item.TaskDescription,
-                    StartTime = item.StartTime,
-                    Deadline = item.Deadline,
-                    EventId = item.EventId,
-                    AmountBudget = item.AmountBudget,
-                    Status = item.Status
-                }).ToList();
-            }
+                    TaskSearchResponeDTO task = new TaskSearchResponeDTO
+                    {
+                        Id = item.Id,
+                        TaskName = item.TaskName,
+                        TaskDescription = item.TaskDescription,
+                        StartTime = item.StartTime,
+                        Deadline = item.Deadline,
+                        EventId = item.EventId,
+                        AmountBudget = item.AmountBudget,
+                        Status = item.Status,
+                    };
+
+              
+                taskList.Add(task);
+
+                }
+                    return new PageResultDTO<TaskSearchResponeDTO>(taskList, tasks.TotalCount, page, pageSize);
+                }
             catch (Exception ex)
             {
-                Console.WriteLine("task - GetAllTasksAsync: " + ex.Message);
-                return new List<TaskSearchResponeDTO>();
+                 Console.WriteLine(ex.ToString()); 
+            throw;
             }
         }
 
@@ -122,8 +139,8 @@ namespace Planify_BackEnd.Services.Tasks
                     StartTime = taskDTO.StartTime,
                     Deadline = taskDTO.Deadline,
                     AmountBudget = taskDTO.AmountBudget,
-                    //GroupId = taskDTO.GroupId,
-                    Status = taskDTO.Status
+                    EventId = taskDTO.EventId
+                    
                 });
 
                 if (existingTask == null)

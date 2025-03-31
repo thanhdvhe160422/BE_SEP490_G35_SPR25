@@ -1,9 +1,10 @@
-﻿using Planify_BackEnd.DTOs.Users;
+﻿using Planify_BackEnd.DTOs;
+using Planify_BackEnd.DTOs.Users;
 using Planify_BackEnd.Models;
 
 public interface IUserRepository
 {
-    Task<IEnumerable<User>> GetListUserAsync(int page, int pageSize);
+    PageResultDTO<User> GetListUser(int page, int pageSize);
     Task<User> GetUserDetailAsync(Guid userId);
     Task<bool> UpdateUserStatusAsync(Guid id, int newStatus);
     Task<User> GetUserByEmailAsync(string email);
