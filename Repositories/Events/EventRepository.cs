@@ -180,39 +180,43 @@ public class EventRepository : IEventRepository
                         Solution = r.Solution,
                         Description = r.Description
                     }).ToList(),
-                    Tasks = e.Tasks.Select(t => new TaskDetailDto
-                    {
-                        Id = t.Id,
-                        TaskName = t.TaskName,
-                        TaskDescription = t.TaskDescription,
-                        StartTime = t.StartTime,
-                        Deadline = t.Deadline,
-                        AmountBudget = t.AmountBudget,
-                        CreatedAt = t.CreateDate,
-                        CreatedBy = new UserDto
+                    Tasks = e.Tasks
+                        .Where(t => t.Status == 1)
+                        .Select(t => new TaskDetailDto
                         {
-                            Id = t.CreateByNavigation.Id,
-                            FirstName = t.CreateByNavigation.FirstName,
-                            LastName = t.CreateByNavigation.LastName,
-                            Email = t.CreateByNavigation.Email
-                        },
-                        SubTasks = t.SubTasks.Select(st => new SubTaskDetailDto
-                        {
-                            Id = st.Id,
-                            SubTaskName = st.SubTaskName,
-                            SubTaskDescription = st.SubTaskDescription,
-                            StartTime = st.StartTime,
-                            Deadline = st.Deadline,
-                            AmountBudget = st.AmountBudget,
+                            Id = t.Id,
+                            TaskName = t.TaskName,
+                            TaskDescription = t.TaskDescription,
+                            StartTime = t.StartTime,
+                            Deadline = t.Deadline,
+                            AmountBudget = t.AmountBudget,
+                            CreatedAt = t.CreateDate,
                             CreatedBy = new UserDto
                             {
-                                Id = st.CreateByNavigation.Id,
-                                FirstName = st.CreateByNavigation.FirstName,
-                                LastName = st.CreateByNavigation.LastName,
-                                Email = st.CreateByNavigation.Email
-                            }
-                        }).ToList()
-                    }).ToList(),
+                                Id = t.CreateByNavigation.Id,
+                                FirstName = t.CreateByNavigation.FirstName,
+                                LastName = t.CreateByNavigation.LastName,
+                                Email = t.CreateByNavigation.Email
+                            },
+                            SubTasks = t.SubTasks
+                                .Where(st => st.Status == 1)
+                                .Select(st => new SubTaskDetailDto
+                                {
+                                    Id = st.Id,
+                                    SubTaskName = st.SubTaskName,
+                                    SubTaskDescription = st.SubTaskDescription,
+                                    StartTime = st.StartTime,
+                                    Deadline = st.Deadline,
+                                    AmountBudget = st.AmountBudget,
+                                    CreatedBy = new UserDto
+                                    {
+                                        Id = st.CreateByNavigation.Id,
+                                        FirstName = st.CreateByNavigation.FirstName,
+                                        LastName = st.CreateByNavigation.LastName,
+                                        Email = st.CreateByNavigation.Email
+                                    }
+                                }).ToList()
+                        }).ToList(),
                     CostBreakdowns = e.CostBreakdowns.Select(cb => new CostBreakdownDetailDto
                     {
                         Id = cb.Id,
