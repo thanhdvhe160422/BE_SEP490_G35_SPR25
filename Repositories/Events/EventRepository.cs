@@ -213,7 +213,7 @@ public class EventRepository : IEventRepository
                             }
                         }).ToList()
                     }).ToList(),
-                    CostBreakdowns = e.CostBreakdowns.Select(cb => new CostBreakdownDto
+                    CostBreakdowns = e.CostBreakdowns.Select(cb => new CostBreakdownDetailDto
                     {
                         Id = cb.Id,
                         Name = cb.Name,

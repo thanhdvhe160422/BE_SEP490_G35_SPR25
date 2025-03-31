@@ -1,4 +1,5 @@
-﻿using Planify_BackEnd.DTOs.CostBreakdown;
+﻿using Planify_BackEnd.DTOs;
+using Planify_BackEnd.DTOs.CostBreakdown;
 using Planify_BackEnd.Models;
 
 public class CostService : ICostService
@@ -10,7 +11,7 @@ public class CostService : ICostService
         _costRepository = costRepository;
     }
 
-    public async Task<CostBreakdownDTO> CreateCostAsync(CostBreakdownDTO costDto)
+    public async Task<ResponseDTO> CreateCostAsync(CostBreakdownCreateDTO costDto)
     {
         var cost = new CostBreakdown
         {
@@ -21,22 +22,15 @@ public class CostService : ICostService
         };
 
         var createdCost = await _costRepository.CreateCostAsync(cost);
-        return new CostBreakdownDTO
-        {
-            Id = createdCost.Id,
-            Name = createdCost.Name,
-            Quantity = createdCost.Quantity,
-            PriceByOne = createdCost.PriceByOne,
-            EventId = createdCost.EventId
-        };
+        return new ResponseDTO(201, "Create Cost Successfully", createdCost);
     }
 
-    public async Task<CostBreakdownDTO> UpdateCostAsync(CostBreakdownDTO costDto)
+    public async Task<ResponseDTO> UpdateCostAsync(CostBreakdownUpdateDTO costDto)
     {
         var existingCost = await _costRepository.GetCostByIdAsync(costDto.Id);
         if (existingCost == null)
         {
-            throw new Exception($"Cost with ID {costDto.Id} not found");
+            return new ResponseDTO(404, $"Cost with ID {costDto.Id} not found", null);
         }
 
         existingCost.Name = costDto.Name;
@@ -44,24 +38,18 @@ public class CostService : ICostService
         existingCost.PriceByOne = costDto.PriceByOne;
 
         var updatedCost = await _costRepository.UpdateCostAsync(existingCost);
-        return new CostBreakdownDTO
-        {
-            Id = updatedCost.Id,
-            Name = updatedCost.Name,
-            Quantity = updatedCost.Quantity,
-            PriceByOne = updatedCost.PriceByOne,
-            EventId = updatedCost.EventId
-        };
+        return new ResponseDTO(200, "Update Cost Successfully", updatedCost);
     }
 
-    public async System.Threading.Tasks.Task DeleteCostAsync(int id)
+    public async Task<ResponseDTO> DeleteCostAsync(int id)
     {
         var existingCost = await _costRepository.GetCostByIdAsync(id);
         if (existingCost == null)
         {
-            throw new Exception($"Cost with ID {id} not found");
+            return new ResponseDTO(404, $"Cost with ID {id} not found", null);
         }
 
         await _costRepository.DeleteCostAsync(id);
+        return new ResponseDTO(200, "Delete Cost Successfully", null);
     }
 }

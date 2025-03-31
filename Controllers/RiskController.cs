@@ -15,7 +15,7 @@ public class RiskController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = "Event Organizer")]
-    public async Task<IActionResult> CreateRisk([FromBody] RiskDTO riskDto)
+    public async Task<IActionResult> CreateRisk([FromBody] RiskCreateDTO riskDto)
     {
         var result = await _riskService.CreateRiskAsync(riskDto);
         return Ok(result);
@@ -23,7 +23,7 @@ public class RiskController : ControllerBase
 
     [HttpPut("{id}")]
     [Authorize(Roles = "Event Organizer")]
-    public async Task<IActionResult> UpdateRisk(int id, [FromBody] RiskDTO riskDto)
+    public async Task<IActionResult> UpdateRisk(int id, [FromBody] RiskUpdateDTO riskDto)
     {
         riskDto.Id = id;
         var result = await _riskService.UpdateRiskAsync(riskDto);
@@ -34,7 +34,7 @@ public class RiskController : ControllerBase
     [Authorize(Roles = "Event Organizer")]
     public async Task<IActionResult> DeleteRisk(int id)
     {
-        await _riskService.DeleteRiskAsync(id);
-        return NoContent();
+        var result = await _riskService.DeleteRiskAsync(id);
+        return Ok(result);
     }
 }
