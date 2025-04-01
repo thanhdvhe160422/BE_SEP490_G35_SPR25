@@ -17,7 +17,6 @@ namespace Planify_BackEnd.DTOs.SubTasks
         public decimal AmountBudget { get; set; }
         [Required]
         public int TaskId { get; set; }
-        public Guid ImplementerId { get; set; } // Người tạo subtask
         public  SubTaskCreateRequestDTO() { }
 
     }

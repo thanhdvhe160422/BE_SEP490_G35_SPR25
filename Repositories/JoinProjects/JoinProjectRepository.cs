@@ -143,28 +143,41 @@ namespace Planify_BackEnd.Repositories.JoinGroups
                 return false;
             }
 
+            const int implementerRoleId = 4; // Nên lấy từ config hoặc db một lần
+
             try
             {
+                // Lấy tất cả UserRole hiện có cho role Implementer
+                var existingUserRoles = await _context.UserRoles
+                    .Where(ur => ur.RoleId == implementerRoleId && implementerIds.Contains(ur.UserId))
+                    .ToListAsync();
+
+                var newUserRolesToAdd = new List<UserRole>();
                 foreach (var implementerId in implementerIds)
                 {
-                    var userRole = await _context.UserRoles
-                    .FirstOrDefaultAsync(ur => ur.UserId == implementerId && ur.RoleId == 4);
-
-                    if (userRole == null)
+                    if (!existingUserRoles.Any(ur => ur.UserId == implementerId))
                     {
-                        _context.UserRoles.Add(new UserRole
+                        newUserRolesToAdd.Add(new UserRole
                         {
                             UserId = implementerId,
-                            RoleId = 4
+                            RoleId = implementerRoleId
                         });
                     }
                 }
-                var result = await _context.SaveChangesAsync();
-                return result > 0;
+
+                if (newUserRolesToAdd.Any())
+                {
+                    _context.UserRoles.AddRange(newUserRolesToAdd);
+                    var result = await _context.SaveChangesAsync();
+                    return result > 0;
+                }
+
+                return true; // Trả về true nếu không có gì để thêm (tất cả đã có role)
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine($"Lỗi khi thêm Implementer Roles: {ex.Message}");
+                // Ghi log lỗi chi tiết hơn ở đây
                 return false;
             }
         }
@@ -182,7 +195,7 @@ namespace Planify_BackEnd.Repositories.JoinGroups
         public async Task<List<Guid>> GetExistingImplementerIdsAsync(int eventId)
         {
             return await _context.JoinProjects
-                .Where(jp => jp.EventId == eventId)
+                .Where(jp => jp.EventId == eventId )//&& jp.TimeJoinProject == null)
                 .Select(jp => jp.UserId)
                 .ToListAsync();
         }

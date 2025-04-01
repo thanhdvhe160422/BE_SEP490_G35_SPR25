@@ -120,6 +120,7 @@ public class EventRepository : IEventRepository
                     MonitoringProcess = e.MonitoringProcess,
                     SizeParticipants = e.SizeParticipants,
                     CampusName = e.Campus.CampusName,
+                    CategoryEventId = e.CategoryEventId,
                     CategoryEventName = e.CategoryEvent.CategoryEventName,
                     CreatedBy = new UserDto
                     {
@@ -145,20 +146,21 @@ public class EventRepository : IEventRepository
                     EventMedia = e.EventMedia.Select(em => new EventMediaDto
                     {
                         Id = em.Id,
-                        MediaUrl = em.Media.MediaUrl
+                        MediaUrl = em.Media != null ? em.Media.MediaUrl : null
                     }).ToList(),
                     FavouriteEvents = e.FavouriteEvents.Select(fe => new FavouriteEventDto
                     {
                         UserId = fe.UserId,
                         UserFullName = $"{fe.User.FirstName} {fe.User.LastName}"
                     }).ToList(),
-                    JoinProjects = e.JoinProjects.Select(jp => new JoinProjectDto
-                    {
-                        UserId = jp.UserId,
-                        UserFullName = $"{jp.User.FirstName} {jp.User.LastName}",
-                        TimeJoinProject = jp.TimeJoinProject,
-                        TimeOutProject = jp.TimeOutProject
-                    }).ToList(),
+                    JoinProjects = e.JoinProjects
+                        .Where(jp => jp.TimeOutProject == null)
+                        .Select(jp => new JoinProjectDto
+                        {
+                            UserId = jp.UserId,
+                            UserFullName = $"{jp.User.FirstName} {jp.User.LastName}",
+                            TimeJoinProject = jp.TimeJoinProject
+                        }).ToList(),
                     Risks = e.Risks.Select(r => new RiskDto
                     {
                         Id = r.Id,
@@ -167,47 +169,63 @@ public class EventRepository : IEventRepository
                         Solution = r.Solution,
                         Description = r.Description
                     }).ToList(),
-                    Tasks = e.Tasks.Select(t => new TaskDetailDto
-                    {
-                        Id = t.Id,
-                        TaskName = t.TaskName,
-                        TaskDescription = t.TaskDescription,
-                        StartTime = t.StartTime,
-                        Deadline = t.Deadline,
-                        AmountBudget = t.AmountBudget,
-                        CreatedAt = t.CreateDate,
-                        CreatedBy = new UserDto
+                    Tasks = e.Tasks
+                        .Where(t => t.Status == 1 || t.Status == 0)
+                        .Select(t => new TaskDetailDto
                         {
-                            Id = t.CreateByNavigation.Id,
-                            FirstName = t.CreateByNavigation.FirstName,
-                            LastName = t.CreateByNavigation.LastName,
-                            Email = t.CreateByNavigation.Email
-                        },
-                        SubTasks = t.SubTasks.Select(st => new SubTaskDetailDto
-                        {
-                            Id = st.Id,
-                            SubTaskName = st.SubTaskName,
-                            SubTaskDescription = st.SubTaskDescription,
-                            StartTime = st.StartTime,
-                            Deadline = st.Deadline,
-                            AmountBudget = st.AmountBudget,
+                            Id = t.Id,
+                            TaskName = t.TaskName,
+                            TaskDescription = t.TaskDescription,
+                            StartTime = t.StartTime,
+                            Deadline = t.Deadline,
+                            AmountBudget = t.AmountBudget,
+                            CreatedAt = t.CreateDate,
                             CreatedBy = new UserDto
                             {
-                                Id = st.CreateByNavigation.Id,
-                                FirstName = st.CreateByNavigation.FirstName,
-                                LastName = st.CreateByNavigation.LastName,
-                                Email = st.CreateByNavigation.Email
-                            }
-                        }).ToList()
+                                Id = t.CreateByNavigation.Id,
+                                FirstName = t.CreateByNavigation.FirstName,
+                                LastName = t.CreateByNavigation.LastName,
+                                Email = t.CreateByNavigation.Email
+                            },
+                            SubTasks = t.SubTasks
+                                .Where(st => st.Status == 1 || st.Status == 0)
+                                .Select(st => new SubTaskDetailDto
+                                {
+                                    Id = st.Id,
+                                    SubTaskName = st.SubTaskName,
+                                    SubTaskDescription = st.SubTaskDescription,
+                                    StartTime = st.StartTime,
+                                    Deadline = st.Deadline,
+                                    AmountBudget = st.AmountBudget,
+                                    CreatedBy = new UserDto
+                                    {
+                                        Id = st.CreateByNavigation.Id,
+                                        FirstName = st.CreateByNavigation.FirstName,
+                                        LastName = st.CreateByNavigation.LastName,
+                                        Email = st.CreateByNavigation.Email
+                                    }
+                                }).ToList()
+                        }).ToList(),
+                    CostBreakdowns = e.CostBreakdowns.Select(cb => new CostBreakdownDetailDto
+                    {
+                        Id = cb.Id,
+                        Name = cb.Name,
+                        Quantity = cb.Quantity,
+                        PriceByOne = cb.PriceByOne
                     }).ToList()
                 })
                 .FirstOrDefaultAsync();
+
+            if (eventDetail == null)
+            {
+                throw new Exception($"Không tìm thấy sự kiện với ID {eventId}.");
+            }
 
             return eventDetail;
         }
         catch (Exception ex)
         {
-            throw new Exception("An unexpected error occurred while retrieving event details.", ex);
+            throw new Exception($"Đã xảy ra lỗi khi lấy chi tiết sự kiện với eventId {eventId}. Chi tiết: {ex.Message}, StackTrace: {ex.StackTrace}", ex);
         }
     }
 

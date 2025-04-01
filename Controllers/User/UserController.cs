@@ -106,14 +106,18 @@ namespace Planify_BackEnd.Controllers.User
                 return BadRequest(new { message = ex.Message });
             }
         }
-        [HttpGet("getListImplementer/{eventId}")]
-        [Authorize(Roles = "Event Organizer")]
+        [HttpGet("get-list-implementer/{eventId}")]
+        //[Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> GetListImplementer(int eventId, int page, int pageSize)
         {
           
             try
             {
-                var response = await _userService.GetListImplementer(eventId, page, pageSize);
+                var response =  _userService.GetListImplementer(eventId, page, pageSize);
+                if (response.TotalCount == 0)
+                {
+                    return NotFound("Cannot found any implementer");
+                }
                 return Ok(response);
             }
             catch (Exception ex)
