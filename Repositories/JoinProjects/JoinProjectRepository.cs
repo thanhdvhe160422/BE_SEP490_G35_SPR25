@@ -34,7 +34,7 @@ namespace Planify_BackEnd.Repositories.JoinGroups
         {
             try
             {
-                var joinProject = _context.JoinProjects.FirstOrDefault(jp => jp.UserId == userId && jp.EventId == eventId);
+                var joinProject = _context.JoinProjects.FirstOrDefault(jp => jp.UserId == userId && jp.EventId == eventId && jp.TimeOutProject == null);
                 joinProject.TimeOutProject = DateTime.Now;
                 _context.JoinProjects.Update(joinProject);
                 await _context.SaveChangesAsync();
@@ -195,7 +195,7 @@ namespace Planify_BackEnd.Repositories.JoinGroups
         public async Task<List<Guid>> GetExistingImplementerIdsAsync(int eventId)
         {
             return await _context.JoinProjects
-                .Where(jp => jp.EventId == eventId )//&& jp.TimeJoinProject == null)
+                .Where(jp => jp.EventId == eventId && jp.TimeOutProject == null)
                 .Select(jp => jp.UserId)
                 .ToListAsync();
         }
