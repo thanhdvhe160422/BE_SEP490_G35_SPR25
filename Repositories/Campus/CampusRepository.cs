@@ -29,13 +29,13 @@ public class CampusRepository : ICampusRepository
         try
         {
             var campus = await _context.Campuses
-                .FirstOrDefaultAsync(c => c.CampusName.Contains(campusName)
+                .FirstOrDefaultAsync(c => c.CampusName==campusName
                 && c.Status == 1);
             return campus;
         }
         catch
         {
-            return new Campus();
+            throw new Exception();
         }
     }
 }
