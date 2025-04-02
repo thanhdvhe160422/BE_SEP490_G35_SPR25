@@ -3,5 +3,6 @@
     public class ApproveRequestDTO
     {
         Guid ManagerId { get; set; }
+        string? Reason { get; set; }
     }
 }

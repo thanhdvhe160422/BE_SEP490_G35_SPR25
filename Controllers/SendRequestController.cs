@@ -35,7 +35,7 @@ namespace Planify_BackEnd.Controllers
 
         [HttpPut("{id}/approve")]
         [Authorize(Roles = "Campus Manager")]
-        public async Task<IActionResult> ApproveRequest(int id, [FromQuery] string reason)
+        public async Task<IActionResult> ApproveRequest(int id, string reason)
         {
             var managerIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(managerIdString))
@@ -54,7 +54,7 @@ namespace Planify_BackEnd.Controllers
 
         [HttpPut("{id}/reject")]
         [Authorize(Roles = "Campus Manager")]
-        public async Task<IActionResult> RejectRequest(int id, [FromQuery] string reason)
+        public async Task<IActionResult> RejectRequest(int id, string reason)
         {
             var managerIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(managerIdString))
