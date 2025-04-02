@@ -35,7 +35,7 @@ namespace Planify_BackEnd.Controllers
 
         [HttpPut("{id}/approve")]
         [Authorize(Roles = "Campus Manager")]
-        public async Task<IActionResult> ApproveRequest(int id, [FromQuery] string reason)
+        public async Task<IActionResult> ApproveRequest([FromBody] ApproveRequestDTO request)
         {
             var managerIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(managerIdString))
@@ -47,14 +47,13 @@ namespace Planify_BackEnd.Controllers
             {
                 return BadRequest(new ResponseDTO(400, "Manager ID không hợp lệ", null));
             }
-
-            var response = await _sendRequestService.ApproveRequestAsync(id, managerId, reason);
+            var response = await _sendRequestService.ApproveRequestAsync(request.Id, managerId, request.Reason);
             return StatusCode(response.Status, response);
         }
 
         [HttpPut("{id}/reject")]
         [Authorize(Roles = "Campus Manager")]
-        public async Task<IActionResult> RejectRequest(int id, [FromQuery] string reason)
+        public async Task<IActionResult> RejectRequest([FromBody] ApproveRequestDTO request)
         {
             var managerIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(managerIdString))
@@ -67,7 +66,7 @@ namespace Planify_BackEnd.Controllers
                 return BadRequest(new ResponseDTO(400, "Manager ID không hợp lệ", null));
             }
 
-            var response = await _sendRequestService.RejectRequestAsync(id, managerId, reason);
+            var response = await _sendRequestService.RejectRequestAsync(request.Id, managerId, request.Reason);
             return StatusCode(response.Status, response);
         }
     }

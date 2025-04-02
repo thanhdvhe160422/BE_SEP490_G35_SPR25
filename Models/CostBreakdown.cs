@@ -13,7 +13,7 @@ public partial class CostBreakdown
 
     public decimal? PriceByOne { get; set; }
 
-    public int EventId { get; set; }
+    public int? EventId { get; set; }
 
     public virtual Event? Event { get; set; }
 }

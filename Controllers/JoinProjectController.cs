@@ -34,7 +34,7 @@ namespace Planify_BackEnd.Controllers
         }
 
         [HttpPut("delete-from-project/{eventId}/{userId}")]
-        //[Authorize(Roles = "Event Organizer")]
+        [Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> DeleteImplementerFromEvent(int eventId, Guid userId)
         {
             try

@@ -25,5 +25,7 @@ public partial class SubTask
 
     public virtual User CreateByNavigation { get; set; } = null!;
 
+    public virtual ICollection<JoinTask> JoinTasks { get; set; } = new List<JoinTask>();
+
     public virtual Task Task { get; set; } = null!;
 }

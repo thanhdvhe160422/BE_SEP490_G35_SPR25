@@ -1,8 +1,9 @@
-﻿using Planify_BackEnd.DTOs.CostBreakdown;
+﻿using Planify_BackEnd.DTOs;
+using Planify_BackEnd.DTOs.CostBreakdown;
 
 public interface ICostService
 {
-    Task<CostBreakdownDTO> CreateCostAsync(CostBreakdownDTO costDto);
-    Task<CostBreakdownDTO> UpdateCostAsync(CostBreakdownDTO costDto);
-    Task DeleteCostAsync(int id);
+    Task<ResponseDTO> CreateCostAsync(CostBreakdownCreateDTO costDto);
+    Task<ResponseDTO> UpdateCostAsync(CostBreakdownUpdateDTO costDto);
+    Task<ResponseDTO> DeleteCostAsync(int id);
 }
