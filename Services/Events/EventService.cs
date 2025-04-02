@@ -345,16 +345,17 @@ public class EventService : IEventService
                 EndTime = e.EndTime,
                 EventDescription = e.EventDescription,
                 EventTitle = e.EventTitle,
-                IsPublic = e.IsPublic,
                 Placed = e.Placed,
                 Status = e.Status,
-                TimePublic = e.TimePublic,
                 UpdateBy = e.UpdateBy,
                 UpdatedAt = DateTime.Now,
                 MeasuringSuccess = e.MeasuringSuccess,
                 Goals = e.Goals,
                 MonitoringProcess = e.MonitoringProcess,
-                SizeParticipants = e.SizeParticipants
+                SizeParticipants = e.SizeParticipants,
+                PromotionalPlan = e.PromotionalPlan,
+                TargetAudience = e.TargetAudience,
+                SloganEvent = e.SloganEvent,
             };
             Event updatedEvent = await _eventRepository.UpdateEventAsync(updateEvent);
             EventDetailDto eventDetailResponseDTO = new EventDetailDto
@@ -377,6 +378,9 @@ public class EventService : IEventService
                 Goals = updatedEvent.Goals,
                 MonitoringProcess = updatedEvent.Goals,
                 SizeParticipants = updatedEvent.SizeParticipants,
+                PromotionalPlan = updatedEvent.PromotionalPlan,
+                TargetAudience = updatedEvent.TargetAudience,
+                SloganEvent = updatedEvent.SloganEvent,
                 CreatedBy = new UserDto
                 {
                     Id = updatedEvent.CreateByNavigation.Id,
@@ -419,12 +423,12 @@ public class EventService : IEventService
 
     public async Task<PageResultDTO<EventGetListResponseDTO>> SearchEventAsync(int page, int pageSize, 
         string? title, DateTime? startTime, DateTime? endTime, decimal? minBudget, decimal? maxBudget, 
-        int? isPublic, int? status, int? CategoryEventId, string? placed, Guid userId, int campusId)
+        int? isPublic, int? status, int? CategoryEventId, string? placed, Guid userId, int campusId, Guid? createBy)
     {
         try
         {
             var resultEvents = await _eventRepository.SearchEventAsync(page, pageSize, title, startTime, endTime,
-                minBudget, maxBudget, isPublic, status, CategoryEventId, placed, userId, campusId);
+                minBudget, maxBudget, isPublic, status, CategoryEventId, placed, userId, campusId, createBy);
             var eventDTOs = resultEvents.Items.Select(e => new EventGetListResponseDTO
             {
                 Id = e.Id,

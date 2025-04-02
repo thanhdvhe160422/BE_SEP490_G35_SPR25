@@ -119,6 +119,9 @@ public class EventRepository : IEventRepository
                     Goals = e.Goals,
                     MonitoringProcess = e.MonitoringProcess,
                     SizeParticipants = e.SizeParticipants,
+                    PromotionalPlan = e.PromotionalPlan,
+                    TargetAudience = e.TargetAudience,
+                    SloganEvent = e.SloganEvent,
                     CampusName = e.Campus.CampusName,
                     CategoryEventId = e.CategoryEventId,
                     CategoryEventName = e.CategoryEvent.CategoryEventName,
@@ -143,7 +146,8 @@ public class EventRepository : IEventRepository
                         LastName = e.UpdateByNavigation.LastName,
                         Email = e.UpdateByNavigation.Email
                     } : null,
-                    EventMedia = e.EventMedia.Select(em => new EventMediaDto
+                    EventMedia = e.EventMedia
+                    .Where(em=>em.Status==1).Select(em => new EventMediaDto
                     {
                         Id = em.Id,
                         MediaUrl = em.Media != null ? em.Media.MediaUrl : null
@@ -242,7 +246,6 @@ public class EventRepository : IEventRepository
             updateEvent.EndTime = e.EndTime;
             updateEvent.EventDescription = e.EventDescription;
             updateEvent.EventTitle = e.EventTitle;
-            updateEvent.IsPublic = e.IsPublic;
             updateEvent.Placed = e.Placed;
             updateEvent.Status = e.Status;
             updateEvent.TimePublic = e.TimePublic;
@@ -298,7 +301,7 @@ public class EventRepository : IEventRepository
 
     public async Task<PageResultDTO<Event>> SearchEventAsync(int page, int pageSize, string? title, 
         DateTime? startTime, DateTime? endTime, decimal? minBudget, decimal? maxBudget, int? isPublic, 
-        int? status, int? CategoryEventId, string? placed, Guid userId, int campusId)
+        int? status, int? CategoryEventId, string? placed, Guid userId, int campusId, Guid? createBy)
     {
         try
         {
@@ -318,7 +321,8 @@ public class EventRepository : IEventRepository
                     (!isPublic.HasValue || e.IsPublic == isPublic) &&
                     (status.HasValue ? e.Status == status : e.Status > -1) &&
                     (!CategoryEventId.HasValue || e.CategoryEventId == CategoryEventId) &&
-                    (string.IsNullOrEmpty(placed) || e.Placed.Contains(placed))
+                    (string.IsNullOrEmpty(placed) || e.Placed.Contains(placed)) &&
+                    (!createBy.HasValue || e.CreateBy == createBy)
                     ).AsEnumerable()
                     .OrderBy(e =>
                         e.StartTime <= DateTime.Now && DateTime.Now <= e.EndTime ? 0:1)
@@ -344,7 +348,8 @@ public class EventRepository : IEventRepository
                     (!isPublic.HasValue || e.IsPublic == isPublic) &&
                     (status.HasValue ? e.Status == status : e.Status > -1) &&
                     (!CategoryEventId.HasValue || e.CategoryEventId == CategoryEventId) &&
-                    (string.IsNullOrEmpty(placed) || e.Placed.Contains(placed))
+                    (string.IsNullOrEmpty(placed) || e.Placed.Contains(placed)) &&
+                    (!createBy.HasValue || e.CreateBy == createBy)
                 ).AsEnumerable()
                 .OrderBy(e =>
                     e.StartTime <= DateTime.Now && DateTime.Now <= e.EndTime ? 0 : 1)

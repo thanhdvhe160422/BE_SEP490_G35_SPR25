@@ -10,6 +10,7 @@ using Planify_BackEnd.Repositories.Categories;
 using Planify_BackEnd.Services.Campus;
 using Planify_BackEnd.Services.Categories;
 using Planify_BackEnd.Services.Events;
+using Planify_BackEnd.Services.Medias;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -22,12 +23,14 @@ namespace Planify_BackEnd.Controllers
         private readonly IEventService _eventService;
         private readonly ICategoryService _categoryService;
         private readonly ICampusService _campusService;
+        private readonly IMediumService _mediumService;
 
-        public EventsController(IEventService eventService, ICampusService campusService, ICategoryService categoryService)
+        public EventsController(IEventService eventService, ICampusService campusService, ICategoryService categoryService,IMediumService mediumService)
         {
             _eventService = eventService;
             _campusService = campusService;
             _categoryService = categoryService;
+            _mediumService = mediumService;
         }
 
         /// <summary>
@@ -138,6 +141,24 @@ namespace Planify_BackEnd.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPut("delete-event-media")]
+        [Authorize(Roles = "Event Organizer")]
+        public async Task<IActionResult> DeleteEventMedia(List<EventMediaDto> list)
+        {
+            try
+            {
+                
+                var response = await _mediumService.DeleteMediaEvent(list);
+                if (response)
+                    return Ok(response);
+                else
+                    return BadRequest("Cannot delete event media!");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         /// <summary>
         /// Delete event.
         /// </summary>
@@ -178,14 +199,14 @@ namespace Planify_BackEnd.Controllers
         [Authorize(Roles = "Event Organizer, Implementer, Campus Manager")]
         public async Task<IActionResult> SearchEventAsync(int page, int pageSize, string? title, 
             DateTime? startTime, DateTime? endTime, decimal? minBudget, decimal? maxBudget, 
-            int? isPublic, int? status, int? CategoryEventId, string? placed)
+            int? isPublic, int? status, int? CategoryEventId, string? placed, Guid? createBy)
         {
             try
             {
                 var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
                 var campusClaim = User.Claims.FirstOrDefault(c => c.Type == "campusId");
                 var response = await _eventService.SearchEventAsync(page, pageSize, title, startTime, endTime,
-                minBudget, maxBudget, isPublic, status, CategoryEventId, placed,userId,int.Parse(campusClaim.Value));
+                minBudget, maxBudget, isPublic, status, CategoryEventId, placed, userId,int.Parse(campusClaim.Value), createBy);
                 if (response.TotalCount == 0)
                     return NotFound("Not found any event");
                 return Ok(response);

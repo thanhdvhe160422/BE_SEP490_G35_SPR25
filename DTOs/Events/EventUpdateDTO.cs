@@ -16,7 +16,7 @@ namespace Planify_BackEnd.DTOs.Events
 
         public decimal AmountBudget { get; set; }
 
-        public int IsPublic { get; set; }
+        public int? IsPublic { get; set; }
 
         public DateTime? TimePublic { get; set; }
 
