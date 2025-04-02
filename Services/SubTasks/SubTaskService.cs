@@ -138,7 +138,6 @@ namespace Planify_BackEnd.Services.SubTasks
                 existingSubTask.StartTime = subTaskDTO.StartTime;
                 existingSubTask.Deadline = subTaskDTO.Deadline;
                 existingSubTask.AmountBudget = subTaskDTO.AmountBudget;
-                existingSubTask.Status = subTaskDTO.Status;
 
                 var updatedSubTask = await _subTaskRepository.UpdateSubTaskAsync(subTaskId, existingSubTask);
 
