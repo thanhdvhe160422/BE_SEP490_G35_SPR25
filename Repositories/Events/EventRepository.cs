@@ -22,7 +22,7 @@ public class EventRepository : IEventRepository
             var now = DateTime.UtcNow;
 
             var count = _context.Events
-                .Where(e => e.Status != -1 && e.CampusId == campusId)
+                .Where(e => e.Status >-1 && e.CampusId == campusId)
                 .Include(e => e.EventMedia)
                 .ThenInclude(em => em.Media)
                 .OrderBy(e => e.StartTime <= now && now <= e.EndTime ? 0 : // Running
@@ -33,7 +33,7 @@ public class EventRepository : IEventRepository
                 return new PageResultDTO<Event>(new List<Event>(), count, page, pageSize);
 
             var events = _context.Events
-                .Where(e => e.Status != -1 && e.CampusId == campusId)
+                .Where(e => e.Status >-1 && e.CampusId == campusId)
                 .Include(e => e.EventMedia)
                 .ThenInclude(em => em.Media)
                 .OrderBy(e => e.StartTime <= now && now <= e.EndTime ? 0 : // Running
@@ -287,7 +287,7 @@ public class EventRepository : IEventRepository
             //ev.SendRequests = null;
             //_context.Events.Remove(ev!);
             var ev = await _context.Events.FirstOrDefaultAsync(e => e.Id == eventId);
-            ev.Status = -1;
+            ev.Status = -2;
             await _context.SaveChangesAsync();
             return true;
         }catch(Exception ex)
@@ -307,16 +307,16 @@ public class EventRepository : IEventRepository
                 .Include(e => e.CategoryEvent)
                 .Include(e => e.EventMedia).ThenInclude(em => em.Media)
                 .Include(e => e.FavouriteEvents)
-                .Where(e => e.Status != -1 && e.IsPublic == 1)
                 .Where(e => e.FavouriteEvents.Any(fe => fe.UserId == userId) || !e.FavouriteEvents.Any())
                 .Where(e => e.CampusId==campusId &&
                     (string.IsNullOrEmpty(title) || e.EventTitle.Contains(title)) &&
+                    (!isPublic.HasValue || e.IsPublic == 1) &&
                     (!startTime.HasValue || e.StartTime >= startTime) &&
                     (!endTime.HasValue || e.EndTime <= endTime) &&
                     (!minBudget.HasValue || e.AmountBudget >= minBudget) &&
                     (!maxBudget.HasValue || e.AmountBudget <= maxBudget) &&
                     (!isPublic.HasValue || e.IsPublic == isPublic) &&
-                    (!status.HasValue || e.Status == status) &&
+                    (status.HasValue ? e.Status == status : e.Status > -1) &&
                     (!CategoryEventId.HasValue || e.CategoryEventId == CategoryEventId) &&
                     (string.IsNullOrEmpty(placed) || e.Placed.Contains(placed))
                     ).AsEnumerable()
@@ -333,16 +333,16 @@ public class EventRepository : IEventRepository
                 .Include(e => e.CategoryEvent)
                 .Include(e => e.EventMedia).ThenInclude(em => em.Media)
                 .Include(e => e.FavouriteEvents)
-                .Where(e => e.Status != -1 && e.IsPublic == 1)
                 .Where(e => e.FavouriteEvents.Any(fe => fe.UserId == userId) || !e.FavouriteEvents.Any())
                 .Where(e => e.CampusId == campusId &&
                     (string.IsNullOrEmpty(title) || e.EventTitle.Contains(title)) &&
+                    (!isPublic.HasValue || e.IsPublic == 1) &&
                     (!startTime.HasValue || e.StartTime >= startTime) &&
                     (!endTime.HasValue || e.EndTime <= endTime) &&
                     (!minBudget.HasValue || e.AmountBudget >= minBudget) &&
                     (!maxBudget.HasValue || e.AmountBudget <= maxBudget) &&
                     (!isPublic.HasValue || e.IsPublic == isPublic) &&
-                    (!status.HasValue || e.Status == status) &&
+                    (status.HasValue ? e.Status == status : e.Status > -1) &&
                     (!CategoryEventId.HasValue || e.CategoryEventId == CategoryEventId) &&
                     (string.IsNullOrEmpty(placed) || e.Placed.Contains(placed))
                 ).AsEnumerable()
