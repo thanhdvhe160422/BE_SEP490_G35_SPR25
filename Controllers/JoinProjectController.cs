@@ -60,5 +60,20 @@ namespace Planify_BackEnd.Controllers
             var response = await _joinProjectService.AddImplementersToEventAsync(request);
             return StatusCode(response.Status, response);
         }
+
+        [HttpGet("get-implement-joined-project")]
+        [Authorize(Roles = "Implementer")]
+        public async Task<IActionResult> GetImplementJoinedProjects(int page, int pageSize, int eventId)
+        {
+            try
+            {
+                var response = await _joinProjectService.GetImplementerJoinedEvent(page, pageSize,eventId);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

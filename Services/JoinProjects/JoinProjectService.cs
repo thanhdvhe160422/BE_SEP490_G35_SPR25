@@ -1,6 +1,8 @@
 ﻿using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.DTOs.JoinedProjects;
+using Planify_BackEnd.DTOs.Users;
+using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories;
 using Planify_BackEnd.Repositories.JoinGroups;
 
@@ -96,6 +98,30 @@ namespace Planify_BackEnd.Services.JoinProjects
 
             var result = new { AddedCount = newUserIds.Count, EventId = request.EventId };
             return new ResponseDTO(200, $"Successfully added {newUserIds.Count} implementer(s) to event {request.EventId}.", result);
+        }
+
+        public async Task<PageResultDTO<JoinedProjectVM>> GetImplementerJoinedEvent(int page,int pageSize, int eventId)
+        {
+            try
+            {
+                var listImplement = await _joinProjectRepository.GetImplementerJoinedEvent(page, pageSize, eventId);
+                List<JoinedProjectVM> list = listImplement.Items.Select(jp => new JoinedProjectVM
+                {
+                    Id = jp.Id,
+                    EventId = jp.EventId,
+                    UserId = jp.UserId,
+                    TimeJoinProject = jp.TimeJoinProject,
+                    TimeOutProject = jp.TimeOutProject,
+                    User = new UserNameVM
+                    {
+                        Id = jp.User.Id,
+                        Email = jp.User.Email,
+                        FirstName = jp.User.FirstName,
+                        LastName = jp.User.LastName,
+                    },
+                }).ToList();
+                return new PageResultDTO<JoinedProjectVM>(list, listImplement.TotalCount, page, pageSize);
+            }
         }
     }
 
