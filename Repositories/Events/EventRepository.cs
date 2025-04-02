@@ -191,6 +191,7 @@ public class EventRepository : IEventRepository
                                 LastName = t.CreateByNavigation.LastName,
                                 Email = t.CreateByNavigation.Email
                             },
+                            Status = t.Status,
                             SubTasks = t.SubTasks
                                 .Where(st => st.Status == 1 || st.Status == 0)
                                 .Select(st => new SubTaskDetailDto
@@ -207,7 +208,8 @@ public class EventRepository : IEventRepository
                                         FirstName = st.CreateByNavigation.FirstName,
                                         LastName = st.CreateByNavigation.LastName,
                                         Email = st.CreateByNavigation.Email
-                                    }
+                                    },
+                                    Status = t.Status,
                                 }).ToList()
                         }).ToList(),
                     CostBreakdowns = e.CostBreakdowns.Select(cb => new CostBreakdownDetailDto

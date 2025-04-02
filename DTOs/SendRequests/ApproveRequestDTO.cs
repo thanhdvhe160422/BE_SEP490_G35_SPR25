@@ -2,7 +2,7 @@
 {
     public class ApproveRequestDTO
     {
-        Guid ManagerId { get; set; }
-        string? Reason { get; set; }
+        public int Id { get; set; }
+        public string? Reason { get; set; }
     }
 }
