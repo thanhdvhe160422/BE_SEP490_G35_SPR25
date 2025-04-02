@@ -178,14 +178,14 @@ namespace Planify_BackEnd.Controllers
         [Authorize(Roles = "Event Organizer, Implementer, Campus Manager")]
         public async Task<IActionResult> SearchEventAsync(int page, int pageSize, string? title, 
             DateTime? startTime, DateTime? endTime, decimal? minBudget, decimal? maxBudget, 
-            int? isPublic, int? status, int? CategoryEventId, string? placed)
+            int? isPublic, int? status, int? CategoryEventId, string? placed, Guid? createBy)
         {
             try
             {
                 var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
                 var campusClaim = User.Claims.FirstOrDefault(c => c.Type == "campusId");
                 var response = await _eventService.SearchEventAsync(page, pageSize, title, startTime, endTime,
-                minBudget, maxBudget, isPublic, status, CategoryEventId, placed,userId,int.Parse(campusClaim.Value));
+                minBudget, maxBudget, isPublic, status, CategoryEventId, placed, userId,int.Parse(campusClaim.Value), createBy);
                 if (response.TotalCount == 0)
                     return NotFound("Not found any event");
                 return Ok(response);

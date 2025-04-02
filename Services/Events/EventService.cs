@@ -419,12 +419,12 @@ public class EventService : IEventService
 
     public async Task<PageResultDTO<EventGetListResponseDTO>> SearchEventAsync(int page, int pageSize, 
         string? title, DateTime? startTime, DateTime? endTime, decimal? minBudget, decimal? maxBudget, 
-        int? isPublic, int? status, int? CategoryEventId, string? placed, Guid userId, int campusId)
+        int? isPublic, int? status, int? CategoryEventId, string? placed, Guid userId, int campusId, Guid? createBy)
     {
         try
         {
             var resultEvents = await _eventRepository.SearchEventAsync(page, pageSize, title, startTime, endTime,
-                minBudget, maxBudget, isPublic, status, CategoryEventId, placed, userId, campusId);
+                minBudget, maxBudget, isPublic, status, CategoryEventId, placed, userId, campusId, createBy);
             var eventDTOs = resultEvents.Items.Select(e => new EventGetListResponseDTO
             {
                 Id = e.Id,
