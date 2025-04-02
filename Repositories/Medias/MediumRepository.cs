@@ -23,6 +23,21 @@ namespace Planify_BackEnd.Repositories.Medias
                 return null;
             }
         }
+        public async Task<bool> DeleteMediaEvent(int mediaEventId)
+        {
+            try
+            {
+                var mediaEvent = _context.EventMedia.FirstOrDefault(em => em.Id == mediaEventId);
+                mediaEvent.Status = 0;
+                _context.EventMedia.Update(mediaEvent);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
     }
 }

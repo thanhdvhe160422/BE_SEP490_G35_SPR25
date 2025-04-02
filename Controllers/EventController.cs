@@ -10,6 +10,7 @@ using Planify_BackEnd.Repositories.Categories;
 using Planify_BackEnd.Services.Campus;
 using Planify_BackEnd.Services.Categories;
 using Planify_BackEnd.Services.Events;
+using Planify_BackEnd.Services.Medias;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -22,12 +23,14 @@ namespace Planify_BackEnd.Controllers
         private readonly IEventService _eventService;
         private readonly ICategoryService _categoryService;
         private readonly ICampusService _campusService;
+        private readonly IMediumService _mediumService;
 
-        public EventsController(IEventService eventService, ICampusService campusService, ICategoryService categoryService)
+        public EventsController(IEventService eventService, ICampusService campusService, ICategoryService categoryService,IMediumService mediumService)
         {
             _eventService = eventService;
             _campusService = campusService;
             _categoryService = categoryService;
+            _mediumService = mediumService;
         }
 
         /// <summary>
@@ -134,6 +137,24 @@ namespace Planify_BackEnd.Controllers
                 
                 return StatusCode(response.Status, response);
             }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPut("delete-event-media")]
+        [Authorize(Roles = "Event Organizer")]
+        public async Task<IActionResult> DeleteEventMedia(List<EventMediaDto> list)
+        {
+            try
+            {
+                
+                var response = await _mediumService.DeleteMediaEvent(list);
+                if (response)
+                    return Ok(response);
+                else
+                    return BadRequest("Cannot delete event media!");
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }

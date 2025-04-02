@@ -119,6 +119,9 @@ public class EventRepository : IEventRepository
                     Goals = e.Goals,
                     MonitoringProcess = e.MonitoringProcess,
                     SizeParticipants = e.SizeParticipants,
+                    PromotionalPlan = e.PromotionalPlan,
+                    TargetAudience = e.TargetAudience,
+                    SloganEvent = e.SloganEvent,
                     CampusName = e.Campus.CampusName,
                     CategoryEventId = e.CategoryEventId,
                     CategoryEventName = e.CategoryEvent.CategoryEventName,
@@ -143,7 +146,8 @@ public class EventRepository : IEventRepository
                         LastName = e.UpdateByNavigation.LastName,
                         Email = e.UpdateByNavigation.Email
                     } : null,
-                    EventMedia = e.EventMedia.Select(em => new EventMediaDto
+                    EventMedia = e.EventMedia
+                    .Where(em=>em.Status==1).Select(em => new EventMediaDto
                     {
                         Id = em.Id,
                         MediaUrl = em.Media.MediaUrl
@@ -225,7 +229,6 @@ public class EventRepository : IEventRepository
             updateEvent.EndTime = e.EndTime;
             updateEvent.EventDescription = e.EventDescription;
             updateEvent.EventTitle = e.EventTitle;
-            updateEvent.IsPublic = e.IsPublic;
             updateEvent.Placed = e.Placed;
             updateEvent.Status = e.Status;
             updateEvent.TimePublic = e.TimePublic;

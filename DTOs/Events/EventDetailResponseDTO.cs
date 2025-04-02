@@ -18,6 +18,11 @@
         public string? Goals { get; set; }
         public string? MonitoringProcess { get; set; }
         public int? SizeParticipants { get; set; }
+        public string? PromotionalPlan { get; set; }
+
+        public string? TargetAudience { get; set; }
+
+        public string? SloganEvent { get; set; }
         public string CampusName { get; set; }
         public int CategoryEventId { get; set; }
         public string CategoryEventName { get; set; }
