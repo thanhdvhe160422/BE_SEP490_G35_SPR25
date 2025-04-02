@@ -53,6 +53,8 @@ public partial class Event
 
     public string? SloganEvent { get; set; }
 
+    public virtual ICollection<Activity> Activities { get; set; } = new List<Activity>();
+
     public virtual Campus Campus { get; set; } = null!;
 
     public virtual CategoryEvent CategoryEvent { get; set; } = null!;
@@ -68,6 +70,8 @@ public partial class Event
     public virtual ICollection<JoinProject> JoinProjects { get; set; } = new List<JoinProject>();
 
     public virtual User? Manager { get; set; }
+
+    public virtual ICollection<Participant> Participants { get; set; } = new List<Participant>();
 
     public virtual ICollection<Risk> Risks { get; set; } = new List<Risk>();
 
