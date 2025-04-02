@@ -298,7 +298,7 @@ public class EventRepository : IEventRepository
 
     public async Task<PageResultDTO<Event>> SearchEventAsync(int page, int pageSize, string? title, 
         DateTime? startTime, DateTime? endTime, decimal? minBudget, decimal? maxBudget, int? isPublic, 
-        int? status, int? CategoryEventId, string? placed, Guid userId, int campusId)
+        int? status, int? CategoryEventId, string? placed, Guid userId, int campusId, Guid? createBy)
     {
         try
         {
@@ -318,7 +318,8 @@ public class EventRepository : IEventRepository
                     (!isPublic.HasValue || e.IsPublic == isPublic) &&
                     (status.HasValue ? e.Status == status : e.Status > -1) &&
                     (!CategoryEventId.HasValue || e.CategoryEventId == CategoryEventId) &&
-                    (string.IsNullOrEmpty(placed) || e.Placed.Contains(placed))
+                    (string.IsNullOrEmpty(placed) || e.Placed.Contains(placed)) &&
+                    (!createBy.HasValue || e.CreateBy == createBy)
                     ).AsEnumerable()
                     .OrderBy(e =>
                         e.StartTime <= DateTime.Now && DateTime.Now <= e.EndTime ? 0:1)
@@ -344,7 +345,8 @@ public class EventRepository : IEventRepository
                     (!isPublic.HasValue || e.IsPublic == isPublic) &&
                     (status.HasValue ? e.Status == status : e.Status > -1) &&
                     (!CategoryEventId.HasValue || e.CategoryEventId == CategoryEventId) &&
-                    (string.IsNullOrEmpty(placed) || e.Placed.Contains(placed))
+                    (string.IsNullOrEmpty(placed) || e.Placed.Contains(placed)) &&
+                    (!createBy.HasValue || e.CreateBy == createBy)
                 ).AsEnumerable()
                 .OrderBy(e =>
                     e.StartTime <= DateTime.Now && DateTime.Now <= e.EndTime ? 0 : 1)

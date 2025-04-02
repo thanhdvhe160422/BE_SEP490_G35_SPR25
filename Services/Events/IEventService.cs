@@ -21,7 +21,8 @@ namespace Planify_BackEnd.Services.Events
             int? CategoryEventId,
             string? placed,
             Guid userId,
-            int campusId);
+            int campusId,
+            Guid? createBy);
 
         //Task<ResponseDTO> CreateSaveDraft(EventCreateRequestDTO eventDTO, Guid organizerId);
         //Task<ResponseDTO> UpdateSaveDraft(EventUpdateDTO eventDTO);
