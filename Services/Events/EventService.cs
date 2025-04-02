@@ -345,16 +345,17 @@ public class EventService : IEventService
                 EndTime = e.EndTime,
                 EventDescription = e.EventDescription,
                 EventTitle = e.EventTitle,
-                IsPublic = e.IsPublic,
                 Placed = e.Placed,
                 Status = e.Status,
-                TimePublic = e.TimePublic,
                 UpdateBy = e.UpdateBy,
                 UpdatedAt = DateTime.Now,
                 MeasuringSuccess = e.MeasuringSuccess,
                 Goals = e.Goals,
                 MonitoringProcess = e.MonitoringProcess,
-                SizeParticipants = e.SizeParticipants
+                SizeParticipants = e.SizeParticipants,
+                PromotionalPlan = e.PromotionalPlan,
+                TargetAudience = e.TargetAudience,
+                SloganEvent = e.SloganEvent,
             };
             Event updatedEvent = await _eventRepository.UpdateEventAsync(updateEvent);
             EventDetailDto eventDetailResponseDTO = new EventDetailDto
@@ -377,6 +378,9 @@ public class EventService : IEventService
                 Goals = updatedEvent.Goals,
                 MonitoringProcess = updatedEvent.Goals,
                 SizeParticipants = updatedEvent.SizeParticipants,
+                PromotionalPlan = updatedEvent.PromotionalPlan,
+                TargetAudience = updatedEvent.TargetAudience,
+                SloganEvent = updatedEvent.SloganEvent,
                 CreatedBy = new UserDto
                 {
                     Id = updatedEvent.CreateByNavigation.Id,
