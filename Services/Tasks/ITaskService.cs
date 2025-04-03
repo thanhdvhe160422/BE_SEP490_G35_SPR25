@@ -14,7 +14,7 @@ namespace Planify_BackEnd.Services.Tasks
         PageResultDTO<TaskSearchResponeDTO> GetAllTasks(int eventId, int page, int pageSize);
         public TaskDetailVM GetTaskById(int taskId);
         Task<bool> changeStatus(int taskId, int status);
-        Task<PageResultDTO<TaskSearchResponeDTO>> SearchTaskByImplementerId(int page, int pageSize,Guid implementerId, DateTime startDate, DateTime endDate);
+        //Task<PageResultDTO<TaskSearchResponeDTO>> SearchTaskByImplementerId(int page, int pageSize,Guid implementerId, DateTime startDate, DateTime endDate);
         Task<ResponseDTO> DeleteTaskV2(int taskId);
     }
 }
