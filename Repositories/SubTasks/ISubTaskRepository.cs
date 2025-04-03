@@ -11,5 +11,6 @@ namespace Planify_BackEnd.Repositories
         Task<bool> DeleteSubTaskAsync(int subTaskId);
         Task<SubTask?> GetSubTaskByIdAsync(int subTaskId);
         Task<List<SubTask>> GetSubTasksByTaskIdAsync(int taskId);
+        Task<bool> AssignSubTask(JoinTask joinTask);
     }
 }

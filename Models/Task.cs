@@ -29,7 +29,5 @@ public partial class Task
 
     public virtual Event? Event { get; set; }
 
-    public virtual ICollection<JoinTask> JoinTasks { get; set; } = new List<JoinTask>();
-
     public virtual ICollection<SubTask> SubTasks { get; set; } = new List<SubTask>();
 }

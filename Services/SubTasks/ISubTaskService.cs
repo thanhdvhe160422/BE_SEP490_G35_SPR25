@@ -1,6 +1,7 @@
 ﻿using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.SubTasks;
+using Planify_BackEnd.Models;
 
 namespace Planify_BackEnd.Services.SubTasks
 {
@@ -13,5 +14,6 @@ namespace Planify_BackEnd.Services.SubTasks
         Task<ResponseDTO> DeleteSubTaskAsync(int subTaskId);
         Task<ResponseDTO> GetSubTaskByIdAsync(int subTaskId);
         Task<ResponseDTO> GetSubTasksByTaskIdAsync(int taskId);
+        Task<bool> AssignSubTask(Guid assignUserId, Guid userId,int taskId);
     }
 }

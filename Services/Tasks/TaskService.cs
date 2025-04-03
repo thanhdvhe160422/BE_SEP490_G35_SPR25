@@ -253,23 +253,24 @@ namespace Planify_BackEnd.Services.Tasks
             }
         }
 
-        public async Task<PageResultDTO<TaskSearchResponeDTO>> SearchTaskByImplementerId(int page, int pageSize, Guid implementerId, DateTime startDate, DateTime endDate)
+        public async Task<PageResultDTO<SubTaskResponseDTO>> SearchSubTaskByImplementerId(int page, int pageSize, Guid implementerId, DateTime startDate, DateTime endDate)
         {
             try
             {
-                var resultTasks = await _taskRepository.SearchTaskByImplementerId(page,pageSize,implementerId,startDate, endDate);
-                var tastDtos = resultTasks.Items.Select(item => new TaskSearchResponeDTO
+                var resultTasks = await _taskRepository.SearchSubTaskByImplementerId(page,pageSize,implementerId,startDate, endDate);
+                var tastDtos = resultTasks.Items.Select(item => new SubTaskResponseDTO
                 {
                     Id = item.Id,
-                    TaskName = item.TaskName,
-                    TaskDescription = item.TaskDescription,
+                    SubTaskName = item.SubTaskName,
+                    SubTaskDescription = item.SubTaskDescription,
                     StartTime = item.StartTime,
                     Deadline = item.Deadline,
-                    EventId = item.EventId,
+                    TaskId = item.TaskId,
                     AmountBudget = item.AmountBudget,
-                    Status = item.Status
+                    Status = item.Status,
+                    CreateBy = item.CreateBy
                 }).ToList();
-                return new PageResultDTO<TaskSearchResponeDTO>(tastDtos, resultTasks.TotalCount, page, pageSize);
+                return new PageResultDTO<SubTaskResponseDTO>(tastDtos, resultTasks.TotalCount, page, pageSize);
             }
             catch (Exception ex)
             {

@@ -247,5 +247,18 @@ namespace Planify_BackEnd.Controllers
 
         //    return StatusCode(response.Status, response);
         //}
+
+        [HttpDelete("events/{eventId}/media")]
+        [Authorize(Roles = "Event Organizer")]
+        public async Task<IActionResult> DeleteImages(int eventId, [FromBody] DeleteImagesRequestDTO request)
+        {
+            if (request.EventId != eventId)
+            {
+                return BadRequest(new ResponseDTO(400, "EventId in URL and body must match", null));
+            }
+
+            var response = await _eventService.DeleteImagesAsync(request);
+            return StatusCode(response.Status, response);
+        }
     }
 }

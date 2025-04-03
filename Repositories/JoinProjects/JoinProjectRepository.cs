@@ -1,7 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Planify_BackEnd.DTOs;
 using Planify_BackEnd.Models;
+using System.Globalization;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Planify_BackEnd.Repositories.JoinGroups
 {
@@ -198,6 +203,57 @@ namespace Planify_BackEnd.Repositories.JoinGroups
                 .Where(jp => jp.EventId == eventId && jp.TimeOutProject == null)
                 .Select(jp => jp.UserId)
                 .ToListAsync();
+        }
+
+        public async Task<PageResultDTO<JoinProject>> SearchImplementerJoinedEvent(int page, int pageSize,
+            int? eventId, string? email, string? name)
+        {
+            try
+            {
+                var count = _context.JoinProjects
+                    .Include(jp => jp.User)
+                    .AsEnumerable()
+                    .Where(jp =>
+                        (!eventId.HasValue || jp.EventId == eventId) &&
+                        (string.IsNullOrEmpty(email) || RemoveDiacriticsAndToLower(jp.User.Email).Contains(RemoveDiacriticsAndToLower(email))) &&
+                        (string.IsNullOrEmpty(name) ||
+                        RemoveDiacriticsAndToLower(jp.User.FirstName).Contains(RemoveDiacriticsAndToLower(name)) ||
+                        RemoveDiacriticsAndToLower(jp.User.LastName).Contains(RemoveDiacriticsAndToLower(name))) &&
+                    jp.TimeOutProject == null)
+                    .Count();
+                var list = _context.JoinProjects
+                    .Include(jp=>jp.User)
+                    .AsEnumerable()
+                    .Where(jp =>
+                        (!eventId.HasValue || jp.EventId == eventId) &&
+                        (string.IsNullOrEmpty(email) || RemoveDiacriticsAndToLower(jp.User.Email).Contains(RemoveDiacriticsAndToLower(email))) &&
+                        (string.IsNullOrEmpty(name) ||
+                        RemoveDiacriticsAndToLower(jp.User.FirstName).Contains(RemoveDiacriticsAndToLower(name)) ||
+                        RemoveDiacriticsAndToLower(jp.User.LastName).Contains(RemoveDiacriticsAndToLower(name))) &&
+                    jp.TimeOutProject == null)
+                    .ToList();
+                return new PageResultDTO<JoinProject>(list, count, page, pageSize);
+            }catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public string RemoveDiacriticsAndToLower(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+
+            var normalizedString = text.Normalize(NormalizationForm.FormD);
+            var stringBuilder = new StringBuilder();
+
+            foreach (var c in normalizedString)
+            {
+                if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
+                }
+            }
+
+            return stringBuilder.ToString().Normalize(NormalizationForm.FormC).ToLower();
         }
     }
 }

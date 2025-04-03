@@ -182,6 +182,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapHub<EventRequestHub>("/eventRequestHub");
+app.MapHub<NotificationHub>("/notificationHub");
 
 app.UseCors("AllowLocalhost");
 app.UseHttpsRedirection();
