@@ -62,13 +62,15 @@ namespace Planify_BackEnd.Controllers
             return StatusCode(response.Status, response);
         }
 
-        [HttpGet("get-implement-joined-project")]
+        [HttpGet("search-implement-joined-project")]
         [Authorize(Roles = "Event Organizer, Implementer, Campus Manager")]
-        public async Task<IActionResult> GetImplementJoinedProjects(int page, int pageSize, int eventId)
+        public async Task<IActionResult> SearchImplementJoinedProjects(int page, int pageSize, int? eventId,
+            string? email,
+            string? name)
         {
             try
             {
-                var response = await _joinProjectService.GetImplementerJoinedEvent(page, pageSize,eventId);
+                var response = await _joinProjectService.SearchImplementerJoinedEvent(page, pageSize,eventId,email,name);
                 return Ok(response);
             }
             catch (Exception ex)

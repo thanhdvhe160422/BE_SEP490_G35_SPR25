@@ -9,6 +9,6 @@ namespace Planify_BackEnd.Services.JoinProjects
         Task<IEnumerable<JoinedProjectDTO>> GetAllJoinedProjects(Guid userId, int page, int pageSize);
         Task<bool> DeleteImplementerFromEvent(Guid userId, int eventId);
         Task<ResponseDTO> AddImplementersToEventAsync(AddImplementersToEventDTO request);
-        Task<PageResultDTO<JoinedProjectVM>> GetImplementerJoinedEvent(int page, int pageSize, int eventId);
+        Task<PageResultDTO<JoinedProjectVM>> SearchImplementerJoinedEvent(int page, int pageSize, int? eventId, string?email, string? name);
     }
 }

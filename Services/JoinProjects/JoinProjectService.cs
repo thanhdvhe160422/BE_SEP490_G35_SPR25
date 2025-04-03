@@ -112,11 +112,13 @@ namespace Planify_BackEnd.Services.JoinProjects
             return new ResponseDTO(200, $"Successfully added {newUserIds.Count} implementer(s) to event {request.EventId}.", result);
         }
 
-        public async Task<PageResultDTO<JoinedProjectVM>> GetImplementerJoinedEvent(int page,int pageSize, int eventId)
+        public async Task<PageResultDTO<JoinedProjectVM>> SearchImplementerJoinedEvent(
+            int page, int pageSize, int? eventId, string? email, string? name)
         {
             try
             {
-                var listImplement = await _joinProjectRepository.GetImplementerJoinedEvent(page, pageSize, eventId);
+                var listImplement = await _joinProjectRepository
+                    .SearchImplementerJoinedEvent(page, pageSize, eventId, email, name);
                 List<JoinedProjectVM> list = listImplement.Items.Select(jp => new JoinedProjectVM
                 {
                     Id = jp.Id,

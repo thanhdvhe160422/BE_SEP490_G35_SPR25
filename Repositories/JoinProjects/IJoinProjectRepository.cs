@@ -14,6 +14,7 @@ namespace Planify_BackEnd.Repositories.JoinGroups
         Task<bool> EventExistsAsync(int eventId);
         Task<List<Guid>> GetInvalidUserIdsAsync(List<Guid> userIds);
         Task<List<Guid>> GetExistingImplementerIdsAsync(int eventId);
-        Task<PageResultDTO<JoinProject>> GetImplementerJoinedEvent(int page, int pageSize, int eventId);
+        Task<PageResultDTO<JoinProject>> SearchImplementerJoinedEvent(int page, int pageSize, 
+            int? eventId, string? email, string? name);
     }
 }
