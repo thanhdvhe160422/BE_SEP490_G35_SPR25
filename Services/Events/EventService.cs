@@ -792,13 +792,15 @@ public class EventService : IEventService
         try
         {
             var uri = new Uri(driveUrl);
-            var segments = uri.Segments;
-            var fileIdSegment = segments.FirstOrDefault(s => s.Contains("d/"));
-            if (fileIdSegment != null)
+            var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+            var fileId = query["id"];
+
+            if (!string.IsNullOrEmpty(fileId))
             {
-                return driveUrl.Split('/')[5];
+                return fileId;
             }
-            throw new Exception("Invalid Google Drive URL format");
+
+            throw new Exception("Invalid Google Drive URL format - No file ID found");
         }
         catch (Exception ex)
         {

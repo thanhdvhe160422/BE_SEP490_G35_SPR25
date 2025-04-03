@@ -249,6 +249,7 @@ namespace Planify_BackEnd.Controllers
         //}
 
         [HttpDelete("events/{eventId}/media")]
+        [Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> DeleteImages(int eventId, [FromBody] DeleteImagesRequestDTO request)
         {
             if (request.EventId != eventId)
