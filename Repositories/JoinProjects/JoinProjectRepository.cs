@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Planify_BackEnd.DTOs;
 using Planify_BackEnd.Models;
 
 namespace Planify_BackEnd.Repositories.JoinGroups
@@ -198,6 +200,26 @@ namespace Planify_BackEnd.Repositories.JoinGroups
                 .Where(jp => jp.EventId == eventId && jp.TimeOutProject == null)
                 .Select(jp => jp.UserId)
                 .ToListAsync();
+        }
+
+        public async Task<PageResultDTO<JoinProject>> GetImplementerJoinedEvent(int page, int pageSize,int eventId)
+        {
+            try
+            {
+                var count = _context.JoinProjects
+                    .Where(jp => jp.EventId == eventId &&
+                    jp.TimeOutProject == null)
+                    .Count();
+                var list = _context.JoinProjects
+                    .Include(jp=>jp.User)
+                    .Where(jp => jp.EventId == eventId &&
+                    jp.TimeOutProject == null)
+                    .ToList();
+                return new PageResultDTO<JoinProject>(list, count, page, pageSize);
+            }catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

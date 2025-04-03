@@ -168,7 +168,18 @@ public class SubTaskRepository : ISubTaskRepository
         }
     }
 
-
+    public async Task<bool> AssignSubTask(JoinTask joinTask)
+    {
+        try
+        {
+            _context.JoinTasks.Add(joinTask);
+            await _context.SaveChangesAsync();
+            return true;
+        }catch(Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
 }
 
 

@@ -13,15 +13,18 @@ namespace Planify_BackEnd.Services.EventRequests
         private readonly ISendRequestRepository _requestRepository;
         private readonly IEventRepository _eventRepository;
         private readonly IHubContext<EventRequestHub> _hubContext;
+        private readonly IHubContext<NotificationHub> _notificationHubContext;
 
         public SendRequestService(
             ISendRequestRepository requestRepository,
             IEventRepository eventRepository,
-            IHubContext<EventRequestHub> hubContext)
+            IHubContext<EventRequestHub> hubContext,
+            IHubContext<NotificationHub> notificationHubContext)
         {
             _requestRepository = requestRepository ?? throw new ArgumentNullException(nameof(requestRepository));
             _eventRepository = eventRepository ?? throw new ArgumentNullException(nameof(eventRepository));
             _hubContext = hubContext ?? throw new ArgumentNullException(nameof(hubContext));
+            _notificationHubContext = notificationHubContext ?? throw new ArgumentNullException(nameof(notificationHubContext));
         }
 
         public async Task<ResponseDTO> GetRequestsAsync()
@@ -104,7 +107,10 @@ namespace Planify_BackEnd.Services.EventRequests
                 await _requestRepository.UpdateRequestAsync(request);
                 await _eventRepository.UpdateEventAsync(eventEntity);
                 await _hubContext.Clients.All.SendAsync("RequestApproved", request);
-
+                //notification
+                await _notificationHubContext.Clients.User(managerId+"").SendAsync("ReceiveNotification",
+                    "Your request has been approved!",
+                    "/event-detail-EOG/" + request.EventId);
                 return new ResponseDTO(200, "Yêu cầu đã được duyệt", request);
             }
             catch (Exception ex)
@@ -142,7 +148,10 @@ namespace Planify_BackEnd.Services.EventRequests
                 await _requestRepository.UpdateRequestAsync(request);
                 await _eventRepository.UpdateEventAsync(eventEntity);
                 await _hubContext.Clients.All.SendAsync("RequestRejected", request);
-
+                //notification
+                await _notificationHubContext.Clients.User(managerId + "").SendAsync("ReceiveNotification",
+                    "Your request has been reject!",
+                    "/event-detail-EOG/" + request.EventId);
                 return new ResponseDTO(200, "Yêu cầu đã bị từ chối", request);
             }
             catch (Exception ex)

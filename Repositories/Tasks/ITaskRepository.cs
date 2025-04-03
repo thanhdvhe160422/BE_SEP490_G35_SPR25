@@ -1,4 +1,5 @@
 ﻿using Planify_BackEnd.DTOs;
+using Planify_BackEnd.Models;
 using TaskModel = Planify_BackEnd.Models.Task;
 namespace Planify_BackEnd.Repositories.Tasks
 {
@@ -15,7 +16,7 @@ namespace Planify_BackEnd.Repositories.Tasks
         bool UpdateActualTaskAmount(int taskId, decimal amount);
         public Models.Task GetTaskById(int taskId);
         public Task<bool> changeStatus(int taskId, int status);
-        //Task<PageResultDTO<Models.Task>> SearchTaskByImplementerId(int page, int pageSize, Guid implementerId, DateTime startDate, DateTime endDate);
+        Task<PageResultDTO<SubTask>> SearchSubTaskByImplementerId(int page, int pageSize, Guid implementerId, DateTime startDate, DateTime endDate);
         Task<bool> DeleteTaskV2(int taskId);
 
     }

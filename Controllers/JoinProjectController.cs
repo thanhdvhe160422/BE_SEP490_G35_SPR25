@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Planify_BackEnd.DTOs.JoinedProjects;
 using Planify_BackEnd.Services.Events;
 using Planify_BackEnd.Services.JoinProjects;
@@ -59,6 +60,21 @@ namespace Planify_BackEnd.Controllers
         {
             var response = await _joinProjectService.AddImplementersToEventAsync(request);
             return StatusCode(response.Status, response);
+        }
+
+        [HttpGet("get-implement-joined-project")]
+        [Authorize(Roles = "Event Organizer, Implementer, Campus Manager")]
+        public async Task<IActionResult> GetImplementJoinedProjects(int page, int pageSize, int eventId)
+        {
+            try
+            {
+                var response = await _joinProjectService.GetImplementerJoinedEvent(page, pageSize,eventId);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

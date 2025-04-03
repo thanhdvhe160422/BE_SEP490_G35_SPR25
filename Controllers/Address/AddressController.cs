@@ -44,6 +44,5 @@ namespace Planify_BackEnd.Controllers.Address
 
         }
 
-
     }
 }
