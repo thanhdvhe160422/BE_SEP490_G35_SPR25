@@ -59,6 +59,7 @@ public partial class PlanifyContext : DbContext
 
     public virtual DbSet<Ward> Wards { get; set; }
 
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Activity>(entity =>
