@@ -191,6 +191,7 @@ public class EventRepository : IEventRepository
                                 LastName = t.CreateByNavigation.LastName,
                                 Email = t.CreateByNavigation.Email
                             },
+                            Status = t.Status,
                             SubTasks = t.SubTasks
                                 .Where(st => st.Status == 1 || st.Status == 0)
                                 .Select(st => new SubTaskDetailDto
@@ -207,7 +208,8 @@ public class EventRepository : IEventRepository
                                         FirstName = st.CreateByNavigation.FirstName,
                                         LastName = st.CreateByNavigation.LastName,
                                         Email = st.CreateByNavigation.Email
-                                    }
+                                    },
+                                    Status = t.Status,
                                 }).ToList()
                         }).ToList(),
                     CostBreakdowns = e.CostBreakdowns.Select(cb => new CostBreakdownDetailDto
@@ -452,6 +454,39 @@ public class EventRepository : IEventRepository
     public async Task<IDbContextTransaction> BeginTransactionAsync()
     {
         return await _context.Database.BeginTransactionAsync();
+    }
+    public async Task<List<EventMedium>> GetEventMediaByIdsAsync(int eventId, List<int> mediaIds)
+    {
+        return await _context.EventMedia
+            .Where(em => em.EventId == eventId && mediaIds.Contains(em.MediaId))
+            .ToListAsync();
+    }
+
+    public async Task<Medium> GetMediaItemAsync(int mediaId)
+    {
+        return await _context.Media.FindAsync(mediaId);
+    }
+
+    public async System.Threading.Tasks.Task DeleteEventMediaListAsync(int eventId, List<int> mediaIds)
+    {
+        var eventMediaList = await GetEventMediaByIdsAsync(eventId, mediaIds);
+        if (eventMediaList.Any())
+        {
+            _context.EventMedia.RemoveRange(eventMediaList);
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async System.Threading.Tasks.Task DeleteMediaItemsAsync(List<int> mediaIds)
+    {
+        var mediaItems = await _context.Media
+            .Where(m => mediaIds.Contains(m.Id))
+            .ToListAsync();
+        if (mediaItems.Any())
+        {
+            _context.Media.RemoveRange(mediaItems);
+            await _context.SaveChangesAsync();
+        }
     }
 }
 

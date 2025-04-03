@@ -84,6 +84,7 @@
         public decimal AmountBudget { get; set; }
         public DateTime CreatedAt { get; set; }
         public UserDto CreatedBy { get; set; }
+        public int Status { get; set; }
         public List<SubTaskDetailDto> SubTasks { get; set; }
     }
 
@@ -95,6 +96,7 @@
         public DateTime StartTime { get; set; }
         public DateTime? Deadline { get; set; }
         public decimal AmountBudget { get; set; }
+        public int Status { get; set; }
         public UserDto CreatedBy { get; set; }
     }
     public class CostBreakdownDetailDto

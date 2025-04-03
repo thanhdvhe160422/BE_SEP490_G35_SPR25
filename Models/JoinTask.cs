@@ -13,7 +13,7 @@ public partial class JoinTask
 
     public DateTime? CreatedAt { get; set; }
 
-    public virtual Task Task { get; set; } = null!;
+    public virtual SubTask Task { get; set; } = null!;
 
     public virtual User User { get; set; } = null!;
 }

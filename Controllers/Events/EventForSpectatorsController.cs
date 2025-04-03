@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Planify_BackEnd.Repositories.Events;
 using Planify_BackEnd.Services.Events;
@@ -16,6 +17,7 @@ namespace Planify_BackEnd.Controllers.Events
             _service = service;
         }
         [HttpGet]
+        [Authorize]
         public IActionResult GetEvents(int page, int pageSize)
         {
             try
@@ -34,6 +36,7 @@ namespace Planify_BackEnd.Controllers.Events
             }
         }
         [HttpGet("{id}")]
+        [Authorize]
         public IActionResult GetEventById(int id)
         {
             try
@@ -51,6 +54,7 @@ namespace Planify_BackEnd.Controllers.Events
             }
         }
         [HttpGet("search")]
+        [Authorize]
         public IActionResult SearchEvents(int page, int pageSize, string? name, DateTime? startDate, DateTime? endDate, string? placed)
         {
             try

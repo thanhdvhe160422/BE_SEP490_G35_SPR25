@@ -113,6 +113,26 @@ namespace Planify_BackEnd.Services.GoogleDrive
                 return null;
             }
         }
+        public async Task<bool> DeleteFileAsync(string fileId)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(fileId))
+                {
+                    throw new ArgumentException("File ID cannot be null or empty.");
+                }
+
+                var request = _driveService.Files.Delete(fileId);
+                await request.ExecuteAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error deleting file on Google Drive: {ex.Message}");
+                return false;
+            }
+        }
 
     }
 }

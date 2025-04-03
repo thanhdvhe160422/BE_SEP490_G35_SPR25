@@ -51,7 +51,7 @@ namespace Planify_BackEnd.Controllers
         /// <param name="subTaskDTO"></param>
         /// <returns></returns>
         [HttpPost("create")]
-        //[Authorize(Roles = "Implementer")]
+        [Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> CreateSubTask([FromBody] SubTaskCreateRequestDTO subTaskDTO)
         {
             var implementerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -65,7 +65,7 @@ namespace Planify_BackEnd.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPut("update-status/{subTaskId}")]
-        //[Authorize(Roles = "Implementer")]
+        [Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> UpdateSubTaskStatus(int subTaskId, [FromBody] SubTaskUpdateStatusDTO request)
         {
 
@@ -80,7 +80,7 @@ namespace Planify_BackEnd.Controllers
         /// <param name="subTaskDTO"></param>
         /// <returns></returns>
         [HttpPut("update/{subTaskId}")]
-        [Authorize(Roles = "Implementer")]
+        //[Authorize(Roles = "Implementer")]
         public async Task<IActionResult> UpdateSubTask(int subTaskId, [FromBody] SubTaskUpdateRequestDTO subTaskDTO)
         {
             var response = await _subTaskService.UpdateSubTaskAsync(subTaskId, subTaskDTO);

@@ -51,6 +51,8 @@ public partial class User
 
     public virtual ICollection<JoinTask> JoinTasks { get; set; } = new List<JoinTask>();
 
+    public virtual ICollection<Participant> Participants { get; set; } = new List<Participant>();
+
     public virtual ICollection<SendRequest> SendRequests { get; set; } = new List<SendRequest>();
 
     public virtual ICollection<SubTask> SubTasks { get; set; } = new List<SubTask>();

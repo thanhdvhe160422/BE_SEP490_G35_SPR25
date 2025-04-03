@@ -253,29 +253,29 @@ namespace Planify_BackEnd.Services.Tasks
             }
         }
 
-        public async Task<PageResultDTO<TaskSearchResponeDTO>> SearchTaskByImplementerId(int page, int pageSize, Guid implementerId, DateTime startDate, DateTime endDate)
-        {
-            try
-            {
-                var resultTasks = await _taskRepository.SearchTaskByImplementerId(page,pageSize,implementerId,startDate, endDate);
-                var tastDtos = resultTasks.Items.Select(item => new TaskSearchResponeDTO
-                {
-                    Id = item.Id,
-                    TaskName = item.TaskName,
-                    TaskDescription = item.TaskDescription,
-                    StartTime = item.StartTime,
-                    Deadline = item.Deadline,
-                    EventId = item.EventId,
-                    AmountBudget = item.AmountBudget,
-                    Status = item.Status
-                }).ToList();
-                return new PageResultDTO<TaskSearchResponeDTO>(tastDtos, resultTasks.TotalCount, page, pageSize);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
+        //public async Task<PageResultDTO<TaskSearchResponeDTO>> SearchTaskByImplementerId(int page, int pageSize, Guid implementerId, DateTime startDate, DateTime endDate)
+        //{
+        //    try
+        //    {
+        //        var resultTasks = await _taskRepository.SearchTaskByImplementerId(page,pageSize,implementerId,startDate, endDate);
+        //        var tastDtos = resultTasks.Items.Select(item => new TaskSearchResponeDTO
+        //        {
+        //            Id = item.Id,
+        //            TaskName = item.TaskName,
+        //            TaskDescription = item.TaskDescription,
+        //            StartTime = item.StartTime,
+        //            Deadline = item.Deadline,
+        //            EventId = item.EventId,
+        //            AmountBudget = item.AmountBudget,
+        //            Status = item.Status
+        //        }).ToList();
+        //        return new PageResultDTO<TaskSearchResponeDTO>(tastDtos, resultTasks.TotalCount, page, pageSize);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception(ex.Message);
+        //    }
+        //}
 
         public async Task<ResponseDTO> DeleteTaskV2(int taskId)
         {
