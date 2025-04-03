@@ -165,15 +165,16 @@ namespace Planify_BackEnd.Repositories.Tasks
         {
             try
             {
-                return _context.Tasks
-                    .Include(t=>t.CreateByNavigation)
-                    .Include(t=>t.Event)
-                    .Include(t=>t.SubTasks).ThenInclude(st=>st.CreateByNavigation)
+                var task = _context.Tasks
+                    .Include(t => t.CreateByNavigation)
+                    .Include(t => t.Event)
+                    .Include(t => t.SubTasks).ThenInclude(st => st.CreateByNavigation)
                     .FirstOrDefault(t => t.Id == taskId);
+                return task;
             }
-            catch
+            catch(Exception ex)
             {
-                return new Models.Task();
+                throw new Exception(ex.Message);
             }
         }
 
@@ -192,7 +193,7 @@ namespace Planify_BackEnd.Repositories.Tasks
             }
         }
 
-        public async Task<PageResultDTO<Models.Task>> SearchTaskByImplementerId(int page, int pageSize, Guid implementerId, DateTime startDate, DateTime endDate)
+        public async Task<PageResultDTO<SubTask>> SearchSubTaskByImplementerId(int page, int pageSize, Guid implementerId, DateTime startDate, DateTime endDate)
         {
             try
             {
@@ -209,12 +210,12 @@ namespace Planify_BackEnd.Repositories.Tasks
                        .Where(jt => jt.UserId == implementerId &&
                                    jt.Task.StartTime <= endDate &&
                                    (jt.Task.Deadline >= startDate || jt.Task.Deadline == null) &&
-                                   jt.Task.Status==1)
+                                   jt.Task.Status == 1)
                        .Select(jt => jt.Task)
                     .OrderBy(e => e.StartTime)
-                    .Skip((page-1)*pageSize).Take(pageSize)
+                    .Skip((page - 1) * pageSize).Take(pageSize)
                     .ToListAsync();
-                return new PageResultDTO<Models.Task>(result,count,page,pageSize);
+                return new PageResultDTO<SubTask>(result, count, page, pageSize);
             }
             catch (Exception ex)
             {

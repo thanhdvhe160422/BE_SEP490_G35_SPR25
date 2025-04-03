@@ -80,7 +80,7 @@ namespace Planify_BackEnd.Controllers
         /// <param name="subTaskDTO"></param>
         /// <returns></returns>
         [HttpPut("update/{subTaskId}")]
-        //[Authorize(Roles = "Implementer")]
+        [Authorize(Roles = "Event Organizer, Implementer")]
         public async Task<IActionResult> UpdateSubTask(int subTaskId, [FromBody] SubTaskUpdateRequestDTO subTaskDTO)
         {
             var response = await _subTaskService.UpdateSubTaskAsync(subTaskId, subTaskDTO);
@@ -92,14 +92,14 @@ namespace Planify_BackEnd.Controllers
         /// <param name="subTaskId"></param>
         /// <returns></returns>
         [HttpDelete("delete/{subTaskId}")]
-        //[Authorize(Roles = "Implementer")]
+        [Authorize(Roles = "Event Organizer, Implementer")]
         public async Task<IActionResult> DeleteSubTask(int subTaskId)
         {
             var response = await _subTaskService.DeleteSubTaskAsync(subTaskId);
             return StatusCode(response.Status, response);
         }
         [HttpPut("{subTaskId}/amount")]
-        //[Authorize(Roles = "Implementer")]
+        [Authorize(Roles = "Event Organizer, Implementer")]
         public IActionResult UpdateActualSubTaskAmount(int subTaskId, [FromBody] decimal amount)
         {
             try
@@ -108,6 +108,25 @@ namespace Planify_BackEnd.Controllers
                 if (!response)
                 {
                     return BadRequest("Cannot update subtask amount!");
+                }
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost("assign-subtask")]
+        [Authorize(Roles = "Event Organizer, Implementer")]
+        public async Task<IActionResult> AssignSubtask(Guid userId, int subtaskId)
+        {
+            try
+            {
+                var id = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                var response = await _subTaskService.AssignSubTask(id, userId, subtaskId);
+                if (!response)
+                {
+                    return BadRequest("Cannot assign subtask for user " + userId + "!");
                 }
                 return Ok();
             }

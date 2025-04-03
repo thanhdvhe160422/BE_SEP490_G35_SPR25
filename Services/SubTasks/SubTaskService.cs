@@ -1,5 +1,8 @@
-﻿using Planify_BackEnd.DTOs;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.SignalR;
+using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.SubTasks;
+using Planify_BackEnd.Hub;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories;
 using Planify_BackEnd.Repositories.Tasks;
@@ -11,11 +14,13 @@ namespace Planify_BackEnd.Services.SubTasks
         private readonly ITaskRepository _taskRepository;
         private readonly ISubTaskRepository _subTaskRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public SubTaskService(ISubTaskRepository subTaskRepository, IHttpContextAccessor httpContextAccessor, ITaskRepository taskRepository)
+        private readonly IHubContext<NotificationHub> _hubContext;
+        public SubTaskService(ISubTaskRepository subTaskRepository, IHttpContextAccessor httpContextAccessor, ITaskRepository taskRepository, IHubContext<NotificationHub> hubContext)
         {
             _taskRepository = taskRepository;
             _subTaskRepository = subTaskRepository;
             _httpContextAccessor = httpContextAccessor;
+            _hubContext = hubContext;
         }
         /// <summary>
         /// Create a new sub-task
@@ -234,5 +239,30 @@ namespace Planify_BackEnd.Services.SubTasks
             }
         }
 
+        public async Task<bool> AssignSubTask(Guid assignUserId, Guid userId, int subtaskId)
+        {
+            try
+            {
+                var subtask = await _subTaskRepository.GetSubTaskByIdAsync(subtaskId);
+                if (subtask == null) throw new Exception("Not found subtask!");
+                var task = _taskRepository.GetTaskById(subtask.TaskId);
+                if (!task.CreateBy.Equals(assignUserId)) throw new Exception("Assign user must be create user!");
+                JoinTask newJoinTask = new JoinTask
+                {
+                    UserId = userId,
+                    TaskId = subtaskId,
+                    CreatedAt = DateTime.Now
+                };
+                await _subTaskRepository.AssignSubTask(newJoinTask);
+                await _hubContext.Clients.User(userId + "").SendAsync("ReceiveNotification",
+                    "You has been assign to a subtask!",
+                    "/event-detail-EOG/" + task.EventId);
+                return true;
+
+            }catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

@@ -1,7 +1,10 @@
-﻿using Planify_BackEnd.DTOs;
+﻿using Azure;
+using Microsoft.AspNetCore.SignalR;
+using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.DTOs.JoinedProjects;
 using Planify_BackEnd.DTOs.Users;
+using Planify_BackEnd.Hub;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories;
 using Planify_BackEnd.Repositories.JoinGroups;
@@ -12,10 +15,12 @@ namespace Planify_BackEnd.Services.JoinProjects
     {
         private readonly IJoinProjectRepository _joinProjectRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public JoinProjectService(IJoinProjectRepository joinProjectRepository, IHttpContextAccessor httpContextAccessor)
+        private readonly IHubContext<NotificationHub> _hubContext;
+        public JoinProjectService(IJoinProjectRepository joinProjectRepository, IHttpContextAccessor httpContextAccessor, IHubContext<NotificationHub> hubContext)
         {
             _joinProjectRepository = joinProjectRepository;
             _httpContextAccessor = httpContextAccessor;
+            _hubContext = hubContext;
         }
         public async Task<IEnumerable<JoinedProjectDTO>> GetAllJoinedProjects(Guid userId, int page, int pageSize)
         {
@@ -97,6 +102,13 @@ namespace Planify_BackEnd.Services.JoinProjects
             }
 
             var result = new { AddedCount = newUserIds.Count, EventId = request.EventId };
+            //notification
+            foreach (var id in newUserIds)
+            {
+                await _hubContext.Clients.User(id + "").SendAsync("ReceiveNotification",
+                    "You have been added to a event plan!",
+                    "/event-detail-EOG/" + request.EventId);
+            }
             return new ResponseDTO(200, $"Successfully added {newUserIds.Count} implementer(s) to event {request.EventId}.", result);
         }
 
@@ -121,6 +133,9 @@ namespace Planify_BackEnd.Services.JoinProjects
                     },
                 }).ToList();
                 return new PageResultDTO<JoinedProjectVM>(list, listImplement.TotalCount, page, pageSize);
+            }catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
     }

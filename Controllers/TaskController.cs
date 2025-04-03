@@ -180,10 +180,10 @@ namespace Planify_BackEnd.Controllers
         {
             try
             {
-                var response = await _taskService.SearchTaskByImplementerId(page, pageSize, implementerId, startDate, endDate);
+                var response = await _taskService.SearchSubTaskByImplementerId(page, pageSize, implementerId, startDate, endDate);
                 if (response.TotalCount == 0)
                 {
-                    return NotFound("Cannot found any task");
+                    return NotFound("Cannot found any sub task");
                 }
                 return Ok(response);
             }
