@@ -455,5 +455,38 @@ public class EventRepository : IEventRepository
     {
         return await _context.Database.BeginTransactionAsync();
     }
+    public async Task<List<EventMedium>> GetEventMediaByIdsAsync(int eventId, List<int> mediaIds)
+    {
+        return await _context.EventMedia
+            .Where(em => em.EventId == eventId && mediaIds.Contains(em.MediaId))
+            .ToListAsync();
+    }
+
+    public async Task<Medium> GetMediaItemAsync(int mediaId)
+    {
+        return await _context.Media.FindAsync(mediaId);
+    }
+
+    public async System.Threading.Tasks.Task DeleteEventMediaListAsync(int eventId, List<int> mediaIds)
+    {
+        var eventMediaList = await GetEventMediaByIdsAsync(eventId, mediaIds);
+        if (eventMediaList.Any())
+        {
+            _context.EventMedia.RemoveRange(eventMediaList);
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async System.Threading.Tasks.Task DeleteMediaItemsAsync(List<int> mediaIds)
+    {
+        var mediaItems = await _context.Media
+            .Where(m => mediaIds.Contains(m.Id))
+            .ToListAsync();
+        if (mediaItems.Any())
+        {
+            _context.Media.RemoveRange(mediaItems);
+            await _context.SaveChangesAsync();
+        }
+    }
 }
 

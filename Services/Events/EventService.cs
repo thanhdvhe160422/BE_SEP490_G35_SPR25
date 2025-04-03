@@ -12,6 +12,7 @@ using Planify_BackEnd.Repositories.Tasks;
 using Microsoft.Extensions.Logging;
 using Planify_BackEnd.DTOs.Medias;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 
 public class EventService : IEventService
 {
@@ -712,5 +713,99 @@ public class EventService : IEventService
     //        return new ResponseDTO(500, "Error orcurs while getting save draft!", ex.Message);
     //    }
     //}
+    public async Task<ResponseDTO> DeleteImagesAsync(DeleteImagesRequestDTO request)
+    {
+        try
+        {
+            if (request.EventId <= 0 || !request.MediaIds.Any())
+            {
+                return new ResponseDTO(400, "Invalid eventId or empty mediaIds list", null);
+            }
+
+            // 1. Kiểm tra các EventMedium tồn tại
+            var eventMediaList = await _eventRepository.GetEventMediaByIdsAsync(request.EventId, request.MediaIds);
+            if (!eventMediaList.Any() || eventMediaList.Count != request.MediaIds.Count)
+            {
+                return new ResponseDTO(404, "One or more images not found in event", null);
+            }
+
+            // 2. Lấy danh sách Medium để xóa trên Drive
+            var mediaItems = new List<Medium>();
+            foreach (var mediaId in request.MediaIds)
+            {
+                var mediaItem = await _eventRepository.GetMediaItemAsync(mediaId);
+                if (mediaItem == null || string.IsNullOrEmpty(mediaItem.MediaUrl))
+                {
+                    return new ResponseDTO(404, $"Media item {mediaId} not found or has no URL", null);
+                }
+                mediaItems.Add(mediaItem);
+            }
+
+            // 3. Xóa files trên Google Drive
+            var failedDeletions = new List<string>();
+            foreach (var mediaItem in mediaItems)
+            {
+                string fileId = ExtractFileIdFromDriveUrl(mediaItem.MediaUrl);
+                bool deleteSuccess = await _googleDriveService.DeleteFileAsync(fileId);
+                if (!deleteSuccess)
+                {
+                    failedDeletions.Add(mediaItem.MediaUrl);
+                    Console.WriteLine($"❌ Failed to delete file on Drive: {mediaItem.MediaUrl}");
+                }
+                else
+                {
+                    Console.WriteLine($"✅ Successfully deleted file on Drive: {mediaItem.MediaUrl}");
+                }
+            }
+
+            if (failedDeletions.Any())
+            {
+                return new ResponseDTO(400, $"Failed to delete some files on Drive: {string.Join(", ", failedDeletions)}", null);
+            }
+
+            using (var transaction = await _eventRepository.BeginTransactionAsync())
+            {
+                try
+                {
+                    await _eventRepository.DeleteEventMediaListAsync(request.EventId, request.MediaIds);
+                    await _eventRepository.DeleteMediaItemsAsync(request.MediaIds);
+                    await transaction.CommitAsync();
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new Exception($"Database deletion failed: {ex.Message}");
+                }
+            }
+
+            return new ResponseDTO(200, "Images deleted successfully!", null);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error deleting images: {ex.Message}");
+            return new ResponseDTO(500, $"Error deleting images: {ex.Message}", null);
+        }
+    }
+
+    private string ExtractFileIdFromDriveUrl(string driveUrl)
+    {
+        try
+        {
+            var uri = new Uri(driveUrl);
+            var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+            var fileId = query["id"];
+
+            if (!string.IsNullOrEmpty(fileId))
+            {
+                return fileId;
+            }
+
+            throw new Exception("Invalid Google Drive URL format - No file ID found");
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to extract file ID from URL: {ex.Message}");
+        }
+    }
 }
 

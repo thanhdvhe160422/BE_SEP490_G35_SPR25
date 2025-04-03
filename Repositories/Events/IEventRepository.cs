@@ -34,5 +34,9 @@ namespace Planify_BackEnd.Repositories
         Task<Event> GetEventByIdAsync(int eventId);
         System.Threading.Tasks.Task CreateCostBreakdownAsync(CostBreakdown costBreakdown);
         Task<IDbContextTransaction> BeginTransactionAsync();
+        Task<List<EventMedium>> GetEventMediaByIdsAsync(int eventId, List<int> mediaIds);
+        Task<Medium> GetMediaItemAsync(int mediaId);
+        System.Threading.Tasks.Task DeleteEventMediaListAsync(int eventId, List<int> mediaIds);
+        System.Threading.Tasks.Task DeleteMediaItemsAsync(List<int> mediaIds);
     }
 }
