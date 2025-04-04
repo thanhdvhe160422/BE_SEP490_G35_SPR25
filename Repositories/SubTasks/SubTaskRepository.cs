@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
+using Planify_BackEnd.DTOs;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories;
 
@@ -206,6 +207,34 @@ public class SubTaskRepository : ISubTaskRepository
                 .Where(e => e.Tasks.Any(t => t.SubTasks.Any(s => s.Id == subtaskId)))
                 .Select(e=>e.Id)
                 .FirstOrDefaultAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+
+    public async Task<PageResultDTO<SubTask>> SearchSubTaskByImplementerId(Guid implementerId, DateTime startDate, DateTime endDate)
+    {
+        try
+        {
+            var count = _context.JoinTasks
+                   .Where(jt => jt.UserId == implementerId &&
+                               jt.Task.StartTime <= endDate &&
+                               (jt.Task.Deadline >= startDate || jt.Task.Deadline == null) &&
+                               jt.Task.Status == 1)
+                   .Select(jt => jt.Task)
+                .OrderBy(e => e.StartTime)
+                .Count();
+            var result = await _context.JoinTasks
+                   .Where(jt => jt.UserId == implementerId &&
+                               jt.Task.StartTime <= endDate &&
+                               (jt.Task.Deadline >= startDate || jt.Task.Deadline == null) &&
+                               jt.Task.Status == 1)
+                   .Select(jt => jt.Task)
+                .OrderBy(e => e.StartTime)
+                .ToListAsync();
+            return new PageResultDTO<SubTask>(result, count, 0, 0);
         }
         catch (Exception ex)
         {

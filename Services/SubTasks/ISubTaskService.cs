@@ -15,5 +15,6 @@ namespace Planify_BackEnd.Services.SubTasks
         Task<ResponseDTO> GetSubTaskByIdAsync(int subTaskId);
         Task<ResponseDTO> GetSubTasksByTaskIdAsync(int taskId);
         Task<bool> AssignSubTask(Guid assignUserId, Guid userId,int taskId);
+        Task<PageResultDTO<SubTaskResponseDTO>> SearchSubTaskByImplementerId(Guid implementerId, DateTime startDate, DateTime endDate);
     }
 }
