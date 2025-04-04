@@ -135,5 +135,23 @@ namespace Planify_BackEnd.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet("search/v2")]
+        [Authorize(Roles = "Event Organizer, Implementer")]
+        public async Task<IActionResult> SearchTasksByGroupId(Guid implementerId, DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                var response = await _subTaskService.SearchSubTaskByImplementerId(implementerId, startDate, endDate);
+                if (response.TotalCount == 0)
+                {
+                    return NotFound("Cannot found any sub task");
+                }
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

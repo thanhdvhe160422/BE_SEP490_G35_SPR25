@@ -279,5 +279,29 @@ namespace Planify_BackEnd.Services.SubTasks
                 throw new Exception(ex.Message);
             }
         }
+        public async Task<PageResultDTO<SubTaskResponseDTO>> SearchSubTaskByImplementerId(Guid implementerId, DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                var resultTasks = await _subTaskRepository.SearchSubTaskByImplementerId(implementerId, startDate, endDate);
+                var tastDtos = resultTasks.Items.Select(item => new SubTaskResponseDTO
+                {
+                    Id = item.Id,
+                    SubTaskName = item.SubTaskName,
+                    SubTaskDescription = item.SubTaskDescription,
+                    StartTime = item.StartTime,
+                    Deadline = item.Deadline,
+                    TaskId = item.TaskId,
+                    AmountBudget = item.AmountBudget,
+                    Status = item.Status,
+                    CreateBy = item.CreateBy
+                }).ToList();
+                return new PageResultDTO<SubTaskResponseDTO>(tastDtos, resultTasks.TotalCount, 0, 0);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }
