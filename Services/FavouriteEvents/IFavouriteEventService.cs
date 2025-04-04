@@ -6,7 +6,7 @@ namespace Planify_BackEnd.Services.FavouriteEvents
 {
     public interface IFavouriteEventService
     {
-        Task<ResponseDTO> CreateFavouriteEventAsync(FavouriteEventCreateDTO feventDTO, Guid spectatorId);
+        Task<ResponseDTO> CreateFavouriteEventAsync(int eventId, Guid spectatorId);
         PageResultDTO<FavouriteEventGetDTO> GetAllFavouriteEventsAsync(int page, int pageSize, Guid spectatorId);
         Task<ResponseDTO> DeleteFavouriteEventAsync(int eventId, Guid spectatorId);
     }

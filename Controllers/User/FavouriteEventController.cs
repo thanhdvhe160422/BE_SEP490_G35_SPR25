@@ -40,13 +40,13 @@ namespace Planify_BackEnd.Controllers.User
                 return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
             }
         }
-        [HttpPost("create")]
+        [HttpPost("create/{eventId}")]
         [Authorize(Roles = "Spectator")]
-        public async Task<IActionResult> CreateFavouriteEvent([FromBody] FavouriteEventCreateDTO feventDTO)
+        public async Task<IActionResult> CreateFavouriteEvent(int eventId)
         {
             var spectatorId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             //var spectatorId = Guid.Parse("F64BA8AC-A0AF-4576-A618-E8502C52FD88");
-            var response = await _favouriteEventService.CreateFavouriteEventAsync(feventDTO, spectatorId);
+            var response = await _favouriteEventService.CreateFavouriteEventAsync(eventId, spectatorId);
 
             return StatusCode(response.Status, response);
         }
