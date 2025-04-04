@@ -255,5 +255,23 @@ namespace Planify_BackEnd.Repositories.JoinGroups
 
             return stringBuilder.ToString().Normalize(NormalizationForm.FormC).ToLower();
         }
+
+        public async Task<List<Guid>> GetUserIdJoinedEvent(int eventId)
+        {
+            try
+            {
+                var userIdJoinedEvent = await _context.JoinProjects
+                    .Include(jp => jp.Event)
+                    .Where(jp => jp.EventId == eventId &&
+                    jp.TimeOutProject!=null &&
+                    jp.Event.Status != -2)
+                    .Select(jp => jp.UserId)
+                    .ToListAsync();
+                return userIdJoinedEvent;
+            }catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

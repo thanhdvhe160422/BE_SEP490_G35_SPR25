@@ -43,6 +43,8 @@ namespace Planify_BackEnd.Services.Events
                     StartTime = e.StartTime,
                     EndTime = e.EndTime,
                     TimePublic = e.TimePublic,
+                    SloganEvent = e.SloganEvent,
+                    TargetAudience = e.TargetAudience,
                     EventMedias = e.EventMedia == null ? new List<EventMediumViewMediaModel>() : e.EventMedia.Select(em => new DTOs.Medias.EventMediumViewMediaModel
                     {
                         Id = em.Id,

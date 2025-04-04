@@ -238,5 +238,25 @@ namespace Planify_BackEnd.Repositories.Tasks
                 return false;
             }
         }
+
+        public async Task<List<Guid>> GetJoinedIdByTaskId(int taskId)
+        {
+            try
+            {
+                var listSubtaskIds = _context.SubTasks
+                                    .Where(s => s.TaskId == taskId)
+                                    .Select(s => s.Id)
+                                    .ToList();
+                var userIds = await _context.JoinTasks
+                                    .Where(jt => listSubtaskIds.Contains(jt.TaskId))
+                                    .Select(jt => jt.UserId)
+                                    .Distinct()
+                                    .ToListAsync();
+                return userIds;
+            }catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

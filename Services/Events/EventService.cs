@@ -13,6 +13,9 @@ using Microsoft.Extensions.Logging;
 using Planify_BackEnd.DTOs.Medias;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.SignalR;
+using Planify_BackEnd.Hub;
+using Google.Apis.Drive.v3.Data;
 
 public class EventService : IEventService
 {
@@ -21,19 +24,17 @@ public class EventService : IEventService
     private readonly ITaskRepository _taskRepository;
     private readonly ISubTaskRepository _subTaskRepository;
     private readonly GoogleDriveService _googleDriveService;
+    private readonly IHubContext<NotificationHub> _hubContext;
     private readonly IJoinProjectRepository _joinProjectRepository;
-    private readonly ICampusRepository _campusRepository;
-    private readonly ICategoryRepository _categoryRepository;
-    public EventService(IEventRepository eventRepository, IHttpContextAccessor httpContextAccessor, GoogleDriveService googleDriveService, IJoinProjectRepository joinProjectRepository, ICampusRepository campusRepository, ICategoryRepository categoryRepository, ISubTaskRepository subTaskRepository, ITaskRepository taskRepository)
+    public EventService(IEventRepository eventRepository, IHttpContextAccessor httpContextAccessor, GoogleDriveService googleDriveService, ISubTaskRepository subTaskRepository, ITaskRepository taskRepository,IHubContext<NotificationHub> hubContext, IJoinProjectRepository joinProjectRepository)
     {
         _eventRepository = eventRepository;
         _httpContextAccessor = httpContextAccessor;
         _googleDriveService = googleDriveService;
-        _joinProjectRepository = joinProjectRepository;
-        _campusRepository = campusRepository;
-        _categoryRepository = categoryRepository;
         _subTaskRepository = subTaskRepository;
         _taskRepository = taskRepository;
+        _hubContext = hubContext;
+        _joinProjectRepository = joinProjectRepository;
     }
     /// <summary>
     /// get all event by campusId and paging
@@ -431,7 +432,21 @@ public class EventService : IEventService
     {
         try
         {
-            return await _eventRepository.DeleteEventAsync(eventId);
+            var response = await _eventRepository.DeleteEventAsync(eventId);
+            //notification
+            if (response)
+            {
+                var e = await _eventRepository.GetEventByIdAsync(eventId);
+                var listJoined = await _joinProjectRepository.GetUserIdJoinedEvent(eventId);
+                var message = "You have been removed from event " + (e.EventTitle.Length>40?e.EventTitle.Substring(0,40)+"..":e.EventTitle) + "!";
+                var link = "/event-detail-EOG/" + eventId;
+                foreach (var id in listJoined) {
+                    await _hubContext.Clients.User(id + "").SendAsync("ReceiveNotification",
+                    message,
+                    link);
+                }
+            }
+            return response;
         }
         catch (Exception ex)
         {
@@ -838,6 +853,28 @@ public class EventService : IEventService
         catch (Exception ex)
         {
             throw new Exception($"Failed to extract file ID from URL: {ex.Message}");
+        }
+    }
+
+    public async Task<bool> EventIncomingNotification(Guid userId)
+    {
+        try
+        {
+            var listEventIncoming = await _eventRepository.GetEventIncomings(userId);
+            foreach (var item in listEventIncoming)
+            {
+                var message = "Upcoming event: " + (item.EventTitle.Length > 40 ? item.EventTitle.Substring(0, 40) + "..." : item.EventTitle) + "!\n"
+                    +"Start time: "+item.StartTime;
+                var link = "/event-detail-EOG/" + item.EventId;
+                await _hubContext.Clients.User(userId + "").SendAsync("ReceiveNotification",
+                    message,
+                    link);
+            }
+            return true;
+            
+        }catch(Exception ex)
+        {
+            throw new Exception(ex.Message);
         }
     }
 }

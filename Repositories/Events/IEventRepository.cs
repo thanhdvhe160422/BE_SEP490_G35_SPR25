@@ -39,5 +39,6 @@ namespace Planify_BackEnd.Repositories
         Task<Medium> GetMediaItemAsync(int mediaId);
         System.Threading.Tasks.Task DeleteEventMediaListAsync(int eventId, List<int> mediaIds);
         System.Threading.Tasks.Task DeleteMediaItemsAsync(List<int> mediaIds);
+        Task<List<EventIncomingNotification>> GetEventIncomings(Guid userId);
     }
 }

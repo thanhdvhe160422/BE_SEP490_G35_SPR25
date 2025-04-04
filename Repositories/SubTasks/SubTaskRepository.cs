@@ -180,6 +180,38 @@ public class SubTaskRepository : ISubTaskRepository
             throw new Exception(ex.Message);
         }
     }
+
+    public async Task<List<Guid>> GetJoinedIdBySubTaskIdAsync(int subtaskId)
+    {
+        try
+        {
+            return await _context.JoinTasks
+                .Where(jt=>jt.TaskId == subtaskId)
+                .Select(jt=>jt.UserId)
+                .ToListAsync();
+                
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+
+    public async Task<int> GetEventIdBySubtaskId(int subtaskId)
+    {
+        try
+        {
+            return await _context.Events
+                .Include(e => e.Tasks).ThenInclude(t => t.SubTasks)
+                .Where(e => e.Tasks.Any(t => t.SubTasks.Any(s => s.Id == subtaskId)))
+                .Select(e=>e.Id)
+                .FirstOrDefaultAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
 }
 
 

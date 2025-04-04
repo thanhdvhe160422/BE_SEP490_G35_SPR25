@@ -260,5 +260,20 @@ namespace Planify_BackEnd.Controllers
             var response = await _eventService.DeleteImagesAsync(request);
             return StatusCode(response.Status, response);
         }
+        [HttpGet("notification")]
+        [Authorize]
+        public async Task<IActionResult> NotificationIncomingEvent()
+        {
+            try
+            {
+                var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                _eventService.EventIncomingNotification(userId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
