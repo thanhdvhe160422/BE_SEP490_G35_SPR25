@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using Google.Apis.Drive.v3.Data;
 using Microsoft.AspNetCore.SignalR;
 using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.SubTasks;
@@ -6,6 +7,7 @@ using Planify_BackEnd.Hub;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories;
 using Planify_BackEnd.Repositories.Tasks;
+using System.Threading.Tasks;
 
 namespace Planify_BackEnd.Services.SubTasks
 {
@@ -195,7 +197,18 @@ namespace Planify_BackEnd.Services.SubTasks
                 {
                     return new ResponseDTO(404, "Sub-task not found.", null);
                 }
-
+                //notification
+                var listJoinUserId = await _subTaskRepository.GetJoinedIdBySubTaskIdAsync(subTaskId);
+                var eventId = await _subTaskRepository.GetEventIdBySubtaskId(subTaskId);
+                var subtask = await _subTaskRepository.GetSubTaskByIdAsync(subTaskId);
+                var message = "Subtask " + subtask.SubTaskName + " has been deleted!";
+                var link = "/event-detail-EOG/" + eventId;
+                foreach (var id in listJoinUserId)
+                {
+                    await _hubContext.Clients.User(id + "").SendAsync("ReceiveNotification",
+                        message,
+                        link);
+                }
                 return new ResponseDTO(200, "Sub-task deleted successfully!", null);
             }
             catch (Exception ex)
@@ -253,11 +266,13 @@ namespace Planify_BackEnd.Services.SubTasks
                     TaskId = subtaskId,
                     CreatedAt = DateTime.Now
                 };
-                await _subTaskRepository.AssignSubTask(newJoinTask);
-                await _hubContext.Clients.User(userId + "").SendAsync("ReceiveNotification",
-                    "You has been assign to a subtask!",
-                    "/event-detail-EOG/" + task.EventId);
-                return true;
+                var response = await _subTaskRepository.AssignSubTask(newJoinTask);
+                //notification
+                if (response)
+                    await _hubContext.Clients.User(userId + "").SendAsync("ReceiveNotification",
+                        "You has been assign to subtask "+ subtask.SubTaskName+ "!",
+                        "/event-detail-EOG/" + task.EventId);
+                return response;
 
             }catch(Exception ex)
             {

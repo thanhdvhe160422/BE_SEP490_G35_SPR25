@@ -16,5 +16,6 @@ namespace Planify_BackEnd.Repositories.JoinGroups
         Task<List<Guid>> GetExistingImplementerIdsAsync(int eventId);
         Task<PageResultDTO<JoinProject>> SearchImplementerJoinedEvent(int page, int pageSize, 
             int? eventId, string? email, string? name);
+        Task<List<Guid>> GetUserIdJoinedEvent(int eventId);
     }
 }

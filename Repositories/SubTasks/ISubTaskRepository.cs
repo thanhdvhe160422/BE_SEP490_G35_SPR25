@@ -12,5 +12,7 @@ namespace Planify_BackEnd.Repositories
         Task<SubTask?> GetSubTaskByIdAsync(int subTaskId);
         Task<List<SubTask>> GetSubTasksByTaskIdAsync(int taskId);
         Task<bool> AssignSubTask(JoinTask joinTask);
+        Task<List<Guid>> GetJoinedIdBySubTaskIdAsync(int subtaskId);
+        Task<int> GetEventIdBySubtaskId(int subtaskId);
     }
 }

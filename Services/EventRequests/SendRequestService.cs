@@ -5,6 +5,7 @@ using Planify_BackEnd.Hub;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories;
 using Planify_BackEnd.Repositories.SendRequests;
+using Planify_BackEnd.Services.Notification;
 
 namespace Planify_BackEnd.Services.EventRequests
 {
@@ -14,17 +15,23 @@ namespace Planify_BackEnd.Services.EventRequests
         private readonly IEventRepository _eventRepository;
         private readonly IHubContext<EventRequestHub> _hubContext;
         private readonly IHubContext<NotificationHub> _notificationHubContext;
+        private readonly IEmailSender _emailSender;
+        private readonly IUserRepository _userRepository;
 
         public SendRequestService(
             ISendRequestRepository requestRepository,
             IEventRepository eventRepository,
             IHubContext<EventRequestHub> hubContext,
-            IHubContext<NotificationHub> notificationHubContext)
+            IHubContext<NotificationHub> notificationHubContext,
+            IEmailSender emailSender,
+            IUserRepository userRepository)
         {
             _requestRepository = requestRepository ?? throw new ArgumentNullException(nameof(requestRepository));
             _eventRepository = eventRepository ?? throw new ArgumentNullException(nameof(eventRepository));
             _hubContext = hubContext ?? throw new ArgumentNullException(nameof(hubContext));
             _notificationHubContext = notificationHubContext ?? throw new ArgumentNullException(nameof(notificationHubContext));
+            _emailSender = emailSender ?? throw new ArgumentNullException(nameof(emailSender));
+            _userRepository = userRepository;
         }
 
         public async Task<ResponseDTO> GetRequestsAsync()
@@ -108,9 +115,21 @@ namespace Planify_BackEnd.Services.EventRequests
                 await _eventRepository.UpdateEventAsync(eventEntity);
                 await _hubContext.Clients.All.SendAsync("RequestApproved", request);
                 //notification
-                await _notificationHubContext.Clients.User(managerId+"").SendAsync("ReceiveNotification",
-                    "Your request has been approved!",
-                    "/event-detail-EOG/" + request.EventId);
+                try
+                {
+                    await _notificationHubContext.Clients.User(managerId + "").SendAsync("ReceiveNotification",
+                        "Your request has been approved!",
+                        "/event-detail-EOG/" + request.EventId);
+                    var user = await _userRepository.GetUserByIdAsync(managerId);
+                    if (user != null) await _emailSender.SendEmailAsync(user.Email,
+                        "Thông Báo Kế Hoạch Của Bạn Đã Được Duyệt",
+                        "Kính gửi " + user.LastName + " " + user.FirstName + ",\n\n" +
+                        "Chúng tôi xin thông báo rằng kế hoạch id " + request.EventId +
+                        " của bạn đã được xem xét và đã được phê duyệt.\n" +
+                        reason + "\n\n" +
+                        "Trân trọng,\nHệ thống tự động");
+                }
+                catch { }
                 return new ResponseDTO(200, "Yêu cầu đã được duyệt", request);
             }
             catch (Exception ex)
@@ -149,9 +168,21 @@ namespace Planify_BackEnd.Services.EventRequests
                 await _eventRepository.UpdateEventAsync(eventEntity);
                 await _hubContext.Clients.All.SendAsync("RequestRejected", request);
                 //notification
-                await _notificationHubContext.Clients.User(managerId + "").SendAsync("ReceiveNotification",
-                    "Your request has been reject!",
-                    "/event-detail-EOG/" + request.EventId);
+                try
+                {
+                    await _notificationHubContext.Clients.User(managerId + "").SendAsync("ReceiveNotification",
+                        "Your request has been reject!",
+                        "/event-detail-EOG/" + request.EventId);
+                    var user = await _userRepository.GetUserByIdAsync(managerId);
+                    if (user != null) await _emailSender.SendEmailAsync(user.Email,
+                        "Thông Báo Kế Hoạch Của Bạn Đã Bị Từ Chối",
+                        "Kính gửi " + user.LastName + " " + user.FirstName + ",\n\n" +
+                        "Chúng tôi xin thông báo rằng kế hoạch id " + request.EventId +
+                        " của bạn đã được xem xét và hiện tại không thể được phê duyệt.\n" +
+                        reason + "\n\n" +
+                        "Trân trọng,\nHệ thống tự động");
+                }
+                catch { }
                 return new ResponseDTO(200, "Yêu cầu đã bị từ chối", request);
             }
             catch (Exception ex)

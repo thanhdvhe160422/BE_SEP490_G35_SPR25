@@ -12,7 +12,7 @@ public class EventRepository : IEventRepository
 
     public EventRepository(PlanifyContext context)
     {
-        _context = context;
+        _context = context ?? throw new ArgumentNullException(nameof(context));
     }
 
     public PageResultDTO<Event> GetAllEvent(int campusId, int page, int pageSize)
@@ -486,6 +486,32 @@ public class EventRepository : IEventRepository
         {
             _context.Media.RemoveRange(mediaItems);
             await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task<List<EventIncomingNotification>> GetEventIncomings(Guid userId)
+    {
+        try
+        {
+            var now = DateTime.Now;
+            var future = now.AddDays(30);
+            var list = await _context.JoinProjects
+                .Where(jp => jp.UserId.Equals(userId))
+                .Include(jp => jp.Event)
+                .Where(jp => jp.Event.StartTime >= now &&
+                jp.Event.StartTime <= future &&
+                jp.Event.Status != -2)
+                .Select(jp => new EventIncomingNotification
+                {
+                    EventId = jp.EventId,
+                    EventTitle = jp.Event.EventTitle,
+                    StartTime = jp.Event.StartTime
+                })
+                .ToListAsync();
+            return list;
+        }catch(Exception ex)
+        {
+            throw new Exception(ex.Message);
         }
     }
 }

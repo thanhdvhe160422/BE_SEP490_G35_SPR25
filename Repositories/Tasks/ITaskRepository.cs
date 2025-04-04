@@ -18,6 +18,7 @@ namespace Planify_BackEnd.Repositories.Tasks
         public Task<bool> changeStatus(int taskId, int status);
         Task<PageResultDTO<SubTask>> SearchSubTaskByImplementerId(int page, int pageSize, Guid implementerId, DateTime startDate, DateTime endDate);
         Task<bool> DeleteTaskV2(int taskId);
+        Task<List<Guid>> GetJoinedIdByTaskId(int taskId);
 
     }
 }

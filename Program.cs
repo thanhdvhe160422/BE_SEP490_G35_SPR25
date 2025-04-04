@@ -38,6 +38,9 @@ using Planify_BackEnd.Services.Medias;
 using Planify_BackEnd.Repositories.Medias;
 using Planify_BackEnd.Services.ChatGPT;
 using Planify_BackEnd.Repositories.Risk;
+using Microsoft.Extensions.Configuration;
+using Planify_BackEnd.DTOs;
+using Planify_BackEnd.Services.Notification;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,7 +50,7 @@ var config = builder.Configuration;
 // Cấu hình kết nối database
 builder.Services.AddDbContext<PlanifyContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddHttpContextAccessor();
 
 // Add services to the container
@@ -96,6 +99,7 @@ builder.Services.AddScoped<IMediumService, MediumService>();
 builder.Services.AddScoped<IChatGPTService, ChatGPTService>();
 builder.Services.AddScoped<IRiskService, RiskService>();
 builder.Services.AddScoped<ICostService, CostService>();
+builder.Services.AddScoped<IEmailSender, EmailSender>();
 // Thêm Repository
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<IEventSpectatorRepository, EventSpectatorRepository>();

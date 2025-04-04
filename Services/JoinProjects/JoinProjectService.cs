@@ -1,5 +1,7 @@
 ﻿using Azure;
+using Azure.Core;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.DTOs.JoinedProjects;
@@ -16,11 +18,13 @@ namespace Planify_BackEnd.Services.JoinProjects
         private readonly IJoinProjectRepository _joinProjectRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHubContext<NotificationHub> _hubContext;
-        public JoinProjectService(IJoinProjectRepository joinProjectRepository, IHttpContextAccessor httpContextAccessor, IHubContext<NotificationHub> hubContext)
+        private readonly IEventRepository _eventRepository;
+        public JoinProjectService(IJoinProjectRepository joinProjectRepository, IHttpContextAccessor httpContextAccessor, IHubContext<NotificationHub> hubContext, IEventRepository eventRepository)
         {
             _joinProjectRepository = joinProjectRepository;
             _httpContextAccessor = httpContextAccessor;
             _hubContext = hubContext;
+            _eventRepository = eventRepository;
         }
         public async Task<IEnumerable<JoinedProjectDTO>> GetAllJoinedProjects(Guid userId, int page, int pageSize)
         {
@@ -55,8 +59,17 @@ namespace Planify_BackEnd.Services.JoinProjects
         {
             try
             {
-                return await _joinProjectRepository.DeleteImplementerFromEvent(userId, eventId);
-            }catch (Exception ex)
+                var response = await _joinProjectRepository.DeleteImplementerFromEvent(userId, eventId);
+                //notification
+                var e = await _eventRepository.GetEventByIdAsync(eventId);
+                var message = "You have been removed from event " + (e.EventTitle.Length > 40 ? e.EventTitle.Substring(0, 40) + ".." : e.EventTitle) + "!";
+                if (response)
+                    await _hubContext.Clients.User(userId + "").SendAsync("ReceiveNotification",
+                    message,
+                    "/event-detail-EOG/" + eventId);
+                return response;
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine("join project service - delete implementer from event: " + ex.Message);
                 return false;
@@ -103,11 +116,14 @@ namespace Planify_BackEnd.Services.JoinProjects
 
             var result = new { AddedCount = newUserIds.Count, EventId = request.EventId };
             //notification
+            var e = await _eventRepository.GetEventByIdAsync(request.EventId);
+            var message = "You have been added to event " + (e.EventTitle.Length > 40 ? e.EventTitle.Substring(0, 40) + ".." : e.EventTitle) + "!";
+            var link = "/event-detail-EOG/" + request.EventId;
             foreach (var id in newUserIds)
             {
                 await _hubContext.Clients.User(id + "").SendAsync("ReceiveNotification",
-                    "You have been added to a event plan!",
-                    "/event-detail-EOG/" + request.EventId);
+                    message,
+                    link);
             }
             return new ResponseDTO(200, $"Successfully added {newUserIds.Count} implementer(s) to event {request.EventId}.", result);
         }

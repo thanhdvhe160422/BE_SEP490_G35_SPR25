@@ -28,5 +28,6 @@ namespace Planify_BackEnd.Services.Events
         //Task<ResponseDTO> UpdateSaveDraft(EventUpdateDTO eventDTO);
         //Task<ResponseDTO> GetSaveDraft(Guid createBy);
         Task<ResponseDTO> DeleteImagesAsync(DeleteImagesRequestDTO request);
+        Task<bool> EventIncomingNotification(Guid userId);
     }
 }

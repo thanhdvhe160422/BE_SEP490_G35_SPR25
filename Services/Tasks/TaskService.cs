@@ -11,6 +11,9 @@ using Planify_BackEnd.DTOs.Groups;
 using Microsoft.Extensions.Logging;
 using Planify_BackEnd.DTOs.Events;
 using System.Threading.Tasks;
+using Google.Apis.Drive.v3.Data;
+using Microsoft.AspNetCore.SignalR;
+using Planify_BackEnd.Hub;
 namespace Planify_BackEnd.Services.Tasks
 {
     public class TaskService : ITaskService
@@ -18,10 +21,12 @@ namespace Planify_BackEnd.Services.Tasks
         //private readonly IGroupRepository _groupRepository;
         private readonly ITaskRepository _taskRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public TaskService(ITaskRepository taskRepository, IHttpContextAccessor httpContextAccessor/*, IGroupRepository groupRepository*/)
+        private readonly IHubContext<NotificationHub> _hubContext;
+        public TaskService(ITaskRepository taskRepository, IHttpContextAccessor httpContextAccessor,IHubContext<NotificationHub> hubContext)
         {
             _taskRepository = taskRepository;
             _httpContextAccessor = httpContextAccessor;
+            _hubContext = hubContext;
         }
         public async Task<ResponseDTO> CreateTaskAsync(TaskCreateRequestDTO taskDTO, Guid organizerId)
         {
@@ -287,7 +292,20 @@ namespace Planify_BackEnd.Services.Tasks
                 {
                     return new ResponseDTO(404, "Task not found or already deleted.", null);
                 }
-
+                //notification
+                var task = _taskRepository.GetTaskById(taskId);
+                var listJoined = await _taskRepository.GetJoinedIdByTaskId(taskId);
+                var message = "Task " + task.TaskName + "has been deleted!";
+                var link = "/event-detail-EOG/" + task.EventId;
+                if (listJoined != null&&listJoined.Count>0)
+                {
+                    foreach(var id in listJoined)
+                    {
+                        await _hubContext.Clients.User(id + "").SendAsync("ReceiveNotification",
+                            message,
+                            link);
+                    }
+                }
                 return new ResponseDTO(200, "Task deleted successfully!", null);
             }
             catch (Exception ex)
