@@ -11,5 +11,7 @@ public partial class Activity
 
     public string Content { get; set; } = null!;
 
+    public string? Name { get; set; }
+
     public virtual Event Event { get; set; } = null!;
 }
