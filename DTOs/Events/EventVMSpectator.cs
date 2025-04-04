@@ -32,6 +32,9 @@ namespace Planify_BackEnd.DTOs.Events
 
         public string? Placed { get; set; } = null!;
         public bool? isFavorite { get; set; }
+        public string? TargetAudience { get; set; }
+
+        public string? SloganEvent { get; set; }
 
         public CampusDTO? CampusDTO { get; set; }
 
