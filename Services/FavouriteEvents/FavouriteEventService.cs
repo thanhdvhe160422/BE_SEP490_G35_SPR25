@@ -44,13 +44,13 @@ namespace Planify_BackEnd.Services.FavouriteEvents
                 throw;
             }
         }
-        public async Task<ResponseDTO> CreateFavouriteEventAsync(FavouriteEventCreateDTO feventDTO, Guid spectatorId)
+        public async Task<ResponseDTO> CreateFavouriteEventAsync(int eventId, Guid spectatorId)
         {
             try
             {
                 var favouriteEvent = new FavouriteEvent
                 {
-                    EventId = feventDTO.EventId,
+                    EventId = eventId,
                     UserId = spectatorId,
                 };
                 var result = await _favouriteEventRepository.CreateFavouriteEventAsync(favouriteEvent);
