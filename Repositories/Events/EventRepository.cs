@@ -173,6 +173,13 @@ public class EventRepository : IEventRepository
                         Solution = r.Solution,
                         Description = r.Description
                     }).ToList(),
+                    Activities = e.Activities.Select(a => new ActivityDto
+                    {
+                        Id = a.Id,
+                        EventId = a.EventId,
+                        Name = a.Name,
+                        Content = a.Content
+                    }).ToList(),
                     Tasks = e.Tasks
                         .Where(t => t.Status == 1 || t.Status == 0)
                         .Select(t => new TaskDetailDto
@@ -426,7 +433,11 @@ public class EventRepository : IEventRepository
         _context.Risks.Add(risk);
         await _context.SaveChangesAsync();
     }
-
+    public async System.Threading.Tasks.Task CreateActivityAsync(Activity activity)
+    {
+        _context.Activities.Add(activity);
+        await _context.SaveChangesAsync();
+    }
     public async Task<Event> GetEventByIdAsync(int eventId)
     {
         return await _context.Events

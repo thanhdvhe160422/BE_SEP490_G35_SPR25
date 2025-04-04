@@ -31,6 +31,7 @@ namespace Planify_BackEnd.Repositories
         Task<Event> UpdateSaveDraft(Event saveEvent);
         Task<Event> GetSaveDraft(Guid createBy);
         System.Threading.Tasks.Task CreateRiskAsync(Models.Risk risk);
+        System.Threading.Tasks.Task CreateActivityAsync(Activity activity);
         Task<Event> GetEventByIdAsync(int eventId);
         System.Threading.Tasks.Task CreateCostBreakdownAsync(CostBreakdown costBreakdown);
         Task<IDbContextTransaction> BeginTransactionAsync();

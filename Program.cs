@@ -40,6 +40,8 @@ using Planify_BackEnd.Services.ChatGPT;
 using Planify_BackEnd.Repositories.Risk;
 using Planify_BackEnd.Services.FavouriteEvents;
 using Planify_BackEnd.Repositories.FavouriteEvents;
+using Planify_BackEnd.Services.Participants;
+using Planify_BackEnd.Repositories.Participants;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -99,6 +101,7 @@ builder.Services.AddScoped<IChatGPTService, ChatGPTService>();
 builder.Services.AddScoped<IRiskService, RiskService>();
 builder.Services.AddScoped<ICostService, CostService>();
 builder.Services.AddScoped<IFavouriteEventService, FavouriteEventService>();
+builder.Services.AddScoped<IParticipantService, ParticipantService>();
 // Thêm Repository
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<IEventSpectatorRepository, EventSpectatorRepository>();
@@ -115,6 +118,8 @@ builder.Services.AddScoped<IMediumRepository, MediumRepository>();
 builder.Services.AddScoped<IRiskRepository, RiskRepository>();
 builder.Services.AddScoped<ICostRepository, CostRepository>();
 builder.Services.AddScoped<IFavouriteEventRepository, FavouriteEventRepository>();
+builder.Services.AddScoped<IParticipantRepository, ParticipantRepository>();
+
 // Thêm Authorization
 builder.Services.AddAuthorization();
 // Cấu hình JSON tránh lỗi vòng lặp
