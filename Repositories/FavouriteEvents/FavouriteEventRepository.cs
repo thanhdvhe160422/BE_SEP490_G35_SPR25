@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Planify_BackEnd.DTOs;
+using Planify_BackEnd.DTOs.FavouriteEvents;
 using Planify_BackEnd.Models;
 
 namespace Planify_BackEnd.Repositories.FavouriteEvents
@@ -66,6 +67,47 @@ namespace Planify_BackEnd.Repositories.FavouriteEvents
             catch (Exception ex)
             {
                 throw new Exception("An unexpected error occurred.", ex);
+            }
+        }
+
+        public PageResultDTO<FavouriteEventVM> GetFavouriteEventsByUserId(int page, int pageSize, Guid userId)
+        {
+            try
+            {
+                var count = _context.FavouriteEvents
+                    .Include(f => f.Event).ThenInclude(e => e.EventMedia).ThenInclude(em => em.Media)
+                    .Include(f => f.User)
+                    .Where(f => f.UserId == userId)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .Count();
+                if (count == 0) return new PageResultDTO<FavouriteEventVM>(new List<FavouriteEventVM>(), 0, page, pageSize);
+                var f = _context.FavouriteEvents
+                    .Include(f => f.Event).ThenInclude(e=>e.EventMedia).ThenInclude(em=>em.Media)
+                    .Include(f => f.User)
+                    .Where(f => f.UserId == userId)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(f=> new FavouriteEventVM
+                    {
+                        Id = f.Event.Id,
+                        EventTitle = f.Event.EventTitle,
+                        StartTime = f.Event.StartTime,
+                        EndTime = f.Event.EndTime,
+                        Placed = f.Event.Placed,
+                        EventMedia = f.Event.EventMedia.Select(em=> new EventMediaDto
+                        {
+                            Id= em.Media.Id,
+                            MediaUrl = em.Media.MediaUrl,
+                        }).ToList()
+                    })
+                    .ToList();
+                PageResultDTO<FavouriteEventVM> result = new PageResultDTO<FavouriteEventVM>(f, count, page, pageSize);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An unexpected error occurred while retrieving favourite events.", ex);
             }
         }
     }

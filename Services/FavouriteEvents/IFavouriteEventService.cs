@@ -9,5 +9,6 @@ namespace Planify_BackEnd.Services.FavouriteEvents
         Task<ResponseDTO> CreateFavouriteEventAsync(int eventId, Guid spectatorId);
         PageResultDTO<FavouriteEventGetDTO> GetAllFavouriteEventsAsync(int page, int pageSize, Guid spectatorId);
         Task<ResponseDTO> DeleteFavouriteEventAsync(int eventId, Guid spectatorId);
+        PageResultDTO<FavouriteEventVM> GetFavouriteEventsByUserId(int page, int pageSize, Guid userId);
     }
 }
