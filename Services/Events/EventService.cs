@@ -245,7 +245,24 @@ public class EventService : IEventService
                     await _eventRepository.CreateRiskAsync(newRisk);
                 }
             }
-            Console.WriteLine("sang "+eventDTO.CostBreakdowns.Count());
+            // Tạo các hoạt động
+            if (eventDTO.Activities != null && eventDTO.Activities.Any())
+            {
+                foreach (var activity in eventDTO.Activities)
+                {
+                    if (string.IsNullOrWhiteSpace(activity.Name))
+                        return new ResponseDTO(400, "Tên hoạt động là bắt buộc.", null);
+
+                    var newActivity = new Activity
+                    {
+                        EventId = newEvent.Id,
+                        Name = activity.Name,
+                        Content = activity.Content
+                    };
+                    await _eventRepository.CreateActivityAsync(newActivity);
+                }
+            }
+            Console.WriteLine("sang " + eventDTO.CostBreakdowns.Count());
             // Tạo các chi phí
             if (eventDTO.CostBreakdowns != null && eventDTO.CostBreakdowns.Any())
             {
@@ -627,7 +644,23 @@ public class EventService : IEventService
                     await _eventRepository.CreateRiskAsync(newRisk);
                 }
             }
+            // Tạo các hoạt động
+            if (eventDTO.Activities != null && eventDTO.Activities.Any())
+            {
+                foreach (var activity in eventDTO.Activities)
+                {
+                    if (string.IsNullOrWhiteSpace(activity.Name))
+                        return new ResponseDTO(400, "Tên hoạt động là bắt buộc.", null);
 
+                    var newActivity = new Activity
+                    {
+                        EventId = newEvent.Id,
+                        Name = activity.Name,
+                        Content = activity.Content
+                    };
+                    await _eventRepository.CreateActivityAsync(newActivity);
+                }
+            }
             // Tạo CostBreakdowns
             if (eventDTO.CostBreakdowns != null && eventDTO.CostBreakdowns.Any())
         {
@@ -737,14 +770,14 @@ public class EventService : IEventService
                 return new ResponseDTO(400, "Invalid eventId or empty mediaIds list", null);
             }
 
-            // 1. Kiểm tra các EventMedium tồn tại
+            // Kiểm tra các EventMedium tồn tại
             var eventMediaList = await _eventRepository.GetEventMediaByIdsAsync(request.EventId, request.MediaIds);
             if (!eventMediaList.Any() || eventMediaList.Count != request.MediaIds.Count)
             {
                 return new ResponseDTO(404, "One or more images not found in event", null);
             }
 
-            // 2. Lấy danh sách Medium để xóa trên Drive
+            // Lấy danh sách Medium để xóa trên Drive
             var mediaItems = new List<Medium>();
             foreach (var mediaId in request.MediaIds)
             {
@@ -756,7 +789,7 @@ public class EventService : IEventService
                 mediaItems.Add(mediaItem);
             }
 
-            // 3. Xóa files trên Google Drive
+            // Xóa files trên Google Drive
             var failedDeletions = new List<string>();
             foreach (var mediaItem in mediaItems)
             {

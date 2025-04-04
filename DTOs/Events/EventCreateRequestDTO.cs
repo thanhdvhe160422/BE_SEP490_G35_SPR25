@@ -40,6 +40,7 @@ namespace Planify_BackEnd.DTOs.Events
         public List<TaskCreateEventDTO> Tasks { get; set; }
 
         public List<RiskCreateEventDTO> Risks { get; set; }
+        public List<ActivityEventDTO> Activities { get; set; }
 
         public List<CostBreakdownCreateEventDTO> CostBreakdowns { get; set; }
     }
@@ -98,5 +99,12 @@ namespace Planify_BackEnd.DTOs.Events
 
         [Range(0, double.MaxValue)]
         public decimal? PriceByOne { get; set; }
+    }
+    public class ActivityEventDTO
+    {
+        [Required]
+        public string Name { get; set; }
+
+        public string Content { get; set; }
     }
 }

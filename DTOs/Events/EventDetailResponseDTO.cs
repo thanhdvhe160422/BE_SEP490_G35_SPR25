@@ -33,6 +33,7 @@
         public List<FavouriteEventDto> FavouriteEvents { get; set; }
         public List<JoinProjectDto> JoinProjects { get; set; }
         public List<RiskDto> Risks { get; set; }
+        public List<ActivityDto> Activities { get; set; }
         public List<TaskDetailDto> Tasks { get; set; }
         public List<CostBreakdownDetailDto> CostBreakdowns { get; set; }
     }
@@ -106,5 +107,12 @@
         public int? Quantity { get; set; }
         public decimal? PriceByOne { get; set; }
         public decimal? TotalCost => Quantity * PriceByOne;
+    }
+    public class ActivityDto
+    {
+        public int Id { get; set; }
+        public int EventId { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Content { get; set; } = string.Empty;
     }
 }
