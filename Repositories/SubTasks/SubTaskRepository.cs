@@ -1,8 +1,11 @@
 ﻿
+using Google.Apis.Drive.v3.Data;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Planify_BackEnd.DTOs;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories;
+using System.Threading.Tasks;
 
 
 public class SubTaskRepository : ISubTaskRepository
@@ -227,12 +230,25 @@ public class SubTaskRepository : ISubTaskRepository
                 .OrderBy(e => e.StartTime)
                 .Count();
             var result = await _context.JoinTasks
-                   .Where(jt => jt.UserId == implementerId &&
+                   .Include(jt => jt.Task).ThenInclude(st => st.Task).ThenInclude(t => t.Event)
+                   .Where(jt => jt.UserId == implementerId && 
                                jt.Task.StartTime <= endDate &&
                                (jt.Task.Deadline >= startDate || jt.Task.Deadline == null) &&
                                jt.Task.Status == 1)
-                   .Select(jt => jt.Task)
-                .OrderBy(e => e.StartTime)
+                .OrderBy(e => e.Task.StartTime)
+                .Select(jt => new SubTask
+                {
+                    Id = jt.Task.Id,
+                    SubTaskName = jt.Task.SubTaskName,
+                    SubTaskDescription = jt.Task.SubTaskDescription,
+                    StartTime = jt.Task.StartTime,
+                    Deadline = jt.Task.Deadline,
+                    TaskId = jt.Task.TaskId,
+                    AmountBudget = jt.Task.AmountBudget,
+                    Status = jt.Task.Status,
+                    CreateBy = jt.Task.CreateBy,
+                    Task = jt.Task.Task,
+                })
                 .ToListAsync();
             return new PageResultDTO<SubTask>(result, count, 0, 0);
         }

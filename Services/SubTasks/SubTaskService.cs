@@ -294,7 +294,9 @@ namespace Planify_BackEnd.Services.SubTasks
                     TaskId = item.TaskId,
                     AmountBudget = item.AmountBudget,
                     Status = item.Status,
-                    CreateBy = item.CreateBy
+                    CreateBy = item.CreateBy,
+                    TaskName = item.Task.TaskName,
+                    EventTitle = item?.Task?.Event?.EventTitle
                 }).ToList();
                 return new PageResultDTO<SubTaskResponseDTO>(tastDtos, resultTasks.TotalCount, 0, 0);
             }
