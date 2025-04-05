@@ -1,10 +1,12 @@
-﻿using Azure;
+﻿using System.Threading.Tasks;
+using Azure;
 using Azure.Core;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.DTOs.JoinedProjects;
+using Planify_BackEnd.DTOs.Tasks;
 using Planify_BackEnd.DTOs.Users;
 using Planify_BackEnd.Hub;
 using Planify_BackEnd.Models;
@@ -26,34 +28,93 @@ namespace Planify_BackEnd.Services.JoinProjects
             _hubContext = hubContext;
             _eventRepository = eventRepository;
         }
-        public async Task<IEnumerable<JoinedProjectDTO>> GetAllJoinedProjects(Guid userId, int page, int pageSize)
+        public PageResultDTO<JoinedProjectDTO> JoiningEvents(int page, int pageSize, Guid userId)
         {
-            var joinedProject = await _joinProjectRepository.GetAllJoinedProjects(userId, page, pageSize);
-            var joinedProjectDTOs = joinedProject.Select(j => new JoinedProjectDTO
+            try
             {
-                Id = j.Id,
-                EventId = j.EventId,
-                UserId = j.UserId,
-                TimeJoinProject = j.TimeJoinProject,
-                TimeOutProject = j.TimeOutProject,
-                EventTitle = j.Event.EventTitle,
-                EventDescription = j.Event.EventDescription,
-                StartTime = j.Event.StartTime,
-                EndTime = j.Event.EndTime,
-                AmountBudget = j.Event.AmountBudget,
-                IsPublic = j.Event.IsPublic,
-                TimePublic = j.Event.TimePublic,
-                Status = j.Event.Status,
-                CampusId = j.Event.CampusId,
-                CategoryEventId = j.Event.CategoryEventId,
-                Placed = j.Event.Placed,
-                CreatedAt = j.Event.CreatedAt,
-                CreateBy = j.Event.CreateBy,
-                UpdatedAt = j.Event.UpdatedAt,
-                UpdateBy = j.Event.UpdateBy
-            }).ToList();
-            return joinedProjectDTOs;
-            
+                var joinedProject = _joinProjectRepository.JoiningEvents(userId,page, pageSize);
+                if (joinedProject.TotalCount == 0)
+
+                    return new PageResultDTO<JoinedProjectDTO>(new List<JoinedProjectDTO>(), 0, page, pageSize);
+                List<JoinedProjectDTO> joiningList = new List<JoinedProjectDTO>();
+                foreach (var item in joinedProject.Items)
+                {
+                    var joinedProjectDTO = new JoinedProjectDTO
+                    {
+                        Id = item.Id,
+                        EventId = item.EventId,
+                        UserId = item.UserId,
+                        TimeJoinProject = item.TimeJoinProject,
+                        TimeOutProject = item.TimeOutProject,
+                        EventTitle = item.Event.EventTitle,
+                        EventDescription = item.Event.EventDescription,
+                        StartTime = item.Event.StartTime,
+                        EndTime = item.Event.EndTime,
+                        AmountBudget = item.Event.AmountBudget,
+                        IsPublic = item.Event.IsPublic,
+                        TimePublic = item.Event.TimePublic,
+                        Status = item.Event.Status,
+                        CampusId = item.Event.CampusId,
+                        CategoryEventId = item.Event.CategoryEventId,
+                        Placed = item.Event.Placed,
+                        CreatedAt = item.Event.CreatedAt,
+                        CreateBy = item.Event.CreateBy,
+                        UpdatedAt = item.Event.UpdatedAt,
+                        UpdateBy = item.Event.UpdateBy
+                    };
+                    joiningList.Add(joinedProjectDTO);
+                }
+
+                return new PageResultDTO<JoinedProjectDTO>(joiningList, joinedProject.TotalCount, page, pageSize);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public PageResultDTO<JoinedProjectDTO> AttendedEvents(int page, int pageSize, Guid userId)
+        {
+            try
+            {
+                var joinedProject = _joinProjectRepository.AttendedEvents(page, pageSize, userId);
+                if(joinedProject.TotalCount == 0)
+
+                    return new PageResultDTO<JoinedProjectDTO>(new List<JoinedProjectDTO>(), 0, page, pageSize);
+                List<JoinedProjectDTO> joinedList = new List<JoinedProjectDTO>();
+                foreach (var item in joinedProject.Items)
+                {
+                    var joinedProjectDTO = new JoinedProjectDTO
+                    {
+                        Id = item.Id,
+                        EventId = item.EventId,
+                        UserId = item.UserId,
+                        TimeJoinProject = item.TimeJoinProject,
+                        TimeOutProject = item.TimeOutProject,
+                        EventTitle = item.Event.EventTitle,
+                        EventDescription = item.Event.EventDescription,
+                        StartTime = item.Event.StartTime,
+                        EndTime = item.Event.EndTime,
+                        AmountBudget = item.Event.AmountBudget,
+                        IsPublic = item.Event.IsPublic,
+                        TimePublic = item.Event.TimePublic,
+                        Status = item.Event.Status,
+                        CampusId = item.Event.CampusId,
+                        CategoryEventId = item.Event.CategoryEventId,
+                        Placed = item.Event.Placed,
+                        CreatedAt = item.Event.CreatedAt,
+                        CreateBy = item.Event.CreateBy,
+                        UpdatedAt = item.Event.UpdatedAt,
+                        UpdateBy = item.Event.UpdateBy
+                    };
+                    joinedList.Add(joinedProjectDTO);
+                }
+              
+                return new PageResultDTO<JoinedProjectDTO>(joinedList, joinedProject.TotalCount, page, pageSize);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
         public async Task<bool> DeleteImplementerFromEvent(Guid userId, int eventId)
         {

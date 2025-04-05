@@ -20,12 +20,16 @@ namespace Planify_BackEnd.Controllers
         }
         [HttpGet("get-list-event-joined")]
         [Authorize(Roles = "Implementer")]
-        public async Task<IActionResult> GetAllJoinedProjects(int page, int pageSize)
+        public async Task<IActionResult> GetJoiningEvenets(int page, int pageSize)
         {
             try
             {
                 var userId =Guid.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value) ;
-                var response = await _joinProjectService.GetAllJoinedProjects(userId, page, pageSize);
+                var response =  _joinProjectService.JoiningEvents( page, pageSize, userId);
+                if (response.TotalCount == 0)
+                {
+                    return NotFound("Cannot found any task");
+                }
                 return Ok(response);
             }
             catch (Exception ex)
@@ -33,7 +37,25 @@ namespace Planify_BackEnd.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
+        [HttpGet("view-attended-events-history")]
+        [Authorize(Roles = "Implementer")]
+        public async Task<IActionResult> GetAttendedEventsHistory(int page, int pageSize)
+        {
+            try
+            {
+                var userId = Guid.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                var response =  _joinProjectService.AttendedEvents( page, pageSize, userId);
+                if (response.TotalCount == 0)
+                {
+                    return NotFound("Cannot found any task");
+                }
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [HttpPut("delete-from-project/{eventId}/{userId}")]
         [Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> DeleteImplementerFromEvent(int eventId, Guid userId)
