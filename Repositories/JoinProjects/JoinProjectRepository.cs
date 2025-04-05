@@ -19,22 +19,51 @@ namespace Planify_BackEnd.Repositories.JoinGroups
             _context = context;
         }
 
-        public async Task<IEnumerable<JoinProject>> GetAllJoinedProjects(Guid userId, int page, int pageSize)
+        public PageResultDTO<JoinProject> JoiningEvents(Guid userId, int page, int pageSize)
         {
             try
             {
-                return await _context.JoinProjects
+                var count = _context.JoinProjects
+                    .Where(jp => jp.UserId == userId && jp.TimeOutProject == null)
+                    .Count();
+                if (count == 0)
+                    return new PageResultDTO<JoinProject>(new List<JoinProject>(), count, page, pageSize);
+                var list = _context.JoinProjects
                     .Include(jp => jp.Event)
-                    .Where(jp => jp.UserId == userId)
+                    .Include(jp => jp.User)
+                    .Where(jp => jp.UserId == userId && jp.TimeOutProject == null)
                     .Skip((page - 1) * pageSize).Take(pageSize)
-                    .ToListAsync(); 
+                    .ToList();
+                return new PageResultDTO<JoinProject>(list, count, page, pageSize);
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 throw new Exception(ex.Message);
             }
 
         }
-
+        public PageResultDTO<JoinProject> AttendedEvents(int page, int pageSize, Guid userId)
+        {
+            try
+            {
+                var count =  _context.JoinProjects
+                    .Where(jp => jp.UserId == userId && jp.TimeOutProject != null)
+                    .Count();
+                if (count == 0)
+                    return new PageResultDTO<JoinProject>(new List<JoinProject>(), count, page, pageSize);
+                var list = _context.JoinProjects
+                    .Include(jp => jp.Event)
+                    .Include(jp => jp.User)
+                    .Where(jp => jp.UserId == userId && jp.TimeOutProject != null)
+                    .Skip((page - 1) * pageSize).Take(pageSize)
+                    .ToList();
+                return new PageResultDTO<JoinProject>(list, count, page, pageSize);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
         public async Task<bool> DeleteImplementerFromEvent(Guid userId, int eventId)
         {
             try

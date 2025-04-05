@@ -279,6 +279,17 @@ namespace Planify_BackEnd.Services.SubTasks
                 throw new Exception(ex.Message);
             }
         }
+        public async Task<bool> DeleteAssignedUser(Guid userId, int subTaskId)
+        {
+            try
+            {
+                return await _subTaskRepository.DeleteAssignedUser(userId, subTaskId);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
         public async Task<PageResultDTO<SubTaskResponseDTO>> SearchSubTaskByImplementerId(Guid implementerId, DateTime startDate, DateTime endDate)
         {
             try
