@@ -242,7 +242,7 @@ public class SubTaskRepository : ISubTaskRepository
                    .Where(jt => jt.UserId == implementerId &&
                                jt.Task.StartTime <= endDate &&
                                (jt.Task.Deadline >= startDate || jt.Task.Deadline == null) &&
-                               jt.Task.Status == 1)
+                               jt.Task.Status != -1)
                    .Select(jt => jt.Task)
                 .OrderBy(e => e.StartTime)
                 .Count();
@@ -251,7 +251,7 @@ public class SubTaskRepository : ISubTaskRepository
                    .Where(jt => jt.UserId == implementerId && 
                                jt.Task.StartTime <= endDate &&
                                (jt.Task.Deadline >= startDate || jt.Task.Deadline == null) &&
-                               jt.Task.Status == 1)
+                               jt.Task.Status != -1)
                 .OrderBy(e => e.Task.StartTime)
                 .Select(jt => new SubTask
                 {
