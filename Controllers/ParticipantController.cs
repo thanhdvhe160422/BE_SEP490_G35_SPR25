@@ -49,5 +49,17 @@ namespace Planify_BackEnd.Controllers
             var response = _service.UnregisterParticipant(unregisterDto);
             return StatusCode(response.Status, response);
         }
+        [HttpGet("is-register")]
+        public IActionResult IsAlreadyRegistered(int eventId, Guid userId)
+        {
+            try
+            {
+                var response = _service.IsAlreadyRegistered(eventId, userId);
+                return StatusCode(response.Status, response);
+            }catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

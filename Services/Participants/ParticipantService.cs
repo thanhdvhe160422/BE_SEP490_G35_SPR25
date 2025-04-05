@@ -109,5 +109,20 @@ namespace Planify_BackEnd.Services.Participants
 
             return new ResponseDTO(200, "Unregistered successfully", null);
         }
+
+        public ResponseDTO IsAlreadyRegistered(int eventId, Guid userId)
+        {
+            try
+            {
+                var response = _repository.IsAlreadyRegistered(eventId, userId);
+                if (!response)
+                    return new ResponseDTO(400, response+"", null);
+                else
+                    return new ResponseDTO(200, response+"", null);
+            }catch
+            {
+                return new ResponseDTO(500, "Failed to check registerd", null);
+            }
+        }
     }
 }

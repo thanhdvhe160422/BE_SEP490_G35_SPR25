@@ -81,5 +81,17 @@ namespace Planify_BackEnd.Services.FavouriteEvents
                 return new ResponseDTO(500, "Error occurs while deleting favourite event!", ex.Message);
             }
         }
+
+        public PageResultDTO<FavouriteEventVM> GetFavouriteEventsByUserId(int page, int pageSize, Guid userId)
+        {
+            try
+            {
+                var pageResult = _favouriteEventRepository.GetFavouriteEventsByUserId(page,pageSize,userId);
+                return pageResult;
+            }catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

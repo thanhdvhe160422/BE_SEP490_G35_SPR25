@@ -9,5 +9,6 @@ namespace Planify_BackEnd.Services.Participants
         ResponseDTO RegisterParticipant(RegisterEventDTO registerDto);
         ResponseDTO GetRegisteredEvents(Guid userId);
         ResponseDTO UnregisterParticipant(RegisterEventDTO unregisterDto);
+        ResponseDTO IsAlreadyRegistered(int eventId, Guid userId);
     }
 }

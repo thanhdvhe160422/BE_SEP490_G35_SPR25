@@ -68,5 +68,25 @@ namespace Planify_BackEnd.Controllers.User
                 return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
             }
         }
+        [HttpGet("get-list/v2")]
+        [Authorize]
+        public async Task<IActionResult> GetFavouriteEventsByUserId(int page, int pageSize)
+        {
+            try
+            {
+                var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                var result = _favouriteEventService.GetFavouriteEventsByUserId(page, pageSize, userId);
+                if (result.TotalCount == 0)
+                {
+                    return NotFound("Cannot found any favourite events");
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }
