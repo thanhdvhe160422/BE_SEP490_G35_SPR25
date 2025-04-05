@@ -45,7 +45,6 @@ namespace Planify_BackEnd.Controllers.User
         public async Task<IActionResult> CreateFavouriteEvent(int eventId)
         {
             var spectatorId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-            //var spectatorId = Guid.Parse("F64BA8AC-A0AF-4576-A618-E8502C52FD88");
             var response = await _favouriteEventService.CreateFavouriteEventAsync(eventId, spectatorId);
 
             return StatusCode(response.Status, response);
@@ -56,8 +55,7 @@ namespace Planify_BackEnd.Controllers.User
         {
             try
             {
-                var spectatorId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-                //var spectatorId = Guid.Parse("F64BA8AC-A0AF-4576-A618-E8502C52FD88");
+               var spectatorId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
                 var result = await _favouriteEventService.DeleteFavouriteEventAsync(eventId, spectatorId);
                 if (result == null)
                 {

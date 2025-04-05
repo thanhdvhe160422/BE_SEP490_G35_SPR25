@@ -181,7 +181,24 @@ public class SubTaskRepository : ISubTaskRepository
             throw new Exception(ex.Message);
         }
     }
-
+    public async Task<bool> DeleteAssignedUser(Guid userId, int subTaskId)
+    {
+        try
+        {
+            var joinTask = await _context.JoinTasks.FirstOrDefaultAsync(jt => jt.UserId == userId && jt.TaskId == subTaskId);
+            if (joinTask != null)
+            {
+                _context.JoinTasks.Remove(joinTask);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
     public async Task<List<Guid>> GetJoinedIdBySubTaskIdAsync(int subtaskId)
     {
         try

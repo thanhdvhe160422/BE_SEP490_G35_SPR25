@@ -135,6 +135,24 @@ namespace Planify_BackEnd.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpDelete("delete-assigned-user")]
+        [Authorize(Roles = "Event Organizer, Implementer")]
+        public async Task<IActionResult> DeleteAssignedUser(Guid userId, int subtaskId)
+        {
+            try
+            {
+                var response = await _subTaskService.DeleteAssignedUser(userId, subtaskId);
+                if (!response)
+                {
+                    return BadRequest("Cannot delete assigned user " + userId + "!");
+                }
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [HttpGet("search/v2")]
         [Authorize(Roles = "Event Organizer, Implementer")]
         public async Task<IActionResult> SearchTasksByGroupId(Guid implementerId, DateTime startDate, DateTime endDate)
