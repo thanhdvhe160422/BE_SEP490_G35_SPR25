@@ -2,6 +2,7 @@
 using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.DTOs;
 using Planify_BackEnd.Services.Participants;
+using System.Security.Claims;
 
 namespace Planify_BackEnd.Controllers
 {
@@ -49,11 +50,12 @@ namespace Planify_BackEnd.Controllers
             var response = _service.UnregisterParticipant(unregisterDto);
             return StatusCode(response.Status, response);
         }
-        [HttpGet("is-register")]
-        public IActionResult IsAlreadyRegistered(int eventId, Guid userId)
+        [HttpGet("is-register/{eventId}")]
+        public IActionResult IsAlreadyRegistered(int eventId)
         {
             try
             {
+                var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
                 var response = _service.IsAlreadyRegistered(eventId, userId);
                 return StatusCode(response.Status, response);
             }catch (Exception ex)
