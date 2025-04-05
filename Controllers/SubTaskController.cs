@@ -154,7 +154,7 @@ namespace Planify_BackEnd.Controllers
             }
         }
         [HttpGet("search/v2")]
-        [Authorize(Roles = "Event Organizer, Implementer")]
+        //[Authorize(Roles = "Event Organizer, Implementer")]
         public async Task<IActionResult> SearchTasksByGroupId(Guid implementerId, DateTime startDate, DateTime endDate)
         {
             try

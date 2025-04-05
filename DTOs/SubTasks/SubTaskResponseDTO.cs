@@ -19,6 +19,8 @@ namespace Planify_BackEnd.DTOs.SubTasks
 
         public int TaskId { get; set; }
         public Guid CreateBy { get; set; }
+        public string? TaskName {  get; set; }
+        public string? EventTitle {  get; set; }
 
     }
 }
