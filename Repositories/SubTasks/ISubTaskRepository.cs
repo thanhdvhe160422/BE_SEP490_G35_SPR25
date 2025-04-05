@@ -1,4 +1,5 @@
-﻿using Planify_BackEnd.DTOs;
+﻿using System.Threading.Tasks;
+using Planify_BackEnd.DTOs;
 using Planify_BackEnd.Models;
 
 namespace Planify_BackEnd.Repositories
@@ -15,6 +16,7 @@ namespace Planify_BackEnd.Repositories
         Task<bool> AssignSubTask(JoinTask joinTask);
         Task<List<Guid>> GetJoinedIdBySubTaskIdAsync(int subtaskId);
         Task<int> GetEventIdBySubtaskId(int subtaskId);
+        Task<bool> DeleteAssignedUser(Guid userId, int subTaskId);
         Task<PageResultDTO<SubTask>> SearchSubTaskByImplementerId(Guid implementerId, DateTime startDate, DateTime endDate);
     }
 }
