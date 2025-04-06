@@ -38,14 +38,14 @@ namespace Planify_BackEnd.Controllers
         /// </summary>
         /// <returns>A list of all events.</returns>
         [HttpGet ("list")]
-        //[Authorize(Roles = "Event Organizer")]
+        [Authorize(Roles = "Event Organizer, Implementer, Campus Manager")]
         public async Task<IActionResult> GetAllEvents(int page, int pageSize)
         {
             try
             {
-               
+                var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
                 var campusClaim = int.Parse(User.Claims.FirstOrDefault(c => c.Type == "campusId").Value);
-                var response =  _eventService.GetAllEvent(campusClaim, page,  pageSize);
+                var response =  _eventService.GetAllEvent(campusClaim, page,  pageSize, userId);
                 if (response.TotalCount == 0)
                 {
                     return NotFound("Cannot found any event");

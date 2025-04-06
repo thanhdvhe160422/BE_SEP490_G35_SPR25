@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Google.Apis.Drive.v3.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Events;
+using Planify_BackEnd.DTOs.Users;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories;
 
@@ -15,7 +17,7 @@ public class EventRepository : IEventRepository
         _context = context ?? throw new ArgumentNullException(nameof(context));
     }
 
-    public PageResultDTO<Event> GetAllEvent(int campusId, int page, int pageSize)
+    public PageResultDTO<Event> GetAllEvent(int campusId, int page, int pageSize, Guid userId)
     {
         try
         {
@@ -25,6 +27,7 @@ public class EventRepository : IEventRepository
                 .Where(e => e.Status >-1 && e.CampusId == campusId)
                 .Include(e => e.EventMedia)
                 .ThenInclude(em => em.Media)
+                .Include(e => e.FavouriteEvents.Where(fe => fe.UserId == userId))
                 .OrderBy(e => e.StartTime <= now && now <= e.EndTime ? 0 : // Running
                            e.StartTime > now ? 1 : // Not Started Yet
                            2) // Closed 
@@ -36,6 +39,7 @@ public class EventRepository : IEventRepository
                 .Where(e => e.Status >-1 && e.CampusId == campusId)
                 .Include(e => e.EventMedia)
                 .ThenInclude(em => em.Media)
+                .Include(e => e.FavouriteEvents.Where(fe => fe.UserId == userId))
                 .OrderBy(e => e.StartTime <= now && now <= e.EndTime ? 0 : // Running
                            e.StartTime > now ? 1 : // Not Started Yet
                            2) // Closed 
@@ -100,6 +104,8 @@ public class EventRepository : IEventRepository
         try
         {
             var eventDetail = await _context.Events
+                .Include(e=>e.Tasks).ThenInclude(t=>t.SubTasks)
+                .ThenInclude(st=>st.JoinTasks).ThenInclude(jt=>jt.User)
                 .Where(e => e.Id == eventId)
                 .Select(e => new EventDetailDto
                 {
@@ -217,6 +223,13 @@ public class EventRepository : IEventRepository
                                         Email = st.CreateByNavigation.Email
                                     },
                                     Status = t.Status,
+                                    JoinSubTask = st.JoinTasks.Select(jt=>new UserNameVM
+                                    {
+                                        Id = jt.UserId,
+                                        Email = jt.User.Email,
+                                        FirstName = jt.User.FirstName,
+                                        LastName = jt.User.LastName,
+                                    }).ToList()
                                 }).ToList()
                         }).ToList(),
                     CostBreakdowns = e.CostBreakdowns.Select(cb => new CostBreakdownDetailDto
@@ -225,7 +238,7 @@ public class EventRepository : IEventRepository
                         Name = cb.Name,
                         Quantity = cb.Quantity,
                         PriceByOne = cb.PriceByOne
-                    }).ToList()
+                    }).ToList(),
                 })
                 .FirstOrDefaultAsync();
 
@@ -318,8 +331,7 @@ public class EventRepository : IEventRepository
                 .Include(e => e.Campus)
                 .Include(e => e.CategoryEvent)
                 .Include(e => e.EventMedia).ThenInclude(em => em.Media)
-                .Include(e => e.FavouriteEvents)
-                .Where(e => e.FavouriteEvents.Any(fe => fe.UserId == userId) || !e.FavouriteEvents.Any())
+                .Include(e => e.FavouriteEvents.Where(fe => fe.UserId == userId))
                 .Where(e => e.CampusId==campusId &&
                     (string.IsNullOrEmpty(title) || e.EventTitle.Contains(title)) &&
                     (!isPublic.HasValue || e.IsPublic == 1) &&
@@ -345,8 +357,7 @@ public class EventRepository : IEventRepository
                 .Include(e => e.Campus)
                 .Include(e => e.CategoryEvent)
                 .Include(e => e.EventMedia).ThenInclude(em => em.Media)
-                .Include(e => e.FavouriteEvents)
-                .Where(e => e.FavouriteEvents.Any(fe => fe.UserId == userId) || !e.FavouriteEvents.Any())
+                .Include(e => e.FavouriteEvents.Where(fe => fe.UserId == userId))
                 .Where(e => e.CampusId == campusId &&
                     (string.IsNullOrEmpty(title) || e.EventTitle.Contains(title)) &&
                     (!isPublic.HasValue || e.IsPublic == 1) &&

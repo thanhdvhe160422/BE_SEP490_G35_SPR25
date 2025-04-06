@@ -43,11 +43,11 @@ public class EventService : IEventService
     /// <param name="page"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    public PageResultDTO<EventGetListResponseDTO> GetAllEvent(int campusId, int page, int pageSize)
+    public PageResultDTO<EventGetListResponseDTO> GetAllEvent(int campusId, int page, int pageSize, Guid userId)
     {
         try
         {
-            PageResultDTO<Event> events = _eventRepository.GetAllEvent(campusId, page, pageSize);
+            PageResultDTO<Event> events = _eventRepository.GetAllEvent(campusId, page, pageSize, userId);
             if (events.TotalCount == 0)
 
                 return new PageResultDTO<EventGetListResponseDTO>(new List<EventGetListResponseDTO>(), 0, page, pageSize);
@@ -86,8 +86,8 @@ public class EventService : IEventService
                             Id = em.Media.Id,
                             MediaUrl = em.Media.MediaUrl
                         }
-                    }).ToList()
-
+                    }).ToList(),
+                    isFavorite = item.FavouriteEvents.Count!=0
                 };
                 eventList.Add(eventDTO);
                 
