@@ -275,5 +275,23 @@ namespace Planify_BackEnd.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet("my-event")]
+        [Authorize(Roles = "Event Organizer, Campus Manager")]
+        public async Task<IActionResult> MyEvent(int page, int pageSize)
+        {
+            try
+            {
+                var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                var response = await _eventService.MyEvent(page, pageSize,userId);
+                if (response.TotalCount == 0)
+                    return NotFound("Not found any event");
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

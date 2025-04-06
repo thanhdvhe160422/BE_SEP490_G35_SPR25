@@ -38,7 +38,7 @@ namespace Planify_BackEnd.Controllers
             }
         }
         [HttpGet("view-attended-events-history")]
-        //[Authorize(Roles = "Implementer")]
+        [Authorize(Roles = "Implementer")]
         public async Task<IActionResult> GetAttendedEventsHistory(int page, int pageSize)
         {
             try

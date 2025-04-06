@@ -222,7 +222,7 @@ public class EventRepository : IEventRepository
                                         LastName = st.CreateByNavigation.LastName,
                                         Email = st.CreateByNavigation.Email
                                     },
-                                    Status = t.Status,
+                                    Status = st.Status,
                                     JoinSubTask = st.JoinTasks.Select(jt=>new UserNameVM
                                     {
                                         Id = jt.UserId,
@@ -532,6 +532,47 @@ public class EventRepository : IEventRepository
                 .ToListAsync();
             return list;
         }catch(Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+    public async Task<PageResultDTO<Event>> MyEvent(int page, int pageSize, Guid createBy)
+    {
+        try
+        {
+            var count = _context.Events
+                .Include(e => e.Campus)
+                .Include(e => e.CategoryEvent)
+                .Include(e => e.EventMedia).ThenInclude(em => em.Media)
+                .Include(e => e.FavouriteEvents.Where(fe => fe.UserId == createBy))
+                .Where(e => e.Status > -2 && e.CreateBy == createBy)
+                    .AsEnumerable()
+                    .OrderBy(e =>
+                        e.StartTime <= DateTime.Now && DateTime.Now <= e.EndTime ? 0 : 1)
+                    .ThenBy(e =>
+                        e.StartTime > DateTime.Now ? 0 : 1)
+                    .ThenBy(e =>
+                        e.EndTime < DateTime.Now ? 0 : 1)
+                    .Count();
+            if (count == 0) new PageResultDTO<Event>(new List<Event>(), count, page, pageSize);
+            var events = _context.Events
+                .Include(e => e.Campus)
+                .Include(e => e.CategoryEvent)
+                .Include(e => e.EventMedia).ThenInclude(em => em.Media)
+                .Include(e => e.FavouriteEvents.Where(fe => fe.UserId == createBy))
+                .Where(e => e.Status > -2 && e.CreateBy == createBy)
+                .AsEnumerable()
+                .OrderBy(e =>
+                    e.StartTime <= DateTime.Now && DateTime.Now <= e.EndTime ? 0 : 1)
+                .ThenBy(e =>
+                    e.StartTime > DateTime.Now ? 0 : 1)
+                .ThenBy(e =>
+                    e.EndTime < DateTime.Now ? 0 : 1)
+                .Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            PageResultDTO<Event> result = new PageResultDTO<Event>(events, count, page, pageSize);
+            return result;
+        }
+        catch (Exception ex)
         {
             throw new Exception(ex.Message);
         }
