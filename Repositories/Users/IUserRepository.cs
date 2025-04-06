@@ -17,4 +17,5 @@ public interface IUserRepository
     Task<User> CreateManagerAsync(User user);
     Task<User> UpdateManagerAsync(Guid id, UserUpdateDTO updateUser);
     Task<User> GetUserByUsernameAsync(string username);
+    Task<PageResultDTO<EventOrganizerVM>> GetEventOrganizer(int page, int pageSize);
 }

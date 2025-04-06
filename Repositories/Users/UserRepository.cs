@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Planify_BackEnd.DTOs;
+using Planify_BackEnd.DTOs.Medias;
 using Planify_BackEnd.DTOs.Users;
 using Planify_BackEnd.Models;
 
@@ -274,5 +275,40 @@ public class UserRepository : IUserRepository
             .Include(u => u.Campus)
             .Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
             .FirstOrDefaultAsync(u => u.UserName == username);
+    }
+
+    public async Task<PageResultDTO<EventOrganizerVM>> GetEventOrganizer(int page, int pageSize)
+    {
+        try
+        {
+            var count = _context.UserRoles
+                .Where(ur => ur.RoleId == 3)
+                .Count();
+            var result = await _context.UserRoles
+                .Include(ur => ur.User).ThenInclude(u => u.Avatar)
+                .Where(ur => ur.RoleId == 3)
+                .Select(ur => new EventOrganizerVM
+                {
+                    Id = ur.User.Id,
+                    DateOfBirth = ur.User.DateOfBirth,
+                    Email = ur.User.Email,
+                    FirstName = ur.User.FirstName,
+                    LastName = ur.User.LastName,
+                    Gender = ur.User.Gender,
+                    PhoneNumber = ur.User.PhoneNumber,
+                    Avatar = ur.User.Avatar==null?
+                    new MediumDTO():
+                    new MediumDTO
+                    {
+                        Id = ur.User.Avatar.Id,
+                        MediaUrl = ur.User.Avatar.MediaUrl
+                    }
+                }).ToListAsync();
+            return new PageResultDTO<EventOrganizerVM>(result, count, page, pageSize);
+        }
+        catch(Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
     }
 }

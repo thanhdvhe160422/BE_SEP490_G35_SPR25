@@ -302,5 +302,17 @@ namespace Planify_BackEnd.Services.Users
                 throw new Exception(ex.Message);
             }
         }
+
+        public Task<PageResultDTO<EventOrganizerVM>> GetEventOrganizer(int page, int pageSize)
+        {
+            try
+            {
+                var result = _userRepository.GetEventOrganizer(page, pageSize);
+                return result;
+            }catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }
