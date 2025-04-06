@@ -46,15 +46,22 @@ namespace Planify_BackEnd.Repositories.JoinGroups
         {
             try
             {
+                var now = DateTime.Now;
                 var count =  _context.JoinProjects
-                    .Where(jp => jp.UserId == userId && jp.TimeOutProject != null)
+                    .Include(jp=>jp.Event)
+                    .Where(jp => jp.UserId == userId &&
+                    jp.Event.EndTime<=now)
+                    .Distinct()
                     .Count();
                 if (count == 0)
                     return new PageResultDTO<JoinProject>(new List<JoinProject>(), count, page, pageSize);
                 var list = _context.JoinProjects
                     .Include(jp => jp.Event)
                     .Include(jp => jp.User)
-                    .Where(jp => jp.UserId == userId && jp.TimeOutProject != null)
+                    .Where(jp => jp.UserId == userId &&
+                    jp.Event.EndTime <= now)
+                    .Distinct()
+                    .OrderByDescending(jp=>jp.Event.EndTime)
                     .Skip((page - 1) * pageSize).Take(pageSize)
                     .ToList();
                 return new PageResultDTO<JoinProject>(list, count, page, pageSize);
