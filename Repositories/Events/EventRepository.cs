@@ -171,21 +171,21 @@ public class EventRepository : IEventRepository
                             UserFullName = $"{jp.User.FirstName} {jp.User.LastName}",
                             TimeJoinProject = jp.TimeJoinProject
                         }).ToList(),
-                    //Risks = e.Risks.Select(r => new RiskDto
-                    //{
-                    //    Id = r.Id,
-                    //    Name = r.Name,
-                    //    Reason = r.Reason,
-                    //    Solution = r.Solution,
-                    //    Description = r.Description
-                    //}).ToList(),
-                    //Activities = e.Activities.Select(a => new ActivityDto
-                    //{
-                    //    Id = a.Id,
-                    //    EventId = a.EventId,
-                    //    Name = a.Name,
-                    //    Content = a.Content
-                    //}).ToList(),
+                    Risks = e.Risks.Select(r => new RiskDto
+                    {
+                        Id = r.Id,
+                        Name = r.Name,
+                        Reason = r.Reason,
+                        Solution = r.Solution,
+                        Description = r.Description
+                    }).ToList(),
+                    Activities = e.Activities.Select(a => new ActivityDto
+                    {
+                        Id = a.Id,
+                        EventId = a.EventId,
+                        Name = a.Name,
+                        Content = a.Content
+                    }).ToList(),
                     Tasks = e.Tasks
                         .Where(t => t.Status == 1 || t.Status == 0)
                         .Select(t => new TaskDetailDto
@@ -232,13 +232,13 @@ public class EventRepository : IEventRepository
                                     }).ToList()
                                 }).ToList()
                         }).ToList(),
-                    //CostBreakdowns = e.CostBreakdowns.Select(cb => new CostBreakdownDetailDto
-                    //{
-                    //    Id = cb.Id,
-                    //    Name = cb.Name,
-                    //    Quantity = cb.Quantity,
-                    //    PriceByOne = cb.PriceByOne
-                    //}).ToList(),
+                    CostBreakdowns = e.CostBreakdowns.Select(cb => new CostBreakdownDetailDto
+                    {
+                        Id = cb.Id,
+                        Name = cb.Name,
+                        Quantity = cb.Quantity,
+                        PriceByOne = cb.PriceByOne
+                    }).ToList(),
                 })
                 .FirstOrDefaultAsync();
 
