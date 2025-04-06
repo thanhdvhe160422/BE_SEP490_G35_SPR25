@@ -287,16 +287,17 @@ public class UserRepository : IUserRepository
             .FirstOrDefaultAsync(u => u.UserName == username);
     }
 
-    public async Task<PageResultDTO<EventOrganizerVM>> GetEventOrganizer(int page, int pageSize)
+    public async Task<PageResultDTO<EventOrganizerVM>> GetEventOrganizer(int page, int pageSize, int campusId)
     {
         try
         {
             var count = _context.UserRoles
-                .Where(ur => ur.RoleId == 3)
+                .Include(ur => ur.User)
+                .Where(ur => ur.RoleId == 3&&ur.User.CampusId==campusId)
                 .Count();
             var result = await _context.UserRoles
                 .Include(ur => ur.User).ThenInclude(u => u.Avatar)
-                .Where(ur => ur.RoleId == 3)
+                .Where(ur => ur.RoleId == 3 && ur.User.CampusId == campusId)
                 .Select(ur => new EventOrganizerVM
                 {
                     Id = ur.User.Id,
