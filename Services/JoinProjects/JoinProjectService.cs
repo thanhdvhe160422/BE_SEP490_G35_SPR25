@@ -100,6 +100,7 @@ namespace Planify_BackEnd.Services.JoinProjects
                         Status = item.Event.Status,
                         CampusId = item.Event.CampusId,
                         CategoryEventId = item.Event.CategoryEventId,
+                        CategoryName = item.Event.CategoryEvent.CategoryEventName,
                         Placed = item.Event.Placed,
                         CreatedAt = item.Event.CreatedAt,
                         CreateBy = item.Event.CreateBy,

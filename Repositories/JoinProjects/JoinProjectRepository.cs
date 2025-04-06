@@ -56,7 +56,7 @@ namespace Planify_BackEnd.Repositories.JoinGroups
                 if (count == 0)
                     return new PageResultDTO<JoinProject>(new List<JoinProject>(), count, page, pageSize);
                 var list = _context.JoinProjects
-                    .Include(jp => jp.Event)
+                    .Include(jp => jp.Event).ThenInclude(jp=>jp.CategoryEvent)
                     .Include(jp => jp.User)
                     .Where(jp => jp.UserId == userId &&
                     jp.Event.EndTime <= now)

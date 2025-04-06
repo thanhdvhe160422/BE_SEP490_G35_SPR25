@@ -38,6 +38,7 @@ namespace Planify_BackEnd.DTOs.JoinedProjects
         public int CampusId { get; set; }
 
         public int CategoryEventId { get; set; }
+        public string? CategoryName { get; set; }
 
         public string Placed { get; set; } = null!;
 
