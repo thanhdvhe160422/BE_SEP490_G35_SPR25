@@ -16,6 +16,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.SignalR;
 using Planify_BackEnd.Hub;
 using Google.Apis.Drive.v3.Data;
+using System.Net.NetworkInformation;
+using System.Numerics;
 
 public class EventService : IEventService
 {
@@ -873,6 +875,49 @@ public class EventService : IEventService
             return true;
             
         }catch(Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+
+    public async Task<PageResultDTO<EventGetListResponseDTO>> MyEvent(int page, int pageSize, Guid createBy)
+    {
+        try
+        {
+            var resultEvents = await _eventRepository.MyEvent(page, pageSize, createBy);
+            var eventDTOs = resultEvents.Items.Select(e => new EventGetListResponseDTO
+            {
+                Id = e.Id,
+                EventTitle = e.EventTitle,
+                EventDescription = e.EventDescription,
+                StartTime = e.StartTime,
+                EndTime = e.EndTime,
+                AmountBudget = e.AmountBudget,
+                IsPublic = e.IsPublic,
+                TimePublic = e.TimePublic,
+                Status = e.Status,
+                CampusId = e.CampusId,
+                CategoryEventId = e.CategoryEventId,
+                Placed = e.Placed,
+                CreateBy = e.CreateBy,
+                CreatedAt = e.CreatedAt,
+                ManagerId = e.ManagerId,
+                EventMedias = e.EventMedia.Select(em => new EventMediumViewMediaModel
+                {
+                    Id = em.Id,
+                    MediaId = em.MediaId,
+                    MediaDTO = new MediaItemDTO
+                    {
+                        Id = em.Media.Id,
+                        MediaUrl = em.Media.MediaUrl,
+                    }
+                }).ToList(),
+                isFavorite = e.FavouriteEvents.Count != 0,
+            }).ToList();
+
+            return new PageResultDTO<EventGetListResponseDTO>(eventDTOs, resultEvents.TotalCount, page, pageSize);
+        }
+        catch (Exception ex)
         {
             throw new Exception(ex.Message);
         }
