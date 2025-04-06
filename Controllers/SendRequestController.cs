@@ -69,5 +69,11 @@ namespace Planify_BackEnd.Controllers
             var response = await _sendRequestService.RejectRequestAsync(request.Id, managerId, request.Reason);
             return StatusCode(response.Status, response);
         }
+        [HttpGet("MyRequests/{userId}")]
+        public async Task<IActionResult> GetMyRequests(Guid userId)
+        {
+            var response = await _sendRequestService.GetMyRequestsAsync(userId);
+            return StatusCode(response.Status, response);
+        }
     }
 }

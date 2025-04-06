@@ -131,11 +131,21 @@ public class UserRepository : IUserRepository
 
         try
         {
-            return await _context.Users
+            var user = await _context.Users
                 .Include(r => r.UserRoles)
                 .ThenInclude(u => u.Role)
                 .Include(c => c.Campus)
                 .FirstOrDefaultAsync(u => u.Email == email && u.Status == 1);
+
+            if (user != null && user.UserRoles != null && user.UserRoles.Any())
+            {
+                user.UserRoles = user.UserRoles
+                    .OrderBy(ur => ur.Role.Id)
+                    .Take(1)
+                    .ToList();
+            }
+
+            return user;
         }
         catch (Exception ex)
         {

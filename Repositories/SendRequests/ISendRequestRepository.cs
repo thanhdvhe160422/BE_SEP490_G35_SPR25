@@ -9,5 +9,6 @@ namespace Planify_BackEnd.Repositories.SendRequests
         Task<SendRequest> GetRequestByIdAsync(int id);
         Task<SendRequest> CreateRequestAsync(SendRequest request);
         System.Threading.Tasks.Task UpdateRequestAsync(SendRequest request);
+        Task<List<SendRequest>> GetRequestsByUserIdAsync(Guid userId);
     }
 }

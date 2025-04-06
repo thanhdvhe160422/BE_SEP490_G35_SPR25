@@ -191,5 +191,34 @@ namespace Planify_BackEnd.Services.EventRequests
                 return new ResponseDTO(500, "Đã xảy ra lỗi khi từ chối yêu cầu", null);
             }
         }
+        public async Task<ResponseDTO> GetMyRequestsAsync(Guid userId)
+        {
+            try
+            {
+                var requests = await _requestRepository.GetRequestsByUserIdAsync(userId);
+
+                if (requests == null || !requests.Any())
+                {
+                    return new ResponseDTO(404, "No requests found for this user.", null);
+                }
+
+                var requestDtos = requests.Select(sr => new GetSendRequestDTO
+                {
+                    Id = sr.Id,
+                    EventId = sr.EventId,
+                    EventTitle = sr.Event.EventTitle,
+                    ManagerId = sr.ManagerId,
+                    Reason = sr.Reason,
+                    Status = sr.Status,
+                    CreatedAt = sr.Event.CreatedAt
+                }).ToList();
+
+                return new ResponseDTO(200, "Requests retrieved successfully.", requestDtos);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseDTO(500, $"Error retrieving requests: {ex.Message}", null);
+            }
+        }
     }
 }
