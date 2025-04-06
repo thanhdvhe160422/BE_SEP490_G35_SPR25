@@ -117,10 +117,10 @@ namespace Planify_BackEnd.Services.EventRequests
                 //notification
                 try
                 {
-                    await _notificationHubContext.Clients.User(managerId + "").SendAsync("ReceiveNotification",
+                    await _notificationHubContext.Clients.User(eventEntity.CreateBy + "").SendAsync("ReceiveNotification",
                         "Your request has been approved!",
                         "/event-detail-EOG/" + request.EventId);
-                    var user = await _userRepository.GetUserByIdAsync(managerId);
+                    var user = await _userRepository.GetUserByIdAsync(eventEntity.CreateBy);
                     if (user != null) await _emailSender.SendEmailAsync(user.Email,
                         "Thông Báo Kế Hoạch Của Bạn Đã Được Duyệt",
                         "Kính gửi " + user.LastName + " " + user.FirstName + ",\n\n" +
@@ -170,10 +170,10 @@ namespace Planify_BackEnd.Services.EventRequests
                 //notification
                 try
                 {
-                    await _notificationHubContext.Clients.User(managerId + "").SendAsync("ReceiveNotification",
+                    await _notificationHubContext.Clients.User(eventEntity.CreateBy + "").SendAsync("ReceiveNotification",
                         "Your request has been reject!",
                         "/event-detail-EOG/" + request.EventId);
-                    var user = await _userRepository.GetUserByIdAsync(managerId);
+                    var user = await _userRepository.GetUserByIdAsync(eventEntity.CreateBy);
                     if (user != null) await _emailSender.SendEmailAsync(user.Email,
                         "Thông Báo Kế Hoạch Của Bạn Đã Bị Từ Chối",
                         "Kính gửi " + user.LastName + " " + user.FirstName + ",\n\n" +
