@@ -84,7 +84,17 @@ namespace Planify_BackEnd.Services.Participants
             {
                 EventId = p.EventId,
                 EventTitle = p.Event.EventTitle,
-                RegistrationTime = p.RegistrationTime
+                RegistrationTime = p.RegistrationTime,
+                StartTime = p.Event.StartTime,
+                EndTime = p.Event.EndTime,
+                Placed = p.Event.Placed,
+                isFavorite = p.Event.FavouriteEvents.Count!=0,
+                EventMedia = p.Event.EventMedia.Select(em=> new EventMediaDto
+                {
+                    Id = em.Media.Id,
+                    MediaUrl = em.Media.MediaUrl,
+                }).ToList()
+                
             }).ToList();
 
             return new ResponseDTO(200, "Success", result);

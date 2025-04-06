@@ -1,4 +1,6 @@
-﻿namespace Planify_BackEnd.DTOs
+﻿using Planify_BackEnd.DTOs.Users;
+
+namespace Planify_BackEnd.DTOs
 {
     public class EventDetailDto
     {
@@ -69,7 +71,7 @@
     public class RiskDto
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public string? Reason { get; set; }
         public string? Solution { get; set; }
         public string? Description { get; set; }
@@ -99,6 +101,7 @@
         public decimal AmountBudget { get; set; }
         public int Status { get; set; }
         public UserDto CreatedBy { get; set; }
+        public List<UserNameVM> JoinSubTask { get; set; }
     }
     public class CostBreakdownDetailDto
     {
@@ -112,7 +115,7 @@
     {
         public int Id { get; set; }
         public int EventId { get; set; }
-        public string Name { get; set; } = string.Empty;
+        public string? Name { get; set; } = string.Empty;
         public string Content { get; set; } = string.Empty;
     }
 }

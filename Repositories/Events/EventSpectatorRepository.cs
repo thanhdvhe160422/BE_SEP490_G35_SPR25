@@ -19,7 +19,7 @@ namespace Planify_BackEnd.Repositories.Events
                 .Include(e=>e.CategoryEvent)
                 .Include(e=>e.EventMedia)
                 .ThenInclude(e=>e.Media)
-                .Where(e => e.FavouriteEvents.Any(fe => fe.UserId == userId) || !e.FavouriteEvents.Any())
+                .Include(e => e.FavouriteEvents.Where(fe => fe.UserId == userId))
                 .FirstOrDefault(em => em.Id == id);
         }
 
@@ -31,9 +31,8 @@ namespace Planify_BackEnd.Repositories.Events
                     .Include(e => e.Campus)
                     .Include(e => e.CategoryEvent)
                     .Include(e => e.EventMedia).ThenInclude(em => em.Media)
-                    .Include(e => e.FavouriteEvents)
+                    .Include(e => e.FavouriteEvents.Where(fe => fe.UserId == userId))
                     .Where(e => e.CampusId == campusId && e.Status != -1 && e.IsPublic == 1)
-                    .Where(e => e.FavouriteEvents.Any(fe => fe.UserId == userId) || !e.FavouriteEvents.Any())
                     .AsEnumerable()
                     .OrderBy(e =>
                         e.StartTime <= DateTime.Now && DateTime.Now <= e.EndTime ? 0 : 1)
@@ -47,9 +46,8 @@ namespace Planify_BackEnd.Repositories.Events
                     .Include(e => e.Campus)
                     .Include(e => e.CategoryEvent)
                     .Include(e => e.EventMedia).ThenInclude(em => em.Media)
-                    .Include(e => e.FavouriteEvents)
+                    .Include(e => e.FavouriteEvents.Where(fe => fe.UserId == userId))
                     .Where(e => e.CampusId == campusId && e.Status != -1 && e.IsPublic == 1)
-                    .Where(e => e.FavouriteEvents.Any(fe => fe.UserId == userId) || !e.FavouriteEvents.Any())
                     .AsEnumerable()
                     .OrderBy(e =>
                         e.StartTime <= DateTime.Now && DateTime.Now <= e.EndTime ? 0 : 1)
@@ -74,13 +72,12 @@ namespace Planify_BackEnd.Repositories.Events
                     .Include(e => e.Campus)
                     .Include(e => e.CategoryEvent)
                     .Include(e => e.EventMedia).ThenInclude(em => em.Media)
-                    .Include(e => e.FavouriteEvents)
+                    .Include(e => e.FavouriteEvents.Where(fe => fe.UserId == userId))
                     .Where(e => e.CampusId == campusId && e.Status != -1 && e.IsPublic == 1)
                     .Where(e => string.IsNullOrEmpty(name) || e.EventTitle.Contains(name))
                     .Where(e => !startDate.HasValue || e.StartTime >= startDate.Value)
                     .Where(e => !endDate.HasValue || e.EndTime <= endDate.Value)
                     .Where(e => string.IsNullOrEmpty(placed) || e.Placed.Contains(placed))
-                    .Where(e => e.FavouriteEvents.Any(fe => fe.UserId == userId) || !e.FavouriteEvents.Any())
                     .AsEnumerable()
                     .OrderBy(e =>
                         e.StartTime <= DateTime.Now && DateTime.Now <= e.EndTime ? 0 : 1)
@@ -93,13 +90,12 @@ namespace Planify_BackEnd.Repositories.Events
                     .Include(e => e.Campus)
                     .Include(e => e.CategoryEvent)
                     .Include(e => e.EventMedia).ThenInclude(em => em.Media)
-                    .Include(e => e.FavouriteEvents)
+                    .Include(e => e.FavouriteEvents.Where(fe => fe.UserId == userId))
                     .Where(e => e.CampusId == campusId && e.Status != -1 && e.IsPublic == 1)
                     .Where(e => string.IsNullOrEmpty(name) || e.EventTitle.Contains(name))
                     .Where(e => !startDate.HasValue || e.StartTime >= startDate.Value)
                     .Where(e => !endDate.HasValue || e.EndTime <= endDate.Value)
                     .Where(e => string.IsNullOrEmpty(placed) || e.Placed.Contains(placed))
-                    .Where(e => e.FavouriteEvents.Any(fe => fe.UserId == userId) || !e.FavouriteEvents.Any())
                     .AsEnumerable()
                     .OrderBy(e =>
                         e.StartTime <= DateTime.Now && DateTime.Now <= e.EndTime ? 0 : 1)

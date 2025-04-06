@@ -6,7 +6,7 @@ namespace Planify_BackEnd.Services.Events
 {
     public interface IEventService
     {
-        PageResultDTO<EventGetListResponseDTO> GetAllEvent(int campusId, int page, int pageSize);
+        PageResultDTO<EventGetListResponseDTO> GetAllEvent(int campusId, int page, int pageSize, Guid userId);
         Task<ResponseDTO> CreateEventAsync(EventCreateRequestDTO eventDTO, Guid organizerId);
         Task<ResponseDTO> UploadImageAsync(UploadImageRequestDTO imageDTO);
         Task<ResponseDTO> GetEventDetailAsync(int eventId);
