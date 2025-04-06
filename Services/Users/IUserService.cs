@@ -15,6 +15,6 @@ namespace Planify_BackEnd.Services.Users
         Task<UserRoleDTO> AddUserRole(UserRoleDTO roleDTO);
         Task<ResponseDTO> CreateManagerAsync(UserCreateDTO user);
         Task<ResponseDTO> UpdateManagerAsync(UserUpdateDTO user, Guid id);
-        Task<PageResultDTO<EventOrganizerVM>> GetEventOrganizer(int page, int pageSize);
+        Task<PageResultDTO<EventOrganizerVM>> GetEventOrganizer(int page, int pageSize, int campusId);
     }
 }

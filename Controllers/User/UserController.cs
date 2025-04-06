@@ -193,12 +193,13 @@ namespace Planify_BackEnd.Controllers.User
         }
 
         [HttpGet("event-organizer")]
-        //[Authorize(Roles = "Campus Manager")]
+        [Authorize(Roles = "Campus Manager")]
         public async Task<IActionResult> GetEventOrganizer(int page,int pageSize)
         {
             try
             {
-                var response = await _userService.GetEventOrganizer(page,pageSize);
+                var campusId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == "campusId").Value);
+                var response = await _userService.GetEventOrganizer(page,pageSize,campusId);
                 if (response.Items.Count() == 0)
                 {
                     return NotFound("Cannot found any event organizer!");

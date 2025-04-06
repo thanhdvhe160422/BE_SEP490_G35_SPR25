@@ -303,11 +303,11 @@ namespace Planify_BackEnd.Services.Users
             }
         }
 
-        public Task<PageResultDTO<EventOrganizerVM>> GetEventOrganizer(int page, int pageSize)
+        public Task<PageResultDTO<EventOrganizerVM>> GetEventOrganizer(int page, int pageSize, int campusId)
         {
             try
             {
-                var result = _userRepository.GetEventOrganizer(page, pageSize);
+                var result = _userRepository.GetEventOrganizer(page, pageSize, campusId);
                 return result;
             }catch(Exception ex)
             {
