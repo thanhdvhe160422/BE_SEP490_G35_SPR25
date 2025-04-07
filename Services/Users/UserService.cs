@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Azure;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Campus;
 using Planify_BackEnd.DTOs.Roles;
@@ -262,18 +263,10 @@ namespace Planify_BackEnd.Services.Users
             }
         }
 
-        public async Task<UserListDTO> UpdateEventOrganizer(EventOrganizerUpdate userDTO)
+        public async Task<UserListDTO> UpdateEventOrganizer(UserDTO userDTO)
         {
             try
             {
-                if (userDTO.roleId != null)
-                {
-                    if (userDTO.roleId != 0)
-                    {
-                        var updateRole = await _userRepository.UpdateRoleEOG(userDTO.Id, (int)userDTO.roleId);
-                        if (!updateRole) throw new Exception("Cannot update event organizer role");
-                    }
-                }
                 Models.User user = new Models.User
                 {
                     Id = userDTO.Id,
@@ -318,6 +311,19 @@ namespace Planify_BackEnd.Services.Users
                 var result = _userRepository.GetEventOrganizer(page, pageSize, campusId);
                 return result;
             }catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public Task<bool> UpdateEOGRole(Guid userId, int roleId)
+        {
+            try
+            {
+                var result = _userRepository.UpdateRoleEOG(userId, roleId);
+                return result;
+            }
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
