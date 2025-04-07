@@ -53,7 +53,7 @@ namespace Planify_BackEnd.Controllers.User
             }
         }
         [HttpGet("get-list-user")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetListUserAsync(int page, int pageSize)
         {
             try
@@ -71,7 +71,7 @@ namespace Planify_BackEnd.Controllers.User
             }
         }
         [HttpGet("get-user-detail/{id}")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetUserDetailAsync(Guid id)
         {
             try
@@ -107,7 +107,7 @@ namespace Planify_BackEnd.Controllers.User
             }
         }
         [HttpGet("get-list-implementer/{eventId}")]
-        //[Authorize(Roles = "Event Organizer")]
+        [Authorize(Roles = "Event Organizer, Campus Manager, Implementer")]
         public async Task<IActionResult> GetListImplementer(int eventId, int page, int pageSize)
         {
           
@@ -174,8 +174,8 @@ namespace Planify_BackEnd.Controllers.User
             }
         }
         [HttpPut("event-organizer")]
-        [Authorize(Roles = "Campus Manager")]
-        public async Task<IActionResult> UpdateEventOrganizer(UserDTO userDTO)
+        //[Authorize(Roles = "Campus Manager")]
+        public async Task<IActionResult> UpdateEventOrganizer(EventOrganizerUpdate userDTO)
         {
             try
             {

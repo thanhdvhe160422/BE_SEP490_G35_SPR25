@@ -24,7 +24,7 @@ public class EventRepository : IEventRepository
             var now = DateTime.UtcNow;
 
             var count = _context.Events
-                .Where(e => e.Status >-1 && e.CampusId == campusId)
+                .Where(e => e.Status == 2 && e.CampusId == campusId)
                 .Include(e => e.EventMedia)
                 .ThenInclude(em => em.Media)
                 .Include(e => e.FavouriteEvents.Where(fe => fe.UserId == userId))
@@ -36,7 +36,7 @@ public class EventRepository : IEventRepository
                 return new PageResultDTO<Event>(new List<Event>(), count, page, pageSize);
 
             var events = _context.Events
-                .Where(e => e.Status >-1 && e.CampusId == campusId)
+                .Where(e => e.Status == 2 && e.CampusId == campusId)
                 .Include(e => e.EventMedia)
                 .ThenInclude(em => em.Media)
                 .Include(e => e.FavouriteEvents.Where(fe => fe.UserId == userId))
