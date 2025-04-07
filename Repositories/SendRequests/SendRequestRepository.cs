@@ -34,7 +34,14 @@ namespace Planify_BackEnd.Repositories.SendRequests
 
         public async Task<SendRequest> GetRequestByIdAsync(int id)
         {
-            return await _context.SendRequests.FindAsync(id);
+            try
+            {
+                return await _context.SendRequests
+                    .Include(sr => sr.Event).FirstOrDefaultAsync(sr => sr.Id == id);
+            }catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         public async Task<SendRequest> CreateRequestAsync(SendRequest request)
