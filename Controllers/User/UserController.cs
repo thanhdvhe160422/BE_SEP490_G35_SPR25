@@ -192,7 +192,7 @@ namespace Planify_BackEnd.Controllers.User
             }
         }
         [HttpPut("update-eog-role")]
-        [Authorize(Roles = "Campus Manager")]
+        [Authorize(Roles = "Campus Manager, Admin")]
         public async Task<IActionResult> UpdateEventOrganizerRole(Guid userId, int roleId)
         {
             try
@@ -221,6 +221,25 @@ namespace Planify_BackEnd.Controllers.User
                 if (response.Items.Count() == 0)
                 {
                     return NotFound("Cannot found any event organizer!");
+                }
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("update-manager-role")]
+        [Authorize(Roles = "Campus Manager, Admin")]
+        public async Task<IActionResult> UpdateCampusManagerRole(Guid userId, int roleId)
+        {
+            try
+            {
+                var response = await _userService.UpdateCampusManagerRole(userId, roleId);
+                if (!response)
+                {
+                    return NotFound("Not found any Campus Manager with id " + userId);
                 }
                 return Ok(response);
             }
