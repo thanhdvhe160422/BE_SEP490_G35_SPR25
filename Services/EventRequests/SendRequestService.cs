@@ -96,7 +96,7 @@ namespace Planify_BackEnd.Services.EventRequests
                 var request = await _requestRepository.GetRequestByIdAsync(id);
                 if (request == null) return new ResponseDTO(404, "Không tìm thấy yêu cầu", null);
 
-                if (request.Event.Status != 0)
+                if (request.Event.Status != 1)
                     return new ResponseDTO(400, "Yêu cầu không thể được duyệt vì không ở trạng thái chờ duyệt", null);
 
                 var eventEntity = await _eventRepository.GetEventByIdAsync(request.EventId);
@@ -149,7 +149,7 @@ namespace Planify_BackEnd.Services.EventRequests
                 var request = await _requestRepository.GetRequestByIdAsync(id);
                 if (request == null) return new ResponseDTO(404, "Không tìm thấy yêu cầu", null);
 
-                if (request.Event.Status != 0)
+                if (request.Event.Status != 1)
                     return new ResponseDTO(400, "Yêu cầu không thể bị từ chối vì không ở trạng thái chờ duyệt", null);
 
                 var eventEntity = await _eventRepository.GetEventByIdAsync(request.EventId);
