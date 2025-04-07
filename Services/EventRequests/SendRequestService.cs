@@ -209,7 +209,7 @@ namespace Planify_BackEnd.Services.EventRequests
                     EventTitle = sr.Event.EventTitle,
                     ManagerId = sr.ManagerId,
                     Reason = sr.Reason,
-                    Status = sr.Status,
+                    Status = sr.Event.Status,
                     CreatedAt = sr.Event.CreatedAt
                 }).ToList();
 
