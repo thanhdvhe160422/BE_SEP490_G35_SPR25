@@ -20,4 +20,5 @@ public interface IUserRepository
     Task<PageResultDTO<EventOrganizerVM>> GetEventOrganizer(int page, int pageSize,int campusId);
     Task<bool> UpdateRoleEOG(Guid userId, int roleId);
     Task<bool> UpdateRoleCampusManager(Guid userId, int roleId);
+    Task<PageResultDTO<EventOrganizerVM>> GetCampusManager(int page, int pageSize, int campusId);
 }

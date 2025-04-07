@@ -211,7 +211,7 @@ namespace Planify_BackEnd.Controllers.User
         }
 
         [HttpGet("event-organizer")]
-        [Authorize(Roles = "Campus Manager")]
+        [Authorize(Roles = "Campus Manager, Admin")]
         public async Task<IActionResult> GetEventOrganizer(int page,int pageSize)
         {
             try
@@ -240,6 +240,25 @@ namespace Planify_BackEnd.Controllers.User
                 if (!response)
                 {
                     return NotFound("Not found any Campus Manager with id " + userId);
+                }
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("campus-manager")]
+        [Authorize(Roles = "Campus Manager, Admin")]
+        public async Task<IActionResult> GetCampusManager(int page, int pageSize)
+        {
+            try
+            {
+                var campusId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == "campusId").Value);
+                var response = await _userService.GetCampusManager(page, pageSize, campusId);
+                if (response.Items.Count() == 0)
+                {
+                    return NotFound("Cannot found any campus manager!");
                 }
                 return Ok(response);
             }
