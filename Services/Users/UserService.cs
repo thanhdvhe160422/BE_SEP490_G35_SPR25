@@ -328,5 +328,18 @@ namespace Planify_BackEnd.Services.Users
                 throw new Exception(ex.Message);
             }
         }
+
+        public Task<bool> UpdateCampusManagerRole(Guid userId, int roleId)
+        {
+            try
+            {
+                var result = _userRepository.UpdateRoleCampusManager(userId, roleId);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }
