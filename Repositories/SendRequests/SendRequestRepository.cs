@@ -23,7 +23,7 @@ namespace Planify_BackEnd.Repositories.SendRequests
                     Id = sr.Id,
                     EventId = sr.EventId,
                     Reason = sr.Reason,
-                    Status = sr.Status,
+                    Status = sr.Event.Status,
                     ManagerId = sr.ManagerId,
                     EventTitle = sr.Event.EventTitle,
                     EventStartTime = sr.Event.StartTime,
