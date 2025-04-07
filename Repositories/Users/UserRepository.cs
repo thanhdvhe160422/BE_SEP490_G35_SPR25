@@ -312,4 +312,20 @@ public class UserRepository : IUserRepository
             throw new Exception(ex.Message);
         }
     }
+
+    public async Task<bool> UpdateRoleEOG(Guid userId, int roleId)
+    {
+        try
+        {
+            var role = _context.UserRoles.FirstOrDefault(u => u.UserId.Equals(userId) && u.RoleId == 3);
+            if (role == null) return false;
+            role.RoleId = roleId;
+            _context.Update(role);
+            await _context.SaveChangesAsync();
+            return true;
+        }catch(Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
 }

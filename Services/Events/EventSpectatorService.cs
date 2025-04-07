@@ -1,4 +1,5 @@
 ﻿using Planify_BackEnd.DTOs;
+using Planify_BackEnd.DTOs.Activity;
 using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.DTOs.Medias;
 using Planify_BackEnd.Models;
@@ -56,6 +57,15 @@ namespace Planify_BackEnd.Services.Events
                             Id = em.Media.Id,
                             MediaUrl = em.Media.MediaUrl
                         }
+                    }).ToList(),
+                    Activities = e.Activities==null?
+                    new List<ActivityDTO>():
+                    e.Activities.Select(a => new ActivityDTO
+                    {
+                        Id = a.Id,
+                        EventId=a.EventId,
+                        Content=a.Content,
+                        Name = a.Name
                     }).ToList(),
                     isFavorite = e.FavouriteEvents.Count()!=0
                 };

@@ -15,12 +15,13 @@ namespace Planify_BackEnd.Repositories.Events
         public Event GetEventById(int id,Guid userId)
         {
             return _context.Events
-                .Include(e=>e.Campus)
-                .Include(e=>e.CategoryEvent)
-                .Include(e=>e.EventMedia)
-                .ThenInclude(e=>e.Media)
-                .Include(e => e.FavouriteEvents.Where(fe => fe.UserId == userId))
-                .FirstOrDefault(em => em.Id == id);
+                    .Include(e => e.Activities)
+                    .Include(e=>e.Campus)
+                    .Include(e=>e.CategoryEvent)
+                    .Include(e=>e.EventMedia)
+                    .ThenInclude(e=>e.Media)
+                    .Include(e => e.FavouriteEvents.Where(fe => fe.UserId == userId))
+                    .FirstOrDefault(em => em.Id == id);
         }
 
         public PageResultDTO<Event> GetEvents(int page, int pageSize, Guid userId, int campusId)
@@ -32,7 +33,7 @@ namespace Planify_BackEnd.Repositories.Events
                     .Include(e => e.CategoryEvent)
                     .Include(e => e.EventMedia).ThenInclude(em => em.Media)
                     .Include(e => e.FavouriteEvents.Where(fe => fe.UserId == userId))
-                    .Where(e => e.CampusId == campusId && e.Status != -1 && e.IsPublic == 1)
+                    .Where(e => e.CampusId == campusId && e.Status == 2 && e.IsPublic == 1)
                     .AsEnumerable()
                     .OrderBy(e =>
                         e.StartTime <= DateTime.Now && DateTime.Now <= e.EndTime ? 0 : 1)
@@ -47,7 +48,7 @@ namespace Planify_BackEnd.Repositories.Events
                     .Include(e => e.CategoryEvent)
                     .Include(e => e.EventMedia).ThenInclude(em => em.Media)
                     .Include(e => e.FavouriteEvents.Where(fe => fe.UserId == userId))
-                    .Where(e => e.CampusId == campusId && e.Status != -1 && e.IsPublic == 1)
+                    .Where(e => e.CampusId == campusId && e.Status == 2 && e.IsPublic == 1)
                     .AsEnumerable()
                     .OrderBy(e =>
                         e.StartTime <= DateTime.Now && DateTime.Now <= e.EndTime ? 0 : 1)
@@ -73,7 +74,7 @@ namespace Planify_BackEnd.Repositories.Events
                     .Include(e => e.CategoryEvent)
                     .Include(e => e.EventMedia).ThenInclude(em => em.Media)
                     .Include(e => e.FavouriteEvents.Where(fe => fe.UserId == userId))
-                    .Where(e => e.CampusId == campusId && e.Status != -1 && e.IsPublic == 1)
+                    .Where(e => e.CampusId == campusId && e.Status == 2 && e.IsPublic == 1)
                     .Where(e => string.IsNullOrEmpty(name) || e.EventTitle.Contains(name))
                     .Where(e => !startDate.HasValue || e.StartTime >= startDate.Value)
                     .Where(e => !endDate.HasValue || e.EndTime <= endDate.Value)
@@ -91,7 +92,7 @@ namespace Planify_BackEnd.Repositories.Events
                     .Include(e => e.CategoryEvent)
                     .Include(e => e.EventMedia).ThenInclude(em => em.Media)
                     .Include(e => e.FavouriteEvents.Where(fe => fe.UserId == userId))
-                    .Where(e => e.CampusId == campusId && e.Status != -1 && e.IsPublic == 1)
+                    .Where(e => e.CampusId == campusId && e.Status == 2 && e.IsPublic == 1)
                     .Where(e => string.IsNullOrEmpty(name) || e.EventTitle.Contains(name))
                     .Where(e => !startDate.HasValue || e.StartTime >= startDate.Value)
                     .Where(e => !endDate.HasValue || e.EndTime <= endDate.Value)

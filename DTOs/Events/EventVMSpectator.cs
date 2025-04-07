@@ -1,4 +1,5 @@
-﻿using Planify_BackEnd.DTOs.Campus;
+﻿using Planify_BackEnd.DTOs.Activity;
+using Planify_BackEnd.DTOs.Campus;
 using Planify_BackEnd.DTOs.Categories;
 using Planify_BackEnd.DTOs.Medias;
 using Planify_BackEnd.Models;
@@ -39,6 +40,7 @@ namespace Planify_BackEnd.DTOs.Events
         public CampusDTO? CampusDTO { get; set; }
 
         public CategoryViewModel? CategoryViewModel { get; set; }
+        public ICollection<ActivityDTO> Activities { get; set; }
 
         public ICollection<EventMediumViewMediaModel> EventMedias { get; set; } = new List<EventMediumViewMediaModel>();
         public string? StatusMessage

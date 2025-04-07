@@ -262,10 +262,18 @@ namespace Planify_BackEnd.Services.Users
             }
         }
 
-        public async Task<UserListDTO> UpdateEventOrganizer(UserDTO userDTO)
+        public async Task<UserListDTO> UpdateEventOrganizer(EventOrganizerUpdate userDTO)
         {
             try
             {
+                if (userDTO.roleId != null)
+                {
+                    if (userDTO.roleId != 0)
+                    {
+                        var updateRole = await _userRepository.UpdateRoleEOG(userDTO.Id, (int)userDTO.roleId);
+                        if (!updateRole) throw new Exception("Cannot update event organizer role");
+                    }
+                }
                 Models.User user = new Models.User
                 {
                     Id = userDTO.Id,
