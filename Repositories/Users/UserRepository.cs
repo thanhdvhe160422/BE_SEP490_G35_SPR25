@@ -345,4 +345,40 @@ public class UserRepository : IUserRepository
             throw new Exception(ex.Message);
         }
     }
+
+    public async Task<PageResultDTO<EventOrganizerVM>> GetCampusManager(int page, int pageSize, int campusId)
+    {
+        try
+        {
+            var count = _context.UserRoles
+                .Include(ur => ur.User)
+                .Where(ur => ur.RoleId == 2 && ur.User.CampusId == campusId)
+                .Count();
+            var result = await _context.UserRoles
+                .Include(ur => ur.User).ThenInclude(u => u.Avatar)
+                .Where(ur => ur.RoleId == 2 && ur.User.CampusId == campusId)
+                .Select(ur => new EventOrganizerVM
+                {
+                    Id = ur.User.Id,
+                    DateOfBirth = ur.User.DateOfBirth,
+                    Email = ur.User.Email,
+                    FirstName = ur.User.FirstName,
+                    LastName = ur.User.LastName,
+                    Gender = ur.User.Gender,
+                    PhoneNumber = ur.User.PhoneNumber,
+                    Avatar = ur.User.Avatar == null ?
+                    new MediumDTO() :
+                    new MediumDTO
+                    {
+                        Id = ur.User.Avatar.Id,
+                        MediaUrl = ur.User.Avatar.MediaUrl
+                    }
+                }).ToListAsync();
+            return new PageResultDTO<EventOrganizerVM>(result, count, page, pageSize);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
 }

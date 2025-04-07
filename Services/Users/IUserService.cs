@@ -18,5 +18,6 @@ namespace Planify_BackEnd.Services.Users
         Task<PageResultDTO<EventOrganizerVM>> GetEventOrganizer(int page, int pageSize, int campusId);
         Task<bool> UpdateEOGRole(Guid userId,int roleId);
         Task<bool> UpdateCampusManagerRole(Guid userId, int roleId);
+        Task<PageResultDTO<EventOrganizerVM>> GetCampusManager(int page, int pageSize, int campusId);
     }
 }

@@ -341,5 +341,18 @@ namespace Planify_BackEnd.Services.Users
                 throw new Exception(ex.Message);
             }
         }
+
+        public Task<PageResultDTO<EventOrganizerVM>> GetCampusManager(int page, int pageSize, int campusId)
+        {
+            try
+            {
+                var result = _userRepository.GetCampusManager(page, pageSize, campusId);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }
