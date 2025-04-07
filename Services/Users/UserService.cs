@@ -33,7 +33,7 @@ namespace Planify_BackEnd.Services.Users
                 return new ResponseDTO(500, "Error occurs while updating user!", ex.Message);
             }
         }
-        public async Task<ResponseDTO> CreateManagerAsync(UserCreateDTO user)
+        public async Task<ResponseDTO> CreateManagerAsync(UserDTO user)
         {
             try
             {
@@ -44,16 +44,12 @@ namespace Planify_BackEnd.Services.Users
                 var newUser = new Models.User
                 {
                     Id = user.Id,
-                    UserName = user.UserName,
                     Email = user.Email,
                     FirstName = user.FirstName,
                     LastName = user.LastName,
-                    Password = user.Password,
                     DateOfBirth = user.DateOfBirth,
                     PhoneNumber = user.PhoneNumber,
-                    AddressId = user.AddressId,
-                    AvatarId = user.AvatarId,
-                    CreatedAt = user.CreatedAt,
+                    CreatedAt = DateTime.Now,
                     CampusId = user.CampusId,
                     Status = 1,
                     Gender = user.Gender,

@@ -17,8 +17,8 @@ namespace Planify_BackEnd.Controllers.User
             _userService = userService;
         }
         [HttpPost("create-campus-manager")]
-        //[Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateManagerAsync(UserCreateDTO userDTO)
+        [Authorize(Roles = "Campus Manager, Admin")]
+        public async Task<IActionResult> CreateManagerAsync(UserDTO userDTO)
         {
             try
             {
