@@ -47,6 +47,7 @@ namespace Planify_BackEnd.Controllers
             {
                 return BadRequest(new ResponseDTO(400, "Manager ID không hợp lệ", null));
             }
+            if (request.Reason == null) request.Reason = "";
             var response = await _sendRequestService.ApproveRequestAsync(request.Id, managerId, request.Reason);
             return StatusCode(response.Status, response);
         }
