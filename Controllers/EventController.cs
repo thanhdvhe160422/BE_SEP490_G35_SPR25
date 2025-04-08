@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Events;
+using Planify_BackEnd.DTOs.Medias;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories.Categories;
 using Planify_BackEnd.Services.Campus;
@@ -141,18 +142,18 @@ namespace Planify_BackEnd.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPut("delete-event-media")]
+        [HttpPut("update-event-media")]
         [Authorize(Roles = "Event Organizer")]
-        public async Task<IActionResult> DeleteEventMedia(List<EventMediaDto> list)
+        public async Task<IActionResult> UpdateEventMedia([FromForm] UpdateMediaEvent updateDTO)
         {
             try
             {
                 
-                var response = await _mediumService.DeleteMediaEvent(list);
+                var response = await _mediumService.UpdateMediaEvent(updateDTO);
                 if (response)
                     return Ok(response);
                 else
-                    return BadRequest("Cannot delete event media!");
+                    return BadRequest("Error while event media!");
             }
             catch (Exception ex)
             {
