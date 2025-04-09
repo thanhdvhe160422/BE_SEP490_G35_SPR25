@@ -39,7 +39,7 @@ namespace Planify_BackEnd.Repositories.Participants
             return _context.Participants
                 .Include(p => p.Event).ThenInclude(e=>e.EventMedia).ThenInclude(em=>em.Media)
                 .Include(p=>p.Event).ThenInclude(e=>e.FavouriteEvents)
-                .Where(p=>p.Event.FavouriteEvents.Any(fe => fe.UserId == userId) || !p.Event.FavouriteEvents.Any())
+                .Where(p=>p.Event.FavouriteEvents.Any(fe => fe.UserId == userId))
                 .Where(p => p.UserId == userId)
                 .ToList();
         }
