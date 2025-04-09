@@ -199,12 +199,12 @@ namespace Planify_BackEnd.Services.Users
 
         }
 
-        public async Task<PageResultDTO<UserListDTO>> GetUserByNameOrEmailAsync(int page, int pageSize, string input, int campusId)
+        public async Task<PageResultDTO<UserListDTO>> GetUserByNameOrEmailAsync(string input, int campusId)
 
         {
             try
             {
-                var users = await _userRepository.GetUserByNameOrEmail(page, pageSize, input, campusId);
+                var users = await _userRepository.GetUserByNameOrEmail(input, campusId);
                 
                 if (users.TotalCount == 0)
                 {

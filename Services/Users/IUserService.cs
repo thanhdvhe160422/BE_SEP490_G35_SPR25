@@ -9,7 +9,7 @@ namespace Planify_BackEnd.Services.Users
         Task<UserDetailDTO> GetUserDetailAsync(Guid id);
         Task<ResponseDTO> UpdateUserStatusAsync(Guid id, int newStatus);
         PageResultDTO<UserListDTO> GetListImplementer(int eventId, int page, int pageSize);
-        Task<PageResultDTO<UserListDTO>> GetUserByNameOrEmailAsync(int page, int pageSize, string input, int campusId);
+        Task<PageResultDTO<UserListDTO>> GetUserByNameOrEmailAsync(string input, int campusId);
         Task<UserListDTO> CreateEventOrganizer(UserDTO userDTO);
         Task<UserListDTO> UpdateEventOrganizer(UserDTO userDTO);
         Task<UserRoleDTO> AddUserRole(UserRoleDTO roleDTO);

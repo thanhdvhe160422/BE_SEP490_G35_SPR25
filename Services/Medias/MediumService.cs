@@ -37,10 +37,15 @@ namespace Planify_BackEnd.Services.Medias
                 {
                     Id = m
                 }).ToList();
-                var listMediaDeleted = await _mediumRepository.GetDeleteMediaEvent(updateDTO.EventId,listEventMediaExist);
-                foreach(var item in listMediaDeleted)
+                var listMediaDeleted = await _mediumRepository.GetIdDeleteMediaEvent(updateDTO.EventId,listEventMediaExist);
+                if (listMediaDeleted != null && listMediaDeleted.Count>0)
                 {
-                    await _mediumRepository.DeleteMediaEvent(item.Id);
+                    var deleteRequest = new DeleteImagesRequestDTO
+                    {
+                        EventId = updateDTO.EventId,
+                        MediaIds = listMediaDeleted
+                    };
+                    await _eventService.DeleteImagesAsync(deleteRequest);
                 }
                 UploadImageRequestDTO listUpload = new UploadImageRequestDTO
                 {

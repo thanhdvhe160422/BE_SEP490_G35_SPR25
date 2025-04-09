@@ -40,13 +40,16 @@ namespace Planify_BackEnd.Repositories.Medias
             }
         }
 
-        public async Task<List<EventMedium>> GetDeleteMediaEvent(int eventId, List<EventMedium> list)
+        public async Task<List<int>> GetIdDeleteMediaEvent(int eventId, List<EventMedium> list)
         {
             try
             {
-                var listMediaEvent = await _context.EventMedia.Where(em=>em.EventId==eventId).ToListAsync();
+                var listMediaEvent = await _context.EventMedia
+                    .Include(em=>em.Media)
+                    .Where(em=>em.EventId==eventId).ToListAsync();
                 var deletedMedia = listMediaEvent
-                    .Where(media => !list.Any(l => l.Id == media.Id) && media.Status != 0)
+                    .Where(media => !list.Any(l => l.Id == media.Id))
+                    .Select(media => media.Media.Id)
                     .ToList();
                 return deletedMedia;
             }
