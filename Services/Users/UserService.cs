@@ -401,5 +401,52 @@ namespace Planify_BackEnd.Services.Users
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<PageResultDTO<UserListDTO>> SearchUser(int page, int pageSize, string input, int campusId)
+        {
+            try
+            {
+                var users = await _userRepository.SearchUser(page, pageSize, input, campusId);
+
+                if (users.TotalCount == 0)
+                {
+                    return new PageResultDTO<UserListDTO>(new List<UserListDTO>(), 0, page, pageSize);
+                }
+                List<UserListDTO> result = new List<UserListDTO>();
+                foreach (var c in users.Items)
+                {
+                    UserListDTO user = new UserListDTO
+                    {
+                        Id = c.Id,
+                        UserName = c.UserName,
+                        Email = c.Email,
+                        FirstName = c.FirstName,
+                        LastName = c.LastName,
+                        Password = c.Password,
+                        DateOfBirth = c.DateOfBirth,
+                        PhoneNumber = c.PhoneNumber,
+                        AddressId = c.AddressId,
+                        AvatarId = c.AvatarId,
+                        CreatedAt = c.CreatedAt,
+                        CampusId = c.CampusId,
+                        Status = c.Status,
+                        Gender = c.Gender,
+                        Avatar = c.Avatar == null ? new DTOs.Medias.MediaItemDTO() :
+                        new DTOs.Medias.MediaItemDTO
+                        {
+                            Id = c.Avatar.Id,
+                            MediaUrl = c.Avatar.MediaUrl
+                        },
+                        RoleName = c.UserRoles.Count == 0 ? "" : c.UserRoles.First().Role.RoleName,
+                    };
+                    result.Add(user);
+                }
+                return new PageResultDTO<UserListDTO>(result, users.TotalCount, page, pageSize);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

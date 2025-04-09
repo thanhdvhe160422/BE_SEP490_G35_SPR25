@@ -31,6 +31,7 @@ namespace Planify_BackEnd.DTOs
         public UserDto CreatedBy { get; set; }
         public UserDto? Manager { get; set; }
         public UserDto? UpdatedBy { get; set; }
+        public int? RequestId { get; set; }
         public List<EventMediaDto> EventMedia { get; set; }
         public List<FavouriteEventDto> FavouriteEvents { get; set; }
         public List<JoinProjectDto> JoinProjects { get; set; }
