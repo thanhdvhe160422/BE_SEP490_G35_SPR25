@@ -199,16 +199,16 @@ namespace Planify_BackEnd.Services.Users
 
         }
 
-        public async Task<PageResultDTO<UserListDTO>> GetUserByNameOrEmailAsync(int page, int pageSize, string input, int campusId)
+        public async Task<PageResultDTO<UserListDTO>> GetUserByNameOrEmailAsync(string input, int campusId)
 
         {
             try
             {
-                var users = await _userRepository.GetUserByNameOrEmail(page, pageSize, input, campusId);
+                var users = await _userRepository.GetUserByNameOrEmail(input, campusId);
                 
                 if (users.TotalCount == 0)
                 {
-                    return new PageResultDTO<UserListDTO>(new List<UserListDTO>(), 0, page, pageSize);
+                    return new PageResultDTO<UserListDTO>(new List<UserListDTO>(), 0, 0, 0);
                 }
                 List<UserListDTO> result = new List<UserListDTO>();
                 foreach (var c in users.Items)
@@ -239,7 +239,7 @@ namespace Planify_BackEnd.Services.Users
                     };
                     result.Add(user);
                 }
-                return new PageResultDTO<UserListDTO>(result, users.TotalCount, page, pageSize);
+                return new PageResultDTO<UserListDTO>(result, users.TotalCount, 0, 0);
             }
             catch (Exception ex)
             {

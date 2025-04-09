@@ -10,7 +10,7 @@ public interface IUserRepository
     Task<User> GetUserByEmailAsync(string email);
     Task<User> GetUserByIdAsync(Guid id);
     PageResultDTO<User> GetListImplementer(int eventId, int page, int pageSize);
-    Task<PageResultDTO<User>> GetUserByNameOrEmail(int page, int pageSize, string input, int campusId);
+    Task<PageResultDTO<User>> GetUserByNameOrEmail(string input, int campusId);
     Task<User> CreateEventOrganizer(User user);
     Task<User> UpdateEventOrganizer(User user);
     Task<UserRole> AddUserRole(UserRole role);

@@ -129,7 +129,7 @@ namespace Planify_BackEnd.Controllers.User
 
         [HttpGet("search")]
         [Authorize(Roles = "Admin, Event Organizer, Campus Manager")]
-        public async Task<IActionResult> SearchUsers(int page, int pageSize, string input)
+        public async Task<IActionResult> SearchUsers(string input)
         {
             var campusId = int.Parse(User.FindFirst("campusId")?.Value);
             if (string.IsNullOrWhiteSpace(input) || campusId == null)
@@ -137,7 +137,7 @@ namespace Planify_BackEnd.Controllers.User
                 return BadRequest("Input và CampusName không được để trống.");
             }
 
-            var users = await _userService.GetUserByNameOrEmailAsync(page, pageSize, input, campusId);
+            var users = await _userService.GetUserByNameOrEmailAsync(input, campusId);
             if (users.TotalCount==0)
             {
                 return NotFound("Không tìm thấy người dùng phù hợp.");

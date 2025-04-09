@@ -209,7 +209,7 @@ public class UserRepository : IUserRepository
         }
     }
 
-    public async Task<PageResultDTO<User>> GetUserByNameOrEmail(int page, int pageSize, string input, int campusId)
+    public async Task<PageResultDTO<User>> GetUserByNameOrEmail(string input, int campusId)
     {
         try
         {
@@ -223,7 +223,7 @@ public class UserRepository : IUserRepository
             .GroupBy(c => c.Id)
             .Select(g => g.First())
             .Count();
-            if (count == 0) return new PageResultDTO<User>(new List<User>(), 0, page, pageSize);
+            if (count == 0) return new PageResultDTO<User>(new List<User>(), 0, 0, 0);
             var result = await _context.Users
             .Where(c => (c.FirstName.Contains(input) || c.LastName.Contains(input) || c.Email.Contains(input))
                         && c.CampusId == campusId
@@ -233,9 +233,8 @@ public class UserRepository : IUserRepository
                 .ThenInclude(ur => ur.Role)
             .GroupBy(c => c.Id)
             .Select(g => g.First())
-            .Skip((page-1)*pageSize).Take(pageSize)
             .ToListAsync();
-            return new PageResultDTO<User>(result, count, page, pageSize);
+            return new PageResultDTO<User>(result, count, 0, 0);
         }
         catch (Exception ex)
         {

@@ -7,7 +7,7 @@ namespace Planify_BackEnd.Repositories.Medias
     public interface IMediumRepository
     {
         Task<Medium> CreateMediaItemAsync(Medium mediaItem);
-        public Task<List<EventMedium>> GetDeleteMediaEvent(int eventId, List<EventMedium> list);
+        public Task<List<int>> GetIdDeleteMediaEvent(int eventId, List<EventMedium> list);
         public Task<bool> DeleteMediaEvent(int mediaEventId);
     }
 }
