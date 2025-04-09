@@ -40,26 +40,52 @@ namespace Planify_BackEnd.Controllers
                         e.EndTime,
                         e.CategoryEventId,
                         e.AmountBudget,
+                        e.Placed,
+                        e.SloganEvent,
+                        e.Goals,
+                        e.TargetAudience,
+                        e.SizeParticipants,
+                        e.MeasuringSuccess,
+                        e.MonitoringProcess,
+                        e.PromotionalPlan,
                         DurationHours = (e.EndTime - e.StartTime).TotalHours,
                         Tasks = _dbContext.Tasks.Where(t => t.EventId == e.Id)
                             .Select(t => new
                             {
                                 t.TaskName,
                                 t.TaskDescription,
-                                t.StartTime,
                                 t.Deadline,
                                 t.AmountBudget,
-                                t.Status,
                                 SubTasks = _dbContext.SubTasks.Where(st => st.TaskId == t.Id)
                                     .Select(st => new
                                     {
                                         st.SubTaskName,
                                         st.SubTaskDescription,
-                                        st.StartTime,
                                         st.Deadline,
                                         st.AmountBudget,
-                                        st.Status
                                     }).ToList()
+                            }).ToList(),
+                        CostBreakdowns = _dbContext.CostBreakdowns.Where(cb => cb.EventId == e.Id)
+                            .Select(cb => new
+                            {
+                                cb.Name,
+                                cb.Quantity,
+                                cb.PriceByOne,
+                                Total = cb.Quantity * cb.PriceByOne
+                            }).ToList(),
+                        Risks = _dbContext.Risks.Where(r => r.EventId == e.Id)
+                            .Select(r => new
+                            {
+                                r.Name,
+                                r.Reason,
+                                r.Description,
+                                r.Solution
+                            }).ToList(),
+                        Activities = _dbContext.Activities.Where(a => a.EventId == e.Id)
+                            .Select(a => new
+                            {
+                                a.Name,
+                                a.Content
                             }).ToList()
                     })
                     .Take(5)
@@ -69,42 +95,136 @@ namespace Planify_BackEnd.Controllers
 
                 if (!pastEvents.Any())
                 {
-                    // Nếu không có dữ liệu lịch sử, tạo prompt để sinh sự kiện mới
-                    fullPrompt = $"Không có dữ liệu lịch sử. Hãy tạo một sự kiện mới thực tế và phù hợp cho trường Đại học FPT.\n" +
-                                $"Yêu cầu: {request.Prompt}\n" +
-                                $"Trả về kết quả bằng tiếng Việt, thời gian phải luôn ở tương lai, ngân sách chuẩn thực tế và dưới dạng JSON chỉ với các trường: " +
-                                $"EventTitle (string), EventDescription (string), StartTime (string, định dạng 'yyyy-MM-dd HH:mm'), " +
-                                $"EndTime (string, định dạng 'yyyy-MM-dd HH:mm'), CategoryEventId (int) = {request.CategoryEventId}, AmountBudget (decimal), " +
-                                $"Tasks (mảng chứa TaskName (string), TaskDescription (string), StartTime (string), Deadline (string), " +
-                                $"AmountBudget (decimal), SubTasks (mảng chứa SubTaskName (string), SubTaskDescription (string), " +
-                                $"StartTime (string), Deadline (string), AmountBudget (decimal))). " +
-                                $"Phản hồi phải cung cấp chi tiết đầy đủ và mô tả kỹ lưỡng kế hoạch. " +
-                                $"Đây là sự kiện tổ chức cho trường Đại học FPT.";
+                    fullPrompt = $"Không có dữ liệu lịch sử. Hãy tạo một sự kiện mới chi tiết và thực tế cho trường Đại học FPT.\n" +
+                                 $"Yêu cầu từ người dùng: {request.Prompt}\n" +
+                                 $"Trả về kết quả bằng tiếng Việt, thời gian phải luôn ở tương lai 2 tháng (sau ngày hiện tại {DateTime.Now:yyyy-MM-dd}), " +
+                                 $"ngân sách thực tế (phù hợp với sự kiện tại trường đại học), và dưới dạng JSON với các trường sau:\n" +
+                                 $"- EventTitle (string): Tiêu đề sự kiện\n" +
+                                 $"- EventDescription (string): Mô tả chi tiết sự kiện\n" +
+                                 $"- StartTime (string, định dạng 'yyyy-MM-dd HH:mm'): Thời gian bắt đầu\n" +
+                                 $"- EndTime (string, định dạng 'yyyy-MM-dd HH:mm'): Thời gian kết thúc\n" +
+                                 $"- CategoryEventId (int): ID danh mục sự kiện = {request.CategoryEventId}\n" +
+                                 $"- Placed (string): Địa điểm tổ chức\n" +
+                                 $"- SloganEvent (string): Khẩu hiệu sự kiện\n" +
+                                 $"- Goals (string): Mục tiêu sự kiện\n" +
+                                 $"- TargetAudience (string): Đối tượng tham gia\n" +
+                                 $"- SizeParticipants (int): Số lượng người tham gia\n" +
+                                 $"- MeasuringSuccess (string): Cách đo lường thành công\n" +
+                                 $"- MonitoringProcess (string): Quy trình giám sát\n" +
+                                 $"- PromotionalPlan (string): Kế hoạch quảng bá\n" +
+                                 $"- AmountBudget (decimal): Ngân sách tổng cho sự kiện\n" +
+                                 $"- Tasks (mảng): Danh sách nhiệm vụ, mỗi nhiệm vụ bao gồm:\n" +
+                                 $"  - TaskName (string): Tên nhiệm vụ\n" +
+                                 $"  - TaskDescription (string): Mô tả chi tiết nhiệm vụ\n" +
+                                 $"  - Deadline (string, định dạng 'yyyy-MM-dd HH:mm'): Hạn chót nhiệm vụ\n" +
+                                 $"  - AmountBudget (decimal): Ngân sách cho nhiệm vụ\n" +
+                                 $"  - SubTasks (mảng): Danh sách nhiệm vụ con, mỗi nhiệm vụ con bao gồm:\n" +
+                                 $"    - SubTaskName (string): Tên nhiệm vụ con\n" +
+                                 $"    - SubTaskDescription (string): Mô tả chi tiết nhiệm vụ con\n" +
+                                 $"    - Deadline (string, định dạng 'yyyy-MM-dd HH:mm'): Hạn chót nhiệm vụ con\n" +
+                                 $"    - AmountBudget (decimal): Ngân sách cho nhiệm vụ con\n" +
+                                 $"- BudgetRows (mảng): Danh sách chi phí, mỗi mục bao gồm:\n" +
+                                 $"  - Name (string): Tên mục chi phí\n" +
+                                 $"  - Quantity (int): Số lượng\n" +
+                                 $"  - Price (decimal): Giá mỗi đơn vị\n" +
+                                 $"  - Total (decimal): Tổng chi phí (Quantity * Price)\n" +
+                                 $"- Risks (mảng): Danh sách rủi ro, mỗi rủi ro bao gồm:\n" +
+                                 $"  - Name (string): Tên rủi ro\n" +
+                                 $"  - Reason (string): Lý do rủi ro\n" +
+                                 $"  - Description (string): Mô tả rủi ro\n" +
+                                 $"  - Solution (string): Giải pháp cho rủi ro\n" +
+                                 $"- Activities (mảng): Danh sách hoạt động, mỗi hoạt động bao gồm:\n" +
+                                 $"  - Name (string): Tên hoạt động\n" +
+                                 $"  - Content (string): Nội dung hoạt động\n" +
+                                 $"Lưu ý: Tất cả các số (AmountBudget, Price, Total, v.v.) phải được viết liền không có dấu phẩy phân cách hàng nghìn (ví dụ: 50000000 thay vì 50,000,000). Phản hồi phải cung cấp chi tiết đầy đủ, mô tả kỹ lưỡng kế hoạch, phù hợp với yêu cầu của người dùng và bối cảnh trường Đại học FPT.";
                 }
                 else
                 {
-                    // Nếu có dữ liệu lịch sử, giữ nguyên logic cũ
-                    string eventData = "Dữ liệu lịch sử:\n";
+                    string eventData = "Dữ liệu lịch sử các sự kiện trước đây tại trường Đại học FPT:\n";
                     foreach (var ev in pastEvents)
                     {
                         eventData += $"- Sự kiện: {ev.EventTitle}\n";
                         eventData += $"  Mô tả: {ev.EventDescription}\n";
-                        eventData += $"  Thời gian: {ev.StartTime} - {ev.EndTime} ({ev.DurationHours:F2} giờ)\n";
-                        eventData += $"  Thể loại: {ev.CategoryEventId}, Ngân sách: {ev.AmountBudget}\n";
+                        eventData += $"  Thời gian: {ev.StartTime:yyyy-MM-dd HH:mm} - {ev.EndTime:yyyy-MM-dd HH:mm} ({ev.DurationHours:F2} giờ)\n";
+                        eventData += $"  Danh mục: {ev.CategoryEventId}, Ngân sách: {ev.AmountBudget:N0} VNĐ\n";
+                        eventData += $"  Địa điểm: {ev.Placed}\n";
+                        eventData += $"  Khẩu hiệu: {ev.SloganEvent}\n";
+                        eventData += $"  Mục tiêu: {ev.Goals}\n";
+                        eventData += $"  Đối tượng: {ev.TargetAudience}\n";
+                        eventData += $"  Số người tham gia: {ev.SizeParticipants}\n";
+                        eventData += $"  Đo lường thành công: {ev.MeasuringSuccess}\n";
+                        eventData += $"  Giám sát: {ev.MonitoringProcess}\n";
+                        eventData += $"  Quảng bá: {ev.PromotionalPlan}\n";
                         eventData += "  Nhiệm vụ:\n";
                         foreach (var task in ev.Tasks)
                         {
-                            eventData += $"    - {task.TaskName}: {task.TaskDescription}, Ngân sách: {task.AmountBudget}, Thời gian: {task.StartTime} - {task.Deadline}\n";
-                            eventData += "      SubTasks:\n";
+                            eventData += $"    - {task.TaskName}: {task.TaskDescription}, Ngân sách: {task.AmountBudget} VNĐ, Thời hạn: {task.Deadline:yyyy-MM-dd HH:mm}\n";
+                            eventData += "      Nhiệm vụ con:\n";
                             foreach (var subTask in task.SubTasks)
                             {
-                                eventData += $"        - {subTask.SubTaskName}: {subTask.SubTaskDescription}, Ngân sách: {subTask.AmountBudget}, Thời gian: {subTask.StartTime} - {subTask.Deadline}\n";
+                                eventData += $"        - {subTask.SubTaskName}: {subTask.SubTaskDescription}, Ngân sách: {subTask.AmountBudget} VNĐ, Thời hạn: {subTask.Deadline:yyyy-MM-dd HH:mm}\n";
                             }
+                        }
+                        eventData += "  Chi phí:\n";
+                        foreach (var cost in ev.CostBreakdowns)
+                        {
+                            eventData += $"    - {cost.Name}: Số lượng: {cost.Quantity}, Giá: {cost.PriceByOne} VNĐ, Tổng: {cost.Total} VNĐ\n";
+                        }
+                        eventData += "  Rủi ro:\n";
+                        foreach (var risk in ev.Risks)
+                        {
+                            eventData += $"    - {risk.Name}: Lý do: {risk.Reason}, Mô tả: {risk.Description}, Giải pháp: {risk.Solution}\n";
+                        }
+                        eventData += "  Hoạt động:\n";
+                        foreach (var activity in ev.Activities)
+                        {
+                            eventData += $"    - {activity.Name}: {activity.Content}\n";
                         }
                         eventData += "\n";
                     }
 
-                    fullPrompt = $"{eventData}\nYêu cầu: {request.Prompt}\nTrả về kết quả bằng tiếng Việt, thời gian phải luôn ở tương lai và dưới dạng JSON chỉ với các trường: EventTitle (string), EventDescription (string), StartTime (string, định dạng 'yyyy-MM-dd HH:mm'), EndTime (string, định dạng 'yyyy-MM-dd HH:mm'), CategoryEventId (int), AmountBudget (decimal), Tasks (mảng chứa TaskName (string), TaskDescription (string), StartTime (string), Deadline (string), AmountBudget (decimal), SubTasks (mảng chứa SubTaskName (string), SubTaskDescription (string), StartTime (string), Deadline (string), AmountBudget (decimal))). Phản hồi phải cung cấp chi tiết đầy đủ và mô tả kỹ lưỡng kế hoạch. Đây là sự kiện tổ chức cho trường Đại học FPT.";
+                    fullPrompt = $"{eventData}\n" +
+                                 $"Yêu cầu từ người dùng: {request.Prompt}\n" +
+                                 $"Trả về kết quả bằng tiếng Việt, thời gian phải luôn ở tương lai 2 tháng (sau ngày hiện tại {DateTime.Now:yyyy-MM-dd}), " +
+                                 $"ngân sách thực tế (phù hợp với sự kiện tại trường đại học), và dưới dạng JSON với các trường sau:\n" +
+                                 $"- EventTitle (string): Tiêu đề sự kiện\n" +
+                                 $"- EventDescription (string): Mô tả chi tiết sự kiện\n" +
+                                 $"- StartTime (string, định dạng 'yyyy-MM-dd HH:mm'): Thời gian bắt đầu\n" +
+                                 $"- EndTime (string, định dạng 'yyyy-MM-dd HH:mm'): Thời gian kết thúc\n" +
+                                 $"- CategoryEventId (int): ID danh mục sự kiện = {request.CategoryEventId}\n" +
+                                 $"- Placed (string): Địa điểm tổ chức\n" +
+                                 $"- SloganEvent (string): Khẩu hiệu sự kiện\n" +
+                                 $"- Goals (string): Mục tiêu sự kiện\n" +
+                                 $"- TargetAudience (string): Đối tượng tham gia\n" +
+                                 $"- SizeParticipants (int): Số lượng người tham gia\n" +
+                                 $"- MeasuringSuccess (string): Cách đo lường thành công\n" +
+                                 $"- MonitoringProcess (string): Quy trình giám sát\n" +
+                                 $"- PromotionalPlan (string): Kế hoạch quảng bá\n" +
+                                 $"- AmountBudget (decimal): Ngân sách tổng cho sự kiện\n" +
+                                 $"- Tasks (mảng): Danh sách nhiệm vụ, mỗi nhiệm vụ bao gồm:\n" +
+                                 $"  - TaskName (string): Tên nhiệm vụ\n" +
+                                 $"  - TaskDescription (string): Mô tả chi tiết nhiệm vụ\n" +
+                                 $"  - Deadline (string, định dạng 'yyyy-MM-dd HH:mm'): Hạn chót nhiệm vụ\n" +
+                                 $"  - AmountBudget (decimal): Ngân sách cho nhiệm vụ\n" +
+                                 $"  - SubTasks (mảng): Danh sách nhiệm vụ con, mỗi nhiệm vụ con bao gồm:\n" +
+                                 $"    - SubTaskName (string): Tên nhiệm vụ con\n" +
+                                 $"    - SubTaskDescription (string): Mô tả chi tiết nhiệm vụ con\n" +
+                                 $"    - Deadline (string, định dạng 'yyyy-MM-dd HH:mm'): Hạn chót nhiệm vụ con\n" +
+                                 $"    - AmountBudget (decimal): Ngân sách cho nhiệm vụ con\n" +
+                                 $"- BudgetRows (mảng): Danh sách chi phí, mỗi mục bao gồm:\n" +
+                                 $"  - Name (string): Tên mục chi phí\n" +
+                                 $"  - Quantity (int): Số lượng\n" +
+                                 $"  - Price (decimal): Giá mỗi đơn vị\n" +
+                                 $"  - Total (decimal): Tổng chi phí (Quantity * Price)\n" +
+                                 $"- Risks (mảng): Danh sách rủi ro, mỗi rủi ro bao gồm:\n" +
+                                 $"  - Name (string): Tên rủi ro\n" +
+                                 $"  - Reason (string): Lý do rủi ro\n" +
+                                 $"  - Description (string): Mô tả rủi ro\n" +
+                                 $"  - Solution (string): Giải pháp cho rủi ro\n" +
+                                 $"- Activities (mảng): Danh sách hoạt động, mỗi hoạt động bao gồm:\n" +
+                                 $"  - Name (string): Tên hoạt động\n" +
+                                 $"  - Content (string): Nội dung hoạt động\n" +
+                                 $"Lưu ý: Tất cả các số (AmountBudget, Price, Total, v.v.) phải được viết liền không có dấu phẩy phân cách hàng nghìn (ví dụ: 50000000 thay vì 50,000,000). Phản hồi phải cung cấp chi tiết đầy đủ, mô tả kỹ lưỡng kế hoạch, phù hợp với yêu cầu của người dùng và bối cảnh trường Đại học FPT.";
                 }
 
                 string suggestion = await _chatGPTService.GetSuggestion(fullPrompt);
@@ -114,9 +234,9 @@ namespace Planify_BackEnd.Controllers
                     var jsonSuggestion = JsonDocument.Parse(suggestion).RootElement;
                     return Ok(jsonSuggestion);
                 }
-                catch (JsonException)
+                catch (JsonException ex)
                 {
-                    return Ok(new { Suggestion = suggestion });
+                    return Ok(new { Suggestion = suggestion, ParsingError = ex.Message });
                 }
             }
             catch (Exception ex)
