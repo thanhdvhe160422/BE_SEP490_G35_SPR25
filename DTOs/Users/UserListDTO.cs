@@ -1,4 +1,6 @@
-﻿namespace Planify_BackEnd.DTOs.Users
+﻿using Planify_BackEnd.DTOs.Medias;
+
+namespace Planify_BackEnd.DTOs.Users
 {
     public class UserListDTO
     {
@@ -28,5 +30,7 @@
 
         public int Status { get; set; }
         public bool Gender { get; set; }
+        public MediaItemDTO Avatar { get; set; }
+        public string RoleName {  get; set; }
     }
 }

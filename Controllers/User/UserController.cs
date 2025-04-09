@@ -128,7 +128,7 @@ namespace Planify_BackEnd.Controllers.User
         }
 
         [HttpGet("search")]
-        [Authorize(Roles = "Event Organizer, Campus Manager")]
+        [Authorize(Roles = "Admin, Event Organizer, Campus Manager")]
         public async Task<IActionResult> SearchUsers([FromQuery] string input)
         {
             var campusId = int.Parse(User.FindFirst("campusId")?.Value);

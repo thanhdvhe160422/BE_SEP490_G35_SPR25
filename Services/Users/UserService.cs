@@ -96,7 +96,13 @@ namespace Planify_BackEnd.Services.Users
                         CreatedAt = c.CreatedAt,
                         CampusId = c.CampusId,
                         Status = c.Status,
-                        Gender = c.Gender
+                        Gender = c.Gender,
+                        Avatar = new DTOs.Medias.MediaItemDTO
+                        {
+                            Id = c.Avatar.Id,
+                            MediaUrl = c.Avatar.MediaUrl
+                        },
+                        RoleName = c.UserRoles.Count == 0 ? "" : c.UserRoles.First().Role.RoleName,
                     };
                     result.Add(user);
                 }
