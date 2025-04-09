@@ -25,6 +25,7 @@ namespace Planify_BackEnd.Repositories.FavouriteEvents
                     .Include(f => f.Event)
                     .Include(f => f.User)
                     .Where(f => f.UserId == spectatorId)
+                    .OrderByDescending(f=>f.Id)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ToList();
