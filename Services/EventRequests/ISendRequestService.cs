@@ -10,6 +10,6 @@ namespace Planify_BackEnd.Services.EventRequests
         Task<ResponseDTO> CreateRequestAsync(SendRequestDTO requestDTO);
         Task<ResponseDTO> ApproveRequestAsync(int id, Guid managerId, string reason);
         Task<ResponseDTO> RejectRequestAsync(int id, Guid managerId, string reason);
-        Task<ResponseDTO> GetMyRequestsAsync(Guid userId);
+        Task<ResponseDTO> GetMyRequestsAsync(Guid userId, int campusId);
     }
 }

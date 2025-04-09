@@ -74,7 +74,7 @@ namespace Planify_BackEnd.Controllers
         public async Task<IActionResult> GetMyRequests(Guid userId)
         {
             var campusClaim = User.Claims.FirstOrDefault(c => c.Type == "campusId");
-            var response = await _sendRequestService.GetMyRequestsAsync(userId,campusClaim);
+            var response = await _sendRequestService.GetMyRequestsAsync(userId, int.Parse(campusClaim.Value));
             return StatusCode(response.Status, response);
         }
     }

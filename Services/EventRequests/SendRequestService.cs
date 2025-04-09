@@ -191,11 +191,11 @@ namespace Planify_BackEnd.Services.EventRequests
                 return new ResponseDTO(500, "Đã xảy ra lỗi khi từ chối yêu cầu", null);
             }
         }
-        public async Task<ResponseDTO> GetMyRequestsAsync(Guid userId)
+        public async Task<ResponseDTO> GetMyRequestsAsync(Guid userId, int campusId)
         {
             try
             {
-                var requests = await _requestRepository.GetRequestsByUserIdAsync(userId);
+                var requests = await _requestRepository.GetRequestsByUserIdAsync(userId,campusId);
 
                 if (requests == null || !requests.Any())
                 {
