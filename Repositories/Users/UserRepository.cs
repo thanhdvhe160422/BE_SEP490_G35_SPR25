@@ -75,6 +75,7 @@ public class UserRepository : IUserRepository
                 .ThenInclude(u => u.Role)
                 .Include(c => c.Campus)
                 .Include(a => a.Address)
+                .Include(a=>a.Avatar)
                 .Skip((page - 1) * pageSize).Take(pageSize)
                 .ToList();
             return new PageResultDTO<User>(data, count, page, pageSize);
