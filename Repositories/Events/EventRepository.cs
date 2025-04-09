@@ -271,6 +271,7 @@ public class EventRepository : IEventRepository
             updateEvent.Placed = e.Placed;
             updateEvent.Status = e.Status;
             updateEvent.TimePublic = e.TimePublic;
+            updateEvent.IsPublic = e.IsPublic;
             updateEvent.MeasuringSuccess = e.MeasuringSuccess;
             updateEvent.Goals = e.Goals;
             updateEvent.MonitoringProcess = e.MonitoringProcess;

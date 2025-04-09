@@ -110,6 +110,8 @@ namespace Planify_BackEnd.Services.EventRequests
                 request.ManagerId = managerId;
                 request.Reason = reason;
                 eventEntity.Status = 2; // Đã duyệt
+                eventEntity.IsPublic = 1; // Public
+                eventEntity.TimePublic = DateTime.UtcNow;
 
                 await _requestRepository.UpdateRequestAsync(request);
                 await _eventRepository.UpdateEventAsync(eventEntity);
