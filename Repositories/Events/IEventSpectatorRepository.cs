@@ -8,6 +8,6 @@ namespace Planify_BackEnd.Repositories.Events
     {
         PageResultDTO<Event> GetEvents(int page, int pageSize, Guid userId, int campusId);
         Event GetEventById(int id,Guid userId);
-        PageResultDTO<Event> SearchEvent(int page, int pageSize, string? name, DateTime? startDate, DateTime? endDate, string? placed, Guid userId, int campusId);
+        PageResultDTO<Event> SearchEvent(int page, int pageSize, string? name, DateTime? startDate, DateTime? endDate, string? placed,int?categoryId, Guid userId, int campusId);
     }
 }

@@ -55,13 +55,13 @@ namespace Planify_BackEnd.Controllers.Events
         }
         [HttpGet("search")]
         [Authorize]
-        public IActionResult SearchEvents(int page, int pageSize, string? name, DateTime? startDate, DateTime? endDate, string? placed)
+        public IActionResult SearchEvents(int page, int pageSize, string? name, DateTime? startDate, DateTime? endDate, string? placed, int? categoryId)
         {
             try
             {
                 var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
                 var campusClaim = User.Claims.FirstOrDefault(c => c.Type == "campusId");
-                var response = _service.SearchEvent(page, pageSize, name, startDate, endDate,placed,userId,int.Parse(campusClaim.Value));
+                var response = _service.SearchEvent(page, pageSize, name, startDate, endDate,placed,categoryId,userId,int.Parse(campusClaim.Value));
                 if (response.TotalCount == 0)
                 {
                     return NotFound("Cannot found any event");

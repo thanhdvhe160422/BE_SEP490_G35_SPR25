@@ -880,11 +880,11 @@ public class EventService : IEventService
         }
     }
 
-    public async Task<PageResultDTO<EventGetListResponseDTO>> MyEvent(int page, int pageSize, Guid createBy)
+    public async Task<PageResultDTO<EventGetListResponseDTO>> MyEvent(int page, int pageSize, Guid createBy, int campusId)
     {
         try
         {
-            var resultEvents = await _eventRepository.MyEvent(page, pageSize, createBy);
+            var resultEvents = await _eventRepository.MyEvent(page, pageSize, createBy, campusId);
             var eventDTOs = resultEvents.Items.Select(e => new EventGetListResponseDTO
             {
                 Id = e.Id,

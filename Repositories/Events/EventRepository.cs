@@ -538,7 +538,7 @@ public class EventRepository : IEventRepository
             throw new Exception(ex.Message);
         }
     }
-    public async Task<PageResultDTO<Event>> MyEvent(int page, int pageSize, Guid createBy)
+    public async Task<PageResultDTO<Event>> MyEvent(int page, int pageSize, Guid createBy, int campusId)
     {
         try
         {
@@ -547,7 +547,8 @@ public class EventRepository : IEventRepository
                 .Include(e => e.CategoryEvent)
                 .Include(e => e.EventMedia).ThenInclude(em => em.Media)
                 .Include(e => e.FavouriteEvents.Where(fe => fe.UserId == createBy))
-                .Where(e => e.Status > -2 && e.CreateBy == createBy)
+                .Where(e => e.Status > -2 && e.CreateBy == createBy &&
+                    e.CampusId == campusId)
                     .AsEnumerable()
                     .OrderBy(e =>
                         e.StartTime <= DateTime.Now && DateTime.Now <= e.EndTime ? 0 : 1)
@@ -562,7 +563,8 @@ public class EventRepository : IEventRepository
                 .Include(e => e.CategoryEvent)
                 .Include(e => e.EventMedia).ThenInclude(em => em.Media)
                 .Include(e => e.FavouriteEvents.Where(fe => fe.UserId == createBy))
-                .Where(e => e.Status > -2 && e.CreateBy == createBy)
+                .Where(e => e.Status > -2 && e.CreateBy == createBy &&
+                    e.CampusId == campusId)
                 .AsEnumerable()
                 .OrderBy(e =>
                     e.StartTime <= DateTime.Now && DateTime.Now <= e.EndTime ? 0 : 1)

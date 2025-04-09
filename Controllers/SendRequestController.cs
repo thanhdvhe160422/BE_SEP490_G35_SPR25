@@ -73,7 +73,8 @@ namespace Planify_BackEnd.Controllers
         [HttpGet("MyRequests/{userId}")]
         public async Task<IActionResult> GetMyRequests(Guid userId)
         {
-            var response = await _sendRequestService.GetMyRequestsAsync(userId);
+            var campusClaim = User.Claims.FirstOrDefault(c => c.Type == "campusId");
+            var response = await _sendRequestService.GetMyRequestsAsync(userId,campusClaim);
             return StatusCode(response.Status, response);
         }
     }

@@ -132,13 +132,13 @@ namespace Planify_BackEnd.Services.Events
                 throw new Exception(ex.Message);
             }
         }
-        public PageResultDTO<EventBasicVMSpectator> SearchEvent(int page, int pageSize, string?name, DateTime? startDate, DateTime? endDate, string? placed, Guid userId, int campusId)
+        public PageResultDTO<EventBasicVMSpectator> SearchEvent(int page, int pageSize, string?name, DateTime? startDate, DateTime? endDate, string? placed, int? categoryId, Guid userId, int campusId)
         {
             try
             {
                 if (name == null) name = "";
                 if (placed == null) placed = "";
-                PageResultDTO<Event> resultEvents = _repository.SearchEvent(page, pageSize, name, startDate, endDate,placed,userId,campusId);
+                PageResultDTO<Event> resultEvents = _repository.SearchEvent(page, pageSize, name, startDate, endDate,placed,categoryId,userId,campusId);
                 List<EventBasicVMSpectator> eventBasicVMs = new List<EventBasicVMSpectator>();
                 foreach (var item in resultEvents.Items)
                 {
