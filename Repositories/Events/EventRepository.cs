@@ -106,6 +106,7 @@ public class EventRepository : IEventRepository
             var eventDetail = await _context.Events
                 .Include(e=>e.Tasks).ThenInclude(t=>t.SubTasks)
                 .ThenInclude(st=>st.JoinTasks).ThenInclude(jt=>jt.User)
+                .Include(e=>e.SendRequests)
                 .Where(e => e.Id == eventId)
                 .Select(e => new EventDetailDto
                 {
@@ -239,6 +240,7 @@ public class EventRepository : IEventRepository
                         Quantity = cb.Quantity,
                         PriceByOne = cb.PriceByOne
                     }).ToList(),
+                    RequestId = e.SendRequests.OrderByDescending(sr => sr.Id).Select(sr => sr.Id).FirstOrDefault()
                 })
                 .FirstOrDefaultAsync();
 
