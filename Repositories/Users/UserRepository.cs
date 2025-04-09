@@ -405,4 +405,38 @@ public class UserRepository : IUserRepository
             throw new Exception(ex.Message);
         }
     }
+
+    public async Task<PageResultDTO<User>> SearchUser(int page, int pageSize, string input, int campusId)
+    {
+        try
+        {
+            var count = _context.Users
+            .Where(c => (c.FirstName.Contains(input) || c.LastName.Contains(input) || c.Email.Contains(input))
+                        && c.CampusId == campusId
+                        && c.UserRoles.Any(ur => ur.RoleId != 1))
+            .Include(c => c.Campus)
+            .Include(c => c.UserRoles)
+                .ThenInclude(ur => ur.Role)
+            .GroupBy(c => c.Id)
+            .Select(g => g.First())
+            .Count();
+            if (count == 0) return new PageResultDTO<User>(new List<User>(), 0, page, pageSize);
+            var result = await _context.Users
+            .Where(c => (c.FirstName.Contains(input) || c.LastName.Contains(input) || c.Email.Contains(input))
+                        && c.CampusId == campusId
+                        && c.UserRoles.Any(ur => ur.RoleId != 1))
+            .Include(c => c.Campus)
+            .Include(c => c.UserRoles)
+                .ThenInclude(ur => ur.Role)
+            .GroupBy(c => c.Id)
+            .Select(g => g.First())
+            .Skip((page - 1) * pageSize).Take(pageSize)
+            .ToListAsync();
+            return new PageResultDTO<User>(result, count, page, pageSize);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
 }
