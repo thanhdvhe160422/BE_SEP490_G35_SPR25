@@ -208,7 +208,7 @@ namespace Planify_BackEnd.Services.Users
                 
                 if (users.TotalCount == 0)
                 {
-                    return new PageResultDTO<UserListDTO>(new List<UserListDTO>(), 0, page, pageSize);
+                    return new PageResultDTO<UserListDTO>(new List<UserListDTO>(), 0, 0, 0);
                 }
                 List<UserListDTO> result = new List<UserListDTO>();
                 foreach (var c in users.Items)
@@ -239,7 +239,7 @@ namespace Planify_BackEnd.Services.Users
                     };
                     result.Add(user);
                 }
-                return new PageResultDTO<UserListDTO>(result, users.TotalCount, page, pageSize);
+                return new PageResultDTO<UserListDTO>(result, users.TotalCount, 0, 0);
             }
             catch (Exception ex)
             {
