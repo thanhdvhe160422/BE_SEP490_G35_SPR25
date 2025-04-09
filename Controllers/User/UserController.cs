@@ -35,7 +35,7 @@ namespace Planify_BackEnd.Controllers.User
             }
         }
         [HttpPost("update-campus-manager/{id}")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Campus Manager, Admin")]
         public async Task<IActionResult> UpdateManagerAsync(UserUpdateDTO userDTO, Guid id)
         {
             try
@@ -266,6 +266,20 @@ namespace Planify_BackEnd.Controllers.User
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        [HttpGet("search/v2")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> SearchUsersForAdmin(int page, int pageSize, string input)
+        {
+            var campusId = int.Parse(User.FindFirst("campusId")?.Value);
+            var users = await _userService.SearchUser(page, pageSize, input, campusId);
+            if (users.TotalCount == 0)
+            {
+                return NotFound("Không tìm thấy người dùng phù hợp.");
+            }
+
+            return Ok(users);
         }
     }
 }
