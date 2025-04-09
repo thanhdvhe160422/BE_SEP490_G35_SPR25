@@ -1,4 +1,5 @@
-﻿using Azure.Core;
+﻿using Azure;
+using Azure.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -59,20 +60,17 @@ namespace Planify_BackEnd.Controllers.User
 
                 if (!userId.Equals(updateProfile.Id+""))
                 {
-                    return BadRequest("UserId login not match with userId update!");
+                    return BadRequest("You can't update other people profile!");
                 }
                 var p = _profileService.getUserProfileById(updateProfile.Id);
                 if (p== null || p.FirstName==null)
                 {
                     return NotFound("Not found any user with id "+updateProfile.Id);
                 }
-                var profile = _profileService.UpdateProfile(updateProfile);
-                if (profile == null || profile.FirstName == null)
-                {
-                    return BadRequest("Cannot update profile!");
-                }
-                return Ok(profile);
-            }catch (Exception ex)
+                var response = _profileService.UpdateProfile(updateProfile);
+                return StatusCode(response.Status, response);
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }

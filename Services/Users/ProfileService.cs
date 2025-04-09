@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Medias;
 using Planify_BackEnd.DTOs.User;
 using Planify_BackEnd.DTOs.Users;
@@ -102,44 +103,49 @@ namespace Planify_BackEnd.Services.User
             }
         }
 
-        public ProfileUpdateModel UpdateProfile(ProfileUpdateModel updateProfile)
+        public ResponseDTO UpdateProfile(ProfileUpdateModel updateProfile)
         {
             try
             {
                 var p = _profileRepository.GetUserProfileById(updateProfile.Id);
-                bool isUpdateAddressSuccess = false;
-                if (p.AddressId == null)
+                //check if need update address
+                if (updateProfile.addressVM.Id != 0||!updateProfile.addressVM.AddressDetail.Equals(""))
                 {
-                    Models.Address createAddress = new Models.Address
+                    bool isUpdateAddressSuccess = false;
+                    if (p.AddressId == null)
                     {
-                        Id = 0,
-                        AddressDetail = updateProfile.addressVM.AddressDetail,
-                        WardId = updateProfile.addressVM.WardVM.Id
-                    };
-                    var addressId = _provinceRepository.CreateAddress(createAddress);
-                    updateProfile.AddressId = addressId;
-                    isUpdateAddressSuccess = true;
-                }
-                if (isUpdateAddressSuccess == false)
-                {
-                    if (updateProfile.addressVM.WardVM.Id != p.Address.Ward.Id
-                    || !updateProfile.addressVM.AddressDetail.Equals(p.Address.AddressDetail))
-                    {
-                        Models.Address updateAddress = new Models.Address
+                        Models.Address createAddress = new Models.Address
                         {
-                            Id = p.Address.Id,
+                            Id = 0,
                             AddressDetail = updateProfile.addressVM.AddressDetail,
                             WardId = updateProfile.addressVM.WardVM.Id
                         };
-                        isUpdateAddressSuccess = _provinceRepository.UpdateAddress(updateAddress);
-                    }
-                    else
-                    {
+                        var addressId = _provinceRepository.CreateAddress(createAddress);
+                        if (addressId == 0) return new ResponseDTO(400, "Error update address!", null);
+                        updateProfile.AddressId = addressId;
                         isUpdateAddressSuccess = true;
                     }
+                    if (isUpdateAddressSuccess == false)
+                    {
+                        if (updateProfile.addressVM.WardVM.Id != p.Address.Ward.Id
+                        || !updateProfile.addressVM.AddressDetail.Equals(p.Address.AddressDetail))
+                        {
+                            Models.Address updateAddress = new Models.Address
+                            {
+                                Id = p.Address.Id,
+                                AddressDetail = updateProfile.addressVM.AddressDetail,
+                                WardId = updateProfile.addressVM.WardVM.Id
+                            };
+                            isUpdateAddressSuccess = _provinceRepository.UpdateAddress(updateAddress);
+                        }
+                        else
+                        {
+                            isUpdateAddressSuccess = true;
+                        }
+                    }
+
+                    if (!isUpdateAddressSuccess) return new ResponseDTO(400, "Error update address!", null);
                 }
-                
-                if (!isUpdateAddressSuccess) throw new Exception();
                 var profile = _profileRepository.UpdateProfile(updateProfile);
                 ProfileUpdateModel updatedprofile = new ProfileUpdateModel
                 {
@@ -151,8 +157,9 @@ namespace Planify_BackEnd.Services.User
                     Gender = profile.Gender,
                     PhoneNumber = profile.PhoneNumber,
                 };
-                return updatedprofile;
-            }catch
+                return new ResponseDTO(200, "Updated successfully!", updatedprofile);
+            }
+            catch
             {
                 throw new Exception();
             }

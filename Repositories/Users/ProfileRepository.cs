@@ -53,7 +53,7 @@ namespace Planify_BackEnd.Repositories.User
                 return user;
             }catch(Exception ex)
             {
-                return new Models.User();
+                throw new Exception(ex.Message);
             }
         }
     }
