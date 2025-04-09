@@ -194,7 +194,7 @@ public class EventService : IEventService
                         AmountBudget = task.Budget,
                         CreateBy = organizerId,
                         CreateDate = DateTime.UtcNow,
-                        Status = 1
+                        Status = 0
                     };
                     await _taskRepository.CreateTaskAsync(newTask);
 
@@ -220,7 +220,7 @@ public class EventService : IEventService
                                 Deadline = subTask.Deadline,
                                 AmountBudget = subTask.Budget,
                                 CreateBy = organizerId,
-                                Status = 1
+                                Status = 0
                             };
                             await _subTaskRepository.CreateSubTaskAsync(newSubTask);
                         }
@@ -593,7 +593,7 @@ public class EventService : IEventService
                         AmountBudget = task.Budget,
                         CreateBy = organizerId,
                         CreateDate = DateTime.UtcNow,
-                        Status = 1
+                        Status = 0
                     };
                     await _taskRepository.CreateTaskAsync(newTask);
 
@@ -619,7 +619,7 @@ public class EventService : IEventService
                                 Deadline = subTask.Deadline,
                                 AmountBudget = subTask.Budget,
                                 CreateBy = organizerId,
-                                Status = 1
+                                Status = 0
                             };
                             await _subTaskRepository.CreateSubTaskAsync(newSubTask);
                         }
