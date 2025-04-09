@@ -45,7 +45,11 @@ namespace Planify_BackEnd.Services.Medias
                         EventId = updateDTO.EventId,
                         MediaIds = listMediaDeleted
                     };
-                    await _eventService.DeleteImagesAsync(deleteRequest);
+                    var isDeleted = await _eventService.DeleteImagesAsync(deleteRequest);
+                    //if (isDeleted.Status!=200)
+                    //{
+                    //    throw new Exception("Error while delete");
+                    //}
                 }
                 UploadImageRequestDTO listUpload = new UploadImageRequestDTO
                 {

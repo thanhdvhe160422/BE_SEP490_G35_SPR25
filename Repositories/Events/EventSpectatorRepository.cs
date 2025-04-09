@@ -65,7 +65,7 @@ namespace Planify_BackEnd.Repositories.Events
             }
         }
 
-        public PageResultDTO<Event> SearchEvent(int page, int pageSize, string? name, DateTime? startDate, DateTime? endDate, string? placed,Guid userId, int campusId)
+        public PageResultDTO<Event> SearchEvent(int page, int pageSize, string? name, DateTime? startDate, DateTime? endDate, string? placed,int?categoryId,Guid userId, int campusId)
         {
             try
             {
@@ -79,6 +79,7 @@ namespace Planify_BackEnd.Repositories.Events
                     .Where(e => !startDate.HasValue || e.StartTime >= startDate.Value)
                     .Where(e => !endDate.HasValue || e.EndTime <= endDate.Value)
                     .Where(e => string.IsNullOrEmpty(placed) || e.Placed.Contains(placed))
+                    .Where(e => !categoryId.HasValue || e.CategoryEventId==categoryId)
                     .AsEnumerable()
                     .OrderBy(e =>
                         e.StartTime <= DateTime.Now && DateTime.Now <= e.EndTime ? 0 : 1)
@@ -97,6 +98,7 @@ namespace Planify_BackEnd.Repositories.Events
                     .Where(e => !startDate.HasValue || e.StartTime >= startDate.Value)
                     .Where(e => !endDate.HasValue || e.EndTime <= endDate.Value)
                     .Where(e => string.IsNullOrEmpty(placed) || e.Placed.Contains(placed))
+                    .Where(e => !categoryId.HasValue || e.CategoryEventId == categoryId)
                     .AsEnumerable()
                     .OrderBy(e =>
                         e.StartTime <= DateTime.Now && DateTime.Now <= e.EndTime ? 0 : 1)

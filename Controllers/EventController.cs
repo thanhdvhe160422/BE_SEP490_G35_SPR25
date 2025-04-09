@@ -284,7 +284,8 @@ namespace Planify_BackEnd.Controllers
             try
             {
                 var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-                var response = await _eventService.MyEvent(page, pageSize,userId);
+                var campusClaim = User.Claims.FirstOrDefault(c => c.Type == "campusId");
+                var response = await _eventService.MyEvent(page, pageSize,userId, int.Parse(campusClaim.Value));
                 if (response.TotalCount == 0)
                     return NotFound("Not found any event");
                 return Ok(response);

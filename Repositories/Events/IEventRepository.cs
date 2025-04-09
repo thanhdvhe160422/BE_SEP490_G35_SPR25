@@ -40,6 +40,6 @@ namespace Planify_BackEnd.Repositories
         System.Threading.Tasks.Task DeleteEventMediaListAsync(int eventId, List<int> mediaIds);
         System.Threading.Tasks.Task DeleteMediaItemsAsync(List<int> mediaIds);
         Task<List<EventIncomingNotification>> GetEventIncomings(Guid userId);
-        Task<PageResultDTO<Event>> MyEvent(int page, int pageSize, Guid createBy);
+        Task<PageResultDTO<Event>> MyEvent(int page, int pageSize, Guid createBy, int campusId);
     }
 }

@@ -75,7 +75,8 @@ namespace Planify_BackEnd.Controllers.User
             try
             {
                 var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-                var result = _favouriteEventService.GetFavouriteEventsByUserId(page, pageSize, userId);
+                var campusClaim = User.Claims.FirstOrDefault(c => c.Type == "campusId");
+                var result = _favouriteEventService.GetFavouriteEventsByUserId(page, pageSize, userId, int.Parse(campusClaim.Value));
                 if (result.TotalCount == 0)
                 {
                     return NotFound("Cannot found any favourite events");

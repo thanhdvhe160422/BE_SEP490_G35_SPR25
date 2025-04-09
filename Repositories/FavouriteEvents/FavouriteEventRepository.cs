@@ -71,14 +71,15 @@ namespace Planify_BackEnd.Repositories.FavouriteEvents
             }
         }
 
-        public PageResultDTO<FavouriteEventVM> GetFavouriteEventsByUserId(int page, int pageSize, Guid userId)
+        public PageResultDTO<FavouriteEventVM> GetFavouriteEventsByUserId(int page, int pageSize, Guid userId, int campusId)
         {
             try
             {
                 var count = _context.FavouriteEvents
                     .Include(f => f.Event).ThenInclude(e => e.EventMedia).ThenInclude(em => em.Media)
                     .Include(f => f.User)
-                    .Where(f => f.UserId == userId)
+                    .Where(f => f.UserId == userId &&
+                    f.Event.CampusId==campusId)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .Count();
@@ -86,7 +87,8 @@ namespace Planify_BackEnd.Repositories.FavouriteEvents
                 var f = _context.FavouriteEvents
                     .Include(f => f.Event).ThenInclude(e=>e.EventMedia).ThenInclude(em=>em.Media)
                     .Include(f => f.User)
-                    .Where(f => f.UserId == userId)
+                    .Where(f => f.UserId == userId &&
+                    f.Event.CampusId == campusId)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .Select(f=> new FavouriteEventVM

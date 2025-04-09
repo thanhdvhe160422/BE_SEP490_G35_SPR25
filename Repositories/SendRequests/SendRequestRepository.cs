@@ -56,11 +56,12 @@ namespace Planify_BackEnd.Repositories.SendRequests
             _context.SendRequests.Update(request);
             await _context.SaveChangesAsync();
         }
-        public async Task<List<SendRequest>> GetRequestsByUserIdAsync(Guid userId)
+        public async Task<List<SendRequest>> GetRequestsByUserIdAsync(Guid userId, int campusId)
         {
             return await _context.SendRequests
                 .Include(sr => sr.Event)
-                .Where(sr => sr.Event.CreateBy == userId)
+                .Where(sr => sr.Event.CreateBy == userId &&
+                    sr.Event.CampusId == campusId)
                 .ToListAsync();
         }
     }

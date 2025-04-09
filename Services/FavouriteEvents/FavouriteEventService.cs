@@ -82,11 +82,11 @@ namespace Planify_BackEnd.Services.FavouriteEvents
             }
         }
 
-        public PageResultDTO<FavouriteEventVM> GetFavouriteEventsByUserId(int page, int pageSize, Guid userId)
+        public PageResultDTO<FavouriteEventVM> GetFavouriteEventsByUserId(int page, int pageSize, Guid userId, int campusId)
         {
             try
             {
-                var pageResult = _favouriteEventRepository.GetFavouriteEventsByUserId(page,pageSize,userId);
+                var pageResult = _favouriteEventRepository.GetFavouriteEventsByUserId(page,pageSize,userId, campusId);
                 return pageResult;
             }catch(Exception ex)
             {
