@@ -45,6 +45,8 @@ using Planify_BackEnd.Services.FavouriteEvents;
 using Planify_BackEnd.Repositories.FavouriteEvents;
 using Planify_BackEnd.Services.Participants;
 using Planify_BackEnd.Repositories.Participants;
+using Planify_BackEnd.Services.Dashboards;
+using Planify_BackEnd.Repositories.Dashboards;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -106,6 +108,7 @@ builder.Services.AddScoped<ICostService, CostService>();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 builder.Services.AddScoped<IFavouriteEventService, FavouriteEventService>();
 builder.Services.AddScoped<IParticipantService, ParticipantService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 // Thêm Repository
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
@@ -124,6 +127,7 @@ builder.Services.AddScoped<IRiskRepository, RiskRepository>();
 builder.Services.AddScoped<ICostRepository, CostRepository>();
 builder.Services.AddScoped<IFavouriteEventRepository, FavouriteEventRepository>();
 builder.Services.AddScoped<IParticipantRepository, ParticipantRepository>();
+builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 
 // Thêm Authorization
 builder.Services.AddAuthorization();
