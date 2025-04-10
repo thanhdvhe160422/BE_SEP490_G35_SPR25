@@ -36,5 +36,12 @@ namespace Planify_BackEnd.Controllers
             var result = await _dashboardService.GetLatestEventsAsync();
             return Ok(result);
         }
+        [HttpGet("top-events-by-participants")]
+        //[Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetTopEventsByParticipants()
+        {
+            var result = await _dashboardService.GetTopEventsByParticipantsAsync();
+            return Ok(result);
+        }
     }
 }

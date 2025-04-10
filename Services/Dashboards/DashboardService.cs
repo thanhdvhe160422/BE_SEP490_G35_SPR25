@@ -22,6 +22,10 @@ namespace Planify_BackEnd.Services.Dashboards
         {
             return await _dashboardRepository.GetLatestEventsAsync();
         }
+        public async Task<List<TopEventByParticipantsDTO>> GetTopEventsByParticipantsAsync()
+        {
+            return await _dashboardRepository.GetTopEventsByParticipantsAsync();
+        }
     }
     
 }

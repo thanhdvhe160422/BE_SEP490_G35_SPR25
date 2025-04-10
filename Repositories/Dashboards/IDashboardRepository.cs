@@ -7,5 +7,6 @@ namespace Planify_BackEnd.Repositories.Dashboards
         Task<List<StatisticsByMonthDTO>> GetMonthlyStatsAsync();
         Task<List<CategoryUsageDTO>> GetUsedCategoriesAsync();
         Task<List<RecentEventDTO>> GetLatestEventsAsync();
+        Task<List<TopEventByParticipantsDTO>> GetTopEventsByParticipantsAsync();
     }
 }
