@@ -38,6 +38,6 @@
         public string? MonitoringProcess { get; set; }
 
         public int? SizeParticipants { get; set; }
-        //public int? TotalParticipants { get; set; }
+        public int? TotalParticipants { get; set; }
     }
 }

@@ -86,7 +86,7 @@ namespace Planify_BackEnd.Repositories.Dashboards
         public async Task<List<TopEventByParticipantsDTO>> GetTopEventsByParticipantsAsync()
         {
             return await _context.Events
-                .Where(e => e.Status == 1 || e.Status == 2) // lọc theo status nếu cần
+                .Where(e => e.Status == 1 || e.Status == 2) 
                 .OrderByDescending(e => e.Participants.Count)
                 .Take(10)
                 .Select(e => new TopEventByParticipantsDTO
@@ -94,13 +94,10 @@ namespace Planify_BackEnd.Repositories.Dashboards
                     Id = e.Id,
                     EventTitle = e.EventTitle,
                     StartTime = e.StartTime,
-                    //TotalParticipants = e.Participants.Count
+                    TotalParticipants = e.Participants.Count
                 })
                 .ToListAsync();
         }
-
-
-
 
     }
 
