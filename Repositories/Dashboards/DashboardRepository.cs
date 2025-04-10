@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Planify_BackEnd.DTOs.Dashboards;
+using Planify_BackEnd.DTOs.Events;
 using Planify_BackEnd.Models;
 
 namespace Planify_BackEnd.Repositories.Dashboards
@@ -49,6 +50,37 @@ namespace Planify_BackEnd.Repositories.Dashboards
                     TotalUsed = g.Count()
                 })
                 .OrderByDescending(x => x.TotalUsed)
+                .ToListAsync();
+        }
+        public async Task<List<RecentEventDTO>> GetLatestEventsAsync()
+        {
+            return await _context.Events
+                .Where(e => e.Status == 1 || e.Status == 2)
+                .OrderByDescending(e => e.StartTime)
+                .Take(5)
+                .Select(e => new RecentEventDTO
+                {
+                    Id = e.Id,
+                    EventTitle = e.EventTitle,
+                    StartTime = e.StartTime,
+                    EndTime = e.EndTime,
+                    Status = e.Status,
+                    EventDescription = e.EventDescription,
+                    IsPublic = e.IsPublic,
+                    CampusId = e.CampusId,
+                    CategoryEventId = e.CategoryEventId,
+                    Placed = e.Placed,
+                    MeasuringSuccess = e.MeasuringSuccess,
+                    Goals = e.Goals,
+                    MonitoringProcess = e.MonitoringProcess,
+                    SizeParticipants = e.SizeParticipants,
+                    CreatedAt = e.CreatedAt,
+                    AmountBudget = e.AmountBudget,
+                    CreateBy = e.CreateBy,
+                    TimePublic = e.TimePublic,
+                    ManagerId = e.ManagerId,
+                    
+                })
                 .ToListAsync();
         }
 
