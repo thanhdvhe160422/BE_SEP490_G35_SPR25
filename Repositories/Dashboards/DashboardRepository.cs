@@ -14,14 +14,12 @@ namespace Planify_BackEnd.Repositories.Dashboards
         }
         public async Task<List<StatisticsByMonthDTO>> GetMonthlyStatsAsync(int year)
         {
-            // Lấy danh sách các sự kiện thỏa điều kiện trong năm cụ thể
             var events = await _context.Events
                 .Where(e => e.Status == 2 &&
                             e.EndTime < DateTime.UtcNow &&
                             e.StartTime.Year == year)
                 .ToListAsync();
 
-            // Nhóm theo tháng
             var grouped = events
                 .GroupBy(e => e.StartTime.Month)
                 .ToDictionary(g => g.Key, g => new
@@ -30,7 +28,6 @@ namespace Planify_BackEnd.Repositories.Dashboards
                     TotalParticipants = g.Sum(e => e.Participants.Count)
                 });
 
-            // Tạo danh sách kết quả đầy đủ 12 tháng
             var result = Enumerable.Range(1, 12)
                 .Select(month => new StatisticsByMonthDTO
                 {
