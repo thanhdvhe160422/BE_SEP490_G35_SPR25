@@ -58,35 +58,41 @@ namespace Planify_BackEnd.Repositories.Dashboards
         }
         public async Task<List<RecentEventDTO>> GetLatestEventsAsync(int campusId)
         {
-            return await _context.Events
-                .Where(e => e.Status == 1 || e.Status == 2 &&
-                e.CampusId==campusId)
-                .OrderByDescending(e => e.StartTime)
-                .Take(5)
-                .Select(e => new RecentEventDTO
-                {
-                    Id = e.Id,
-                    EventTitle = e.EventTitle,
-                    StartTime = e.StartTime,
-                    EndTime = e.EndTime,
-                    Status = e.Status,
-                    EventDescription = e.EventDescription,
-                    IsPublic = e.IsPublic,
-                    CampusId = e.CampusId,
-                    CategoryEventId = e.CategoryEventId,
-                    Placed = e.Placed,
-                    MeasuringSuccess = e.MeasuringSuccess,
-                    Goals = e.Goals,
-                    MonitoringProcess = e.MonitoringProcess,
-                    SizeParticipants = e.SizeParticipants,
-                    CreatedAt = e.CreatedAt,
-                    AmountBudget = e.AmountBudget,
-                    CreateBy = e.CreateBy,
-                    TimePublic = e.TimePublic,
-                    ManagerId = e.ManagerId,
-                    
-                })
-                .ToListAsync();
+            try
+            {
+                return await _context.Events
+                    .Where(e => e.Status == 1 || e.Status == 2 &&
+                    e.CampusId == campusId)
+                    .OrderByDescending(e => e.StartTime)
+                    .Take(5)
+                    .Select(e => new RecentEventDTO
+                    {
+                        Id = e.Id,
+                        EventTitle = e.EventTitle,
+                        StartTime = e.StartTime,
+                        EndTime = e.EndTime,
+                        Status = e.Status,
+                        EventDescription = e.EventDescription,
+                        IsPublic = e.IsPublic,
+                        CampusId = e.CampusId,
+                        CategoryEventId = e.CategoryEventId,
+                        Placed = e.Placed,
+                        MeasuringSuccess = e.MeasuringSuccess,
+                        Goals = e.Goals,
+                        MonitoringProcess = e.MonitoringProcess,
+                        SizeParticipants = e.SizeParticipants,
+                        CreatedAt = e.CreatedAt,
+                        AmountBudget = e.AmountBudget,
+                        CreateBy = e.CreateBy,
+                        TimePublic = e.TimePublic,
+                        ManagerId = e.ManagerId,
+
+                    })
+                    .ToListAsync();
+            }catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
         public async Task<List<TopEventByParticipantsDTO>> GetTopEventsByParticipantsAsync()
         {
@@ -106,6 +112,28 @@ namespace Planify_BackEnd.Repositories.Dashboards
                     CategoryEventName = e.CategoryEvent.CategoryEventName
                 })
                 .ToListAsync();
+        }
+        public async Task<List<PercentEventByCampus>> GetPercentEventsByCampus()
+        {
+            try
+            {
+                return await _context.Campuses
+                            .GroupJoin(
+                                _context.Events.Where(e => e.Status == 2),
+                                campus => campus.Id,
+                                ev => ev.CampusId,
+                                (campus, events) => new PercentEventByCampus
+                                {
+                                    CampusName = campus.CampusName,
+                                    TotalEvent = events.Count()
+                                }
+                            )
+                            .ToListAsync();
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
     }
