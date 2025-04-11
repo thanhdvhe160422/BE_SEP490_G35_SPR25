@@ -100,6 +100,7 @@ namespace Planify_BackEnd.Repositories.Dashboards
                     Id = e.Id,
                     EventTitle = e.EventTitle,
                     StartTime = e.StartTime,
+                    EndTime = e.EndTime,
                     AmountBudget =e.AmountBudget,
                     TotalParticipants = e.Participants.Count,
                     CategoryEventName = e.CategoryEvent.CategoryEventName
