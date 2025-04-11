@@ -6,6 +6,7 @@ namespace Planify_BackEnd.Services.Dashboards
     public class DashboardService : IDashboardService
     {
         private readonly IDashboardRepository _dashboardRepository;
+        private readonly ICampusRepository _campusRepository;
         public DashboardService(IDashboardRepository dashboardRepository)
         {
             _dashboardRepository = dashboardRepository;
@@ -31,9 +32,16 @@ namespace Planify_BackEnd.Services.Dashboards
                 throw new Exception(ex.Message);
             }
         }
-        public async Task<List<RecentEventDTO>> GetLatestEventsAsync()
+        public async Task<List<RecentEventDTO>> GetLatestEventsAsync(string campusName)
         {
-            return await _dashboardRepository.GetLatestEventsAsync();
+            try
+            {
+                var campusId = await _campusRepository.GetCampusByName(campusName);
+                return await _dashboardRepository.GetLatestEventsAsync(campusId.Id);
+            }catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
         public async Task<List<TopEventByParticipantsDTO>> GetTopEventsByParticipantsAsync()
         {

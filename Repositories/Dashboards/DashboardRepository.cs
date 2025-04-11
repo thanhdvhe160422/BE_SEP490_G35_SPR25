@@ -56,10 +56,11 @@ namespace Planify_BackEnd.Repositories.Dashboards
                 .OrderByDescending(x => x.TotalUsed)
                 .ToListAsync();
         }
-        public async Task<List<RecentEventDTO>> GetLatestEventsAsync()
+        public async Task<List<RecentEventDTO>> GetLatestEventsAsync(int campusId)
         {
             return await _context.Events
-                .Where(e => e.Status == 1 || e.Status == 2)
+                .Where(e => e.Status == 1 || e.Status == 2 &&
+                e.CampusId==campusId)
                 .OrderByDescending(e => e.StartTime)
                 .Take(5)
                 .Select(e => new RecentEventDTO
@@ -90,6 +91,7 @@ namespace Planify_BackEnd.Repositories.Dashboards
         public async Task<List<TopEventByParticipantsDTO>> GetTopEventsByParticipantsAsync()
         {
             return await _context.Events
+                .Include(e=>e.CategoryEvent)
                 .Where(e => e.Status == 1 || e.Status == 2) 
                 .OrderByDescending(e => e.Participants.Count)
                 .Take(10)
@@ -98,7 +100,9 @@ namespace Planify_BackEnd.Repositories.Dashboards
                     Id = e.Id,
                     EventTitle = e.EventTitle,
                     StartTime = e.StartTime,
-                    TotalParticipants = e.Participants.Count
+                    AmountBudget =e.AmountBudget,
+                    TotalParticipants = e.Participants.Count,
+                    CategoryEventName = e.CategoryEvent.CategoryEventName
                 })
                 .ToListAsync();
         }

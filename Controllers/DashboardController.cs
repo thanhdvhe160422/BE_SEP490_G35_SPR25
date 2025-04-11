@@ -31,9 +31,9 @@ namespace Planify_BackEnd.Controllers
         }
         [HttpGet("latest-events")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetLatestEvents()
+        public async Task<IActionResult> GetLatestEvents(string campusName)
         {
-            var result = await _dashboardService.GetLatestEventsAsync();
+            var result = await _dashboardService.GetLatestEventsAsync(campusName);
             return Ok(result);
         }
         [HttpGet("top-events-by-participants")]
