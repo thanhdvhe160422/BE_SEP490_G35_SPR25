@@ -14,6 +14,9 @@ namespace Planify_BackEnd.Repositories.Dashboards
         }
         public async Task<List<StatisticsByMonthDTO>> GetMonthlyStatsAsync(int year)
         {
+            var monthNames = new[] { "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6",
+                         "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12" };
+
             var events = await _context.Events
                 .Where(e => e.Status == 2 &&
                             e.EndTime < DateTime.UtcNow &&
@@ -31,7 +34,7 @@ namespace Planify_BackEnd.Repositories.Dashboards
             var result = Enumerable.Range(1, 12)
                 .Select(month => new StatisticsByMonthDTO
                 {
-                    Month = $"{year}-{month:D2}",
+                    Month = monthNames[month - 1],
                     TotalEvents = grouped.ContainsKey(month) ? grouped[month].TotalEvents : 0,
                     TotalParticipants = grouped.ContainsKey(month) ? grouped[month].TotalParticipants : 0
                 })
