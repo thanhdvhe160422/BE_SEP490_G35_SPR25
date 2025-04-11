@@ -10,9 +10,9 @@ namespace Planify_BackEnd.Services.Dashboards
         {
             _dashboardRepository = dashboardRepository;
         }
-        public async Task<List<StatisticsByMonthDTO>> GetMonthlyStatsAsync()
+        public async Task<List<StatisticsByMonthDTO>> GetMonthlyStatsAsync(int year)
         {
-            return await _dashboardRepository.GetMonthlyStatsAsync();
+            return await _dashboardRepository.GetMonthlyStatsAsync(year);
         }
         public async Task<List<CategoryUsageDTO>> GetUsedCategoriesAsync()
         {

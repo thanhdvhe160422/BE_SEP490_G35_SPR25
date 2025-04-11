@@ -12,31 +12,38 @@ namespace Planify_BackEnd.Repositories.Dashboards
         {
             _context = context;
         }
-        public async Task<List<StatisticsByMonthDTO>> GetMonthlyStatsAsync()
+        public async Task<List<StatisticsByMonthDTO>> GetMonthlyStatsAsync(int year)
         {
-            var query = await _context.Events
-                .Where(e => e.Status == 2 && e.EndTime < DateTime.UtcNow)
-                .GroupBy(e => new { e.StartTime.Year, e.StartTime.Month })
-                .Select(g => new
-                {
-                    Year = g.Key.Year,
-                    Month = g.Key.Month,
-                    Events = g.ToList() 
-                })
-                .ToListAsync(); 
+            // Lấy danh sách các sự kiện thỏa điều kiện trong năm cụ thể
+            var events = await _context.Events
+                .Where(e => e.Status == 2 &&
+                            e.EndTime < DateTime.UtcNow &&
+                            e.StartTime.Year == year)
+                .ToListAsync();
 
-            
-            var result = query.Select(g => new StatisticsByMonthDTO
-            {
-                Month = $"{g.Year}-{g.Month:D2}",
-                TotalEvents = g.Events.Count,
-                TotalParticipants = g.Events.Sum(e => e.Participants.Count)
-            })
-            .OrderBy(x => x.Month)
-            .ToList();
+            // Nhóm theo tháng
+            var grouped = events
+                .GroupBy(e => e.StartTime.Month)
+                .ToDictionary(g => g.Key, g => new
+                {
+                    TotalEvents = g.Count(),
+                    TotalParticipants = g.Sum(e => e.Participants.Count)
+                });
+
+            // Tạo danh sách kết quả đầy đủ 12 tháng
+            var result = Enumerable.Range(1, 12)
+                .Select(month => new StatisticsByMonthDTO
+                {
+                    Month = $"{year}-{month:D2}",
+                    TotalEvents = grouped.ContainsKey(month) ? grouped[month].TotalEvents : 0,
+                    TotalParticipants = grouped.ContainsKey(month) ? grouped[month].TotalParticipants : 0
+                })
+                .OrderBy(x => x.Month)
+                .ToList();
 
             return result;
         }
+
 
         public async Task<List<CategoryUsageDTO>> GetUsedCategoriesAsync()
         {
