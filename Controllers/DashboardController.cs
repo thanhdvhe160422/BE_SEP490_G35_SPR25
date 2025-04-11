@@ -16,7 +16,7 @@ namespace Planify_BackEnd.Controllers
             _dashboardService = dashboardService;
         }
         [HttpGet("monthly-stats")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetMonthlyStats(int year)
         {
             var stats = await _dashboardService.GetMonthlyStatsAsync(year);
