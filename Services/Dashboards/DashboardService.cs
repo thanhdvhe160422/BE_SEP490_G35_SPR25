@@ -24,7 +24,7 @@ namespace Planify_BackEnd.Services.Dashboards
                 var total = list.Sum(c => c.TotalUsed);
                 foreach (var item in list)
                 {
-                    item.Percentage = total > 0 ? (item.TotalUsed * 100) / total : 0;
+                    item.Percentage = total > 0 ? decimal.Parse(item.TotalUsed+"") * 100 / total : 0;
                 }
                 return list;
             }
@@ -57,7 +57,7 @@ namespace Planify_BackEnd.Services.Dashboards
                 var total = list.Sum(p => p.TotalEvent);
                 foreach(var data in list)
                 {
-                    data.Percent = total != 0 ? data.TotalEvent / total * 100 : 0;
+                    data.Percent = total != 0 ? decimal.Parse(data.TotalEvent+"") / total * 100 : 0;
                 }
                 return list;
             }catch(Exception ex)
