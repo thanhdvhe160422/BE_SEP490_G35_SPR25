@@ -16,7 +16,20 @@ namespace Planify_BackEnd.Services.Dashboards
         }
         public async Task<List<CategoryUsageDTO>> GetUsedCategoriesAsync()
         {
-            return await _dashboardRepository.GetUsedCategoriesAsync();
+            try
+            {
+                var list = await _dashboardRepository.GetUsedCategoriesAsync();
+                var total = list.Sum(c => c.TotalUsed);
+                foreach (var item in list)
+                {
+                    item.Percentage = total > 0 ? (item.TotalUsed * 100) / total : 0;
+                }
+                return list;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
         public async Task<List<RecentEventDTO>> GetLatestEventsAsync()
         {
