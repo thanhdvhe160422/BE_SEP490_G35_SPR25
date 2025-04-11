@@ -7,9 +7,10 @@ namespace Planify_BackEnd.Services.Dashboards
     {
         private readonly IDashboardRepository _dashboardRepository;
         private readonly ICampusRepository _campusRepository;
-        public DashboardService(IDashboardRepository dashboardRepository)
+        public DashboardService(IDashboardRepository dashboardRepository, ICampusRepository campusRepository)
         {
             _dashboardRepository = dashboardRepository;
+            _campusRepository = campusRepository;
         }
         public async Task<List<StatisticsByMonthDTO>> GetMonthlyStatsAsync(int year)
         {
@@ -46,6 +47,23 @@ namespace Planify_BackEnd.Services.Dashboards
         public async Task<List<TopEventByParticipantsDTO>> GetTopEventsByParticipantsAsync()
         {
             return await _dashboardRepository.GetTopEventsByParticipantsAsync();
+        }
+
+        public async Task<List<PercentEventByCampus>> GetPercentEventsByCampus()
+        {
+            try
+            {
+                var list = await _dashboardRepository.GetPercentEventsByCampus();
+                var total = list.Sum(p => p.TotalEvent);
+                foreach(var data in list)
+                {
+                    data.Percent = total != 0 ? data.TotalEvent / total * 100 : 0;
+                }
+                return list;
+            }catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
     

@@ -8,5 +8,6 @@ namespace Planify_BackEnd.Services.Dashboards
         Task<List<CategoryUsageDTO>> GetUsedCategoriesAsync();
         Task<List<RecentEventDTO>> GetLatestEventsAsync(string campusName);
         Task<List<TopEventByParticipantsDTO>> GetTopEventsByParticipantsAsync();
+        Task<List<PercentEventByCampus>> GetPercentEventsByCampus();
     }
 }

@@ -43,5 +43,12 @@ namespace Planify_BackEnd.Controllers
             var result = await _dashboardService.GetTopEventsByParticipantsAsync();
             return Ok(result);
         }
+        [HttpGet("percent-events")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetPercentByCampus()
+        {
+            var result = await _dashboardService.GetPercentEventsByCampus();
+            return Ok(result);
+        }
     }
 }
