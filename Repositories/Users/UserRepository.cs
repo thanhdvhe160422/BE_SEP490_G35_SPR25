@@ -405,28 +405,28 @@ public class UserRepository : IUserRepository
         }
     }
 
-    public async Task<PageResultDTO<User>> SearchUser(int page, int pageSize, string input, int campusId)
+    public async Task<PageResultDTO<User>> SearchUser(int page, int pageSize, string? input, string? roleName, int campusId)
     {
         try
         {
             var count = _context.Users
-            .Where(c => (c.FirstName.Contains(input) || c.LastName.Contains(input) || c.Email.Contains(input))
+            .Include(c => c.Campus)
+            .Include(u=>u.UserRoles).ThenInclude(ur=>ur.Role)
+            .Where(c => (string.IsNullOrEmpty(input)||(c.FirstName.Contains(input) || c.LastName.Contains(input) || c.Email.Contains(input)))
+                        && (string.IsNullOrEmpty(roleName)||c.UserRoles.Any(ur=>ur.Role.RoleName.Contains(roleName)))
                         && c.CampusId == campusId
                         && c.UserRoles.Any(ur => ur.RoleId != 1))
-            .Include(c => c.Campus)
-            .Include(c => c.UserRoles)
-                .ThenInclude(ur => ur.Role)
             .GroupBy(c => c.Id)
             .Select(g => g.First())
             .Count();
             if (count == 0) return new PageResultDTO<User>(new List<User>(), 0, page, pageSize);
             var result = await _context.Users
-            .Where(c => (c.FirstName.Contains(input) || c.LastName.Contains(input) || c.Email.Contains(input))
+            .Include(c => c.Campus)
+            .Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
+            .Where(c => (string.IsNullOrEmpty(input) || (c.FirstName.Contains(input) || c.LastName.Contains(input) || c.Email.Contains(input)))
+                        && (string.IsNullOrEmpty(roleName) || c.UserRoles.Any(ur => ur.Role.RoleName.Contains(roleName)))
                         && c.CampusId == campusId
                         && c.UserRoles.Any(ur => ur.RoleId != 1))
-            .Include(c => c.Campus)
-            .Include(c => c.UserRoles)
-                .ThenInclude(ur => ur.Role)
             .GroupBy(c => c.Id)
             .Select(g => g.First())
             .Skip((page - 1) * pageSize).Take(pageSize)

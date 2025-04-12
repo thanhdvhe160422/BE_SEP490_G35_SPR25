@@ -402,11 +402,11 @@ namespace Planify_BackEnd.Services.Users
             }
         }
 
-        public async Task<PageResultDTO<UserListDTO>> SearchUser(int page, int pageSize, string input, int campusId)
+        public async Task<PageResultDTO<UserListDTO>> SearchUser(int page, int pageSize, string? input, string? roleName, int campusId)
         {
             try
             {
-                var users = await _userRepository.SearchUser(page, pageSize, input, campusId);
+                var users = await _userRepository.SearchUser(page, pageSize, input, roleName, campusId);
 
                 if (users.TotalCount == 0)
                 {
