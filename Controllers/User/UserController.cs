@@ -270,10 +270,10 @@ namespace Planify_BackEnd.Controllers.User
 
         [HttpGet("search/v2")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> SearchUsersForAdmin(int page, int pageSize, string input)
+        public async Task<IActionResult> SearchUsersForAdmin(int page, int pageSize, string? input, string? roleName)
         {
             var campusId = int.Parse(User.FindFirst("campusId")?.Value);
-            var users = await _userService.SearchUser(page, pageSize, input, campusId);
+            var users = await _userService.SearchUser(page, pageSize, input, roleName, campusId);
             if (users.TotalCount == 0)
             {
                 return NotFound("Không tìm thấy người dùng phù hợp.");
