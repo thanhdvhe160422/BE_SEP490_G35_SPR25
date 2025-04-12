@@ -47,6 +47,7 @@ using Planify_BackEnd.Services.Participants;
 using Planify_BackEnd.Repositories.Participants;
 using Planify_BackEnd.Services.Dashboards;
 using Planify_BackEnd.Repositories.Dashboards;
+using OfficeOpenXml;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -84,6 +85,8 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("Implementer", policy => policy.RequireRole("Implementer"));
     options.AddPolicy("Spectator", policy => policy.RequireRole("Spectator"));
 });
+
+ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
 // Them Service
 builder.Services.AddControllers();

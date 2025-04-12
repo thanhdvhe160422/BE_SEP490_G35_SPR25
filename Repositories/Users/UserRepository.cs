@@ -438,4 +438,32 @@ public class UserRepository : IUserRepository
             throw new Exception(ex.Message);
         }
     }
+    public async Task<User> AddUserAsync(User user)
+    {
+        await _context.Users.AddAsync(user);
+        await _context.SaveChangesAsync();
+        return user;
+    }
+
+    public async Task<UserRole> AddUserRoleAsync(UserRole userRole)
+    {
+        await _context.UserRoles.AddAsync(userRole);
+        await _context.SaveChangesAsync();
+        return userRole;
+    }
+
+    public async Task<Campus?> GetCampusByIdAsync(int campusId)
+    {
+        return await _context.Campuses.FindAsync(campusId);
+    }
+
+    public async Task<bool> EmailExistsAsync(string email, int campusId)
+    {
+        return await _context.Users.AnyAsync(u => u.Email == email && u.CampusId == campusId);
+    }
+    public async System.Threading.Tasks.Task UpdateUserAsync(User user)
+    {
+        _context.Users.Update(user);
+        await _context.SaveChangesAsync();
+    }
 }
