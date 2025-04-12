@@ -269,7 +269,7 @@ namespace Planify_BackEnd.Controllers.User
         }
 
         [HttpGet("search/v2")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> SearchUsersForAdmin(int page, int pageSize, string? input, string? roleName)
         {
             var campusId = int.Parse(User.FindFirst("campusId")?.Value);
