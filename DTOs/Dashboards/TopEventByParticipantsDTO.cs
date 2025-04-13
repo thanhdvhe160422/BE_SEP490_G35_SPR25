@@ -29,6 +29,7 @@
         public int? CampusId { get; set; }
 
         public int? CategoryEventId { get; set; }
+        public string? CategoryEventName { get; set; }
 
         public string? Placed { get; set; }
         public string? MeasuringSuccess { get; set; }

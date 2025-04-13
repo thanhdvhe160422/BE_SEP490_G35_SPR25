@@ -4,9 +4,10 @@ namespace Planify_BackEnd.Repositories.Dashboards
 {
     public interface IDashboardRepository
     {
-        Task<List<StatisticsByMonthDTO>> GetMonthlyStatsAsync();
+        Task<List<StatisticsByMonthDTO>> GetMonthlyStatsAsync(int year);
         Task<List<CategoryUsageDTO>> GetUsedCategoriesAsync();
-        Task<List<RecentEventDTO>> GetLatestEventsAsync();
+        Task<List<RecentEventDTO>> GetLatestEventsAsync(int campusId);
         Task<List<TopEventByParticipantsDTO>> GetTopEventsByParticipantsAsync();
+        Task<List<PercentEventByCampus>> GetPercentEventsByCampus();
     }
 }

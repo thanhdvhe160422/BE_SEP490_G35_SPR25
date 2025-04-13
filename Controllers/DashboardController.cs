@@ -17,9 +17,9 @@ namespace Planify_BackEnd.Controllers
         }
         [HttpGet("monthly-stats")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetMonthlyStats()
+        public async Task<IActionResult> GetMonthlyStats(int year)
         {
-            var stats = await _dashboardService.GetMonthlyStatsAsync();
+            var stats = await _dashboardService.GetMonthlyStatsAsync(year);
             return Ok(stats);
         }
         [HttpGet("used-categories")]
@@ -31,9 +31,9 @@ namespace Planify_BackEnd.Controllers
         }
         [HttpGet("latest-events")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetLatestEvents()
+        public async Task<IActionResult> GetLatestEvents(string campusName)
         {
-            var result = await _dashboardService.GetLatestEventsAsync();
+            var result = await _dashboardService.GetLatestEventsAsync(campusName);
             return Ok(result);
         }
         [HttpGet("top-events-by-participants")]
@@ -41,6 +41,13 @@ namespace Planify_BackEnd.Controllers
         public async Task<IActionResult> GetTopEventsByParticipants()
         {
             var result = await _dashboardService.GetTopEventsByParticipantsAsync();
+            return Ok(result);
+        }
+        [HttpGet("percent-events")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetPercentByCampus()
+        {
+            var result = await _dashboardService.GetPercentEventsByCampus();
             return Ok(result);
         }
     }
