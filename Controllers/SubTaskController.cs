@@ -65,7 +65,7 @@ namespace Planify_BackEnd.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPut("update-status/{subTaskId}")]
-        [Authorize(Roles = "Event Organizer")]
+        [Authorize(Roles = "Event Organizer, Implementer")]
         public async Task<IActionResult> UpdateSubTaskStatus(int subTaskId, [FromBody] SubTaskUpdateStatusDTO request)
         {
 
