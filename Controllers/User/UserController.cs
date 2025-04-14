@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Users;
 using Planify_BackEnd.Services.Users;
 using System.Security.Claims;
@@ -280,6 +281,38 @@ namespace Planify_BackEnd.Controllers.User
             }
 
             return Ok(users);
+        }
+
+        [HttpPost("import")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<ResponseDTO>> ImportUsers(int campusId, IFormFile excelFile)
+        {
+            var response = await _userService.ImportUsersAsync(campusId, excelFile);
+            return StatusCode(response.Status, response);
+        }
+
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out Guid userId))
+                {
+                    return Unauthorized("Không thể xác định người dùng.");
+                }
+
+                var result = await _userService.ChangePasswordAsync(userId, request);
+                return Ok(new { Message = "Đổi mật khẩu thành công." });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Lỗi hệ thống: " + ex.Message });
+            }
         }
     }
 }
