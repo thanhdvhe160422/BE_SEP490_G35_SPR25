@@ -6,6 +6,7 @@ using Planify_BackEnd.DTOs.SubTasks;
 using Planify_BackEnd.Hub;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories;
+using Planify_BackEnd.Repositories.JoinGroups;
 using Planify_BackEnd.Repositories.Tasks;
 using System.Threading.Tasks;
 
@@ -17,12 +18,14 @@ namespace Planify_BackEnd.Services.SubTasks
         private readonly ISubTaskRepository _subTaskRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHubContext<NotificationHub> _hubContext;
-        public SubTaskService(ISubTaskRepository subTaskRepository, IHttpContextAccessor httpContextAccessor, ITaskRepository taskRepository, IHubContext<NotificationHub> hubContext)
+        private readonly IJoinProjectRepository _joinProjectRepository;
+        public SubTaskService(ISubTaskRepository subTaskRepository, IHttpContextAccessor httpContextAccessor, ITaskRepository taskRepository, IHubContext<NotificationHub> hubContext,IJoinProjectRepository joinProjectRepository)
         {
             _taskRepository = taskRepository;
             _subTaskRepository = subTaskRepository;
             _httpContextAccessor = httpContextAccessor;
             _hubContext = hubContext;
+            _joinProjectRepository = joinProjectRepository;
         }
         /// <summary>
         /// Create a new sub-task
@@ -260,6 +263,13 @@ namespace Planify_BackEnd.Services.SubTasks
                 if (subtask == null) throw new Exception("Not found subtask!");
                 var task = _taskRepository.GetTaskById(subtask.TaskId);
                 if (!task.CreateBy.Equals(assignUserId)) throw new Exception("Assign user must be create user!");
+
+                var isInProject = await _joinProjectRepository.IsImplementerInProject(userId, (int)task.EventId);
+                if (!isInProject)
+                {
+                    await _joinProjectRepository.AddImplementerToProject(userId, (int)task.EventId);
+                }
+
                 JoinTask newJoinTask = new JoinTask
                 {
                     UserId = userId,

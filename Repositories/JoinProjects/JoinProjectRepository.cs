@@ -309,5 +309,22 @@ namespace Planify_BackEnd.Repositories.JoinGroups
                 throw new Exception(ex.Message);
             }
         }
+        public async Task<bool> IsImplementerInProject(Guid implementerId, int eventId)
+        {
+            try
+            {
+                if (implementerId == Guid.Empty)
+                {
+                    return false;
+                }
+
+                return await _context.JoinProjects
+                    .AnyAsync(jp => jp.UserId == implementerId && jp.EventId == eventId);
+            }catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
     }
 }
