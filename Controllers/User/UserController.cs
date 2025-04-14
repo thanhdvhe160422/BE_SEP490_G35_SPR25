@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Users;
 using Planify_BackEnd.Services.Users;
 using System.Security.Claims;
@@ -270,16 +271,48 @@ namespace Planify_BackEnd.Controllers.User
 
         [HttpGet("search/v2")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> SearchUsersForAdmin(int page, int pageSize, string input)
+        public async Task<IActionResult> SearchUsersForAdmin(int page, int pageSize, string? input, string? roleName)
         {
             var campusId = int.Parse(User.FindFirst("campusId")?.Value);
-            var users = await _userService.SearchUser(page, pageSize, input, campusId);
+            var users = await _userService.SearchUser(page, pageSize, input, roleName, campusId);
             if (users.TotalCount == 0)
             {
                 return NotFound("Không tìm thấy người dùng phù hợp.");
             }
 
             return Ok(users);
+        }
+
+        [HttpPost("import")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<ResponseDTO>> ImportUsers(int campusId, IFormFile excelFile)
+        {
+            var response = await _userService.ImportUsersAsync(campusId, excelFile);
+            return StatusCode(response.Status, response);
+        }
+
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out Guid userId))
+                {
+                    return Unauthorized("Không thể xác định người dùng.");
+                }
+
+                var result = await _userService.ChangePasswordAsync(userId, request);
+                return Ok(new { Message = "Đổi mật khẩu thành công." });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Lỗi hệ thống: " + ex.Message });
+            }
         }
     }
 }

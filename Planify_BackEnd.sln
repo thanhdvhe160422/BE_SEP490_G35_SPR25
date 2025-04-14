@@ -5,8 +5,6 @@ VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Planify_BackEnd", "Planify_BackEnd.csproj", "{C4729F17-A895-4132-847E-69B0BCDFFC13}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Planify.Tests", "..\Planify.Tests\Planify.Tests.csproj", "{7DEEF909-C47B-45FB-9733-4839A9DB9C0A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,10 +15,6 @@ Global
 		{C4729F17-A895-4132-847E-69B0BCDFFC13}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4729F17-A895-4132-847E-69B0BCDFFC13}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C4729F17-A895-4132-847E-69B0BCDFFC13}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7DEEF909-C47B-45FB-9733-4839A9DB9C0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7DEEF909-C47B-45FB-9733-4839A9DB9C0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7DEEF909-C47B-45FB-9733-4839A9DB9C0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7DEEF909-C47B-45FB-9733-4839A9DB9C0A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -405,28 +405,28 @@ public class UserRepository : IUserRepository
         }
     }
 
-    public async Task<PageResultDTO<User>> SearchUser(int page, int pageSize, string input, int campusId)
+    public async Task<PageResultDTO<User>> SearchUser(int page, int pageSize, string? input, string? roleName, int campusId)
     {
         try
         {
             var count = _context.Users
-            .Where(c => (c.FirstName.Contains(input) || c.LastName.Contains(input) || c.Email.Contains(input))
+            .Include(c => c.Campus)
+            .Include(u=>u.UserRoles).ThenInclude(ur=>ur.Role)
+            .Where(c => (string.IsNullOrEmpty(input)||(c.FirstName.Contains(input) || c.LastName.Contains(input) || c.Email.Contains(input)))
+                        && (string.IsNullOrEmpty(roleName)||c.UserRoles.Any(ur=>ur.Role.RoleName.Contains(roleName)))
                         && c.CampusId == campusId
                         && c.UserRoles.Any(ur => ur.RoleId != 1))
-            .Include(c => c.Campus)
-            .Include(c => c.UserRoles)
-                .ThenInclude(ur => ur.Role)
             .GroupBy(c => c.Id)
             .Select(g => g.First())
             .Count();
             if (count == 0) return new PageResultDTO<User>(new List<User>(), 0, page, pageSize);
             var result = await _context.Users
-            .Where(c => (c.FirstName.Contains(input) || c.LastName.Contains(input) || c.Email.Contains(input))
+            .Include(c => c.Campus)
+            .Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
+            .Where(c => (string.IsNullOrEmpty(input) || (c.FirstName.Contains(input) || c.LastName.Contains(input) || c.Email.Contains(input)))
+                        && (string.IsNullOrEmpty(roleName) || c.UserRoles.Any(ur => ur.Role.RoleName.Contains(roleName)))
                         && c.CampusId == campusId
                         && c.UserRoles.Any(ur => ur.RoleId != 1))
-            .Include(c => c.Campus)
-            .Include(c => c.UserRoles)
-                .ThenInclude(ur => ur.Role)
             .GroupBy(c => c.Id)
             .Select(g => g.First())
             .Skip((page - 1) * pageSize).Take(pageSize)
@@ -437,5 +437,33 @@ public class UserRepository : IUserRepository
         {
             throw new Exception(ex.Message);
         }
+    }
+    public async Task<User> AddUserAsync(User user)
+    {
+        await _context.Users.AddAsync(user);
+        await _context.SaveChangesAsync();
+        return user;
+    }
+
+    public async Task<UserRole> AddUserRoleAsync(UserRole userRole)
+    {
+        await _context.UserRoles.AddAsync(userRole);
+        await _context.SaveChangesAsync();
+        return userRole;
+    }
+
+    public async Task<Campus?> GetCampusByIdAsync(int campusId)
+    {
+        return await _context.Campuses.FindAsync(campusId);
+    }
+
+    public async Task<bool> EmailExistsAsync(string email, int campusId)
+    {
+        return await _context.Users.AnyAsync(u => u.Email == email && u.CampusId == campusId);
+    }
+    public async System.Threading.Tasks.Task UpdateUserAsync(User user)
+    {
+        _context.Users.Update(user);
+        await _context.SaveChangesAsync();
     }
 }

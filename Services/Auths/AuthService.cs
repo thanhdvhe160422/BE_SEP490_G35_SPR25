@@ -36,6 +36,11 @@ public class AuthService : IAuthService
             return new ResponseDTO(401, "Email not found in the system. Please register or contact an admin.", null);
         }
 
+        if (user.Status == 0)
+        {
+            return new ResponseDTO(401, "Your account has been banned.", null);
+        }
+
         var jwtToken = GenerateJwtToken(user);
         var refreshToken = GenerateRefreshToken();
 
