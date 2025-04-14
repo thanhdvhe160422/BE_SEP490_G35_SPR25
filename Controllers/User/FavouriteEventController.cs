@@ -86,7 +86,7 @@ namespace Planify_BackEnd.Controllers.User
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
     }
