@@ -660,6 +660,11 @@ namespace Planify_BackEnd.Services.Users
 
         public async Task<bool> ChangePasswordAsync(Guid userId, ChangePasswordRequest request)
         {
+            if (string.IsNullOrEmpty(request.NewPassword) || request.NewPassword.Length < 6)
+            {
+                throw new ArgumentException("Mật khẩu mới phải có ít nhất 6 ký tự.");
+            }
+
             if (request.NewPassword != request.ConfirmNewPassword)
             {
                 throw new ArgumentException("Mật khẩu mới và xác nhận mật khẩu không khớp.");

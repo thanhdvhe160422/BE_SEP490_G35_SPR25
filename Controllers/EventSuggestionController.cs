@@ -109,7 +109,7 @@ namespace Planify_BackEnd.Controllers
                                  $"- Goals (string): Mục tiêu sự kiện\n" +
                                  $"- TargetAudience (string): Đối tượng tham gia\n" +
                                  $"- SizeParticipants (int): Số lượng người tham gia\n" +
-                                 $"- MeasuringSuccess (string): Cách đo lường thành công\n" +
+                                 $"- MeasuringSuccess (string): Định lượng cụ thể như thế nào là sự kiện thành công, phải bao gồm một tỉ lệ phần trăm rõ ràng (ví dụ: 'Đạt ít nhất 85% phản hồi tích cực từ khảo sát sau sự kiện' hoặc 'Có ít nhất 90% người tham gia hoàn thành chương trình'). Đảm bảo tiêu chí thực tế, có thể đo lường được qua khảo sát, thống kê tham gia, hoặc kết quả hoạt động, phù hợp với mục tiêu sự kiện và bối cảnh trường Đại học FPT\n" +
                                  $"- MonitoringProcess (string): Quy trình giám sát\n" +
                                  $"- PromotionalPlan (string): Kế hoạch quảng bá\n" +
                                  $"- AmountBudget (decimal): Ngân sách tổng cho sự kiện\n" +
@@ -197,7 +197,7 @@ namespace Planify_BackEnd.Controllers
                                  $"- Goals (string): Mục tiêu sự kiện\n" +
                                  $"- TargetAudience (string): Đối tượng tham gia\n" +
                                  $"- SizeParticipants (int): Số lượng người tham gia\n" +
-                                 $"- MeasuringSuccess (string): Cách đo lường thành công\n" +
+                                 $"- MeasuringSuccess (string): Định lượng cụ thể như thế nào là sự kiện thành công, phải bao gồm một tỉ lệ phần trăm rõ ràng (ví dụ: 'Đạt ít nhất 85% phản hồi tích cực từ khảo sát sau sự kiện' hoặc 'Có ít nhất 90% người tham gia hoàn thành chương trình'). Đảm bảo tiêu chí thực tế, có thể đo lường được qua khảo sát, thống kê tham gia, hoặc kết quả hoạt động, phù hợp với mục tiêu sự kiện và bối cảnh trường Đại học FPT\n" +
                                  $"- MonitoringProcess (string): Quy trình giám sát\n" +
                                  $"- PromotionalPlan (string): Kế hoạch quảng bá\n" +
                                  $"- AmountBudget (decimal): Ngân sách tổng cho sự kiện\n" +
