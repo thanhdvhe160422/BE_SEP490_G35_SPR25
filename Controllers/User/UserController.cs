@@ -91,10 +91,11 @@ namespace Planify_BackEnd.Controllers.User
         }
         [HttpPut("ban/unban-users/{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateUserStatusAsync(Guid id, int newStatus)
+        public async Task<IActionResult> UpdateUserStatusAsync(Guid id,  int newStatus)
         {
             try
             {
+               
                 var response = await _userService.UpdateUserStatusAsync(id, newStatus);
                 if (response == null)
                 {
