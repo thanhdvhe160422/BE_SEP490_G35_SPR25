@@ -41,7 +41,7 @@ namespace Planify_BackEnd.Controllers.User
             }
         }
         [HttpPost("create/{eventId}")]
-        [Authorize(Roles ="Spectator")]
+        [Authorize(Roles = "Spectator, Event Organizer, Implementer, Campus Manager")]
         public async Task<IActionResult> CreateFavouriteEvent(int eventId)
         {
             var spectatorId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -50,7 +50,7 @@ namespace Planify_BackEnd.Controllers.User
             return StatusCode(response.Status, response);
         }
         [HttpDelete("delete/{eventId}")]
-        [Authorize(Roles = "Spectator")]
+        [Authorize(Roles = "Spectator, Event Organizer, Implementer, Campus Manager")]
         public async Task<IActionResult> DeleteFavouriteEventAsync(int eventId)
         {
             try
