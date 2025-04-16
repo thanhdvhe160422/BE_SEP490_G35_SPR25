@@ -431,6 +431,16 @@ public class UserRepository : IUserRepository
             .Select(g => g.First())
             .Skip((page - 1) * pageSize).Take(pageSize)
             .ToListAsync();
+            foreach (var user in result)
+            {
+                var minUserRole = user.UserRoles
+                    .OrderBy(ur => ur.RoleId)
+                    .FirstOrDefault();
+
+                user.UserRoles = minUserRole != null
+                    ? new List<UserRole> { minUserRole }
+                    : new List<UserRole>();
+            }
             return new PageResultDTO<User>(result, count, page, pageSize);
         }
         catch (Exception ex)
