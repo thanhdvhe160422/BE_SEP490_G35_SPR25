@@ -751,6 +751,12 @@ namespace Planify_BackEnd.Services.Users
         {
             try
             {
+                var user = await _userRepository.GetUserByIdAsync(userId);
+                var role = user.UserRoles.FirstOrDefault(ur => ur.RoleId == 3);
+                if (role != null)
+                {
+                    return new ResponseDTO(200, "User already event organizer!", null);
+                }
                 var userRole = new UserRole
                 {
                     RoleId = 3,
