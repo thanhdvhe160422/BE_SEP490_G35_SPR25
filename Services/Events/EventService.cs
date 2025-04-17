@@ -858,19 +858,40 @@ public class EventService : IEventService
         }
     }
 
-    public async Task<bool> EventIncomingNotification(Guid userId)
+    public async Task<bool> EventIncomingNotification(Guid userId,string?role)
     {
         try
         {
-            var listEventIncoming = await _eventRepository.GetEventIncomings(userId);
-            foreach (var item in listEventIncoming)
+            var listEventIncoming = new List<EventIncomingNotification>();
+            if (role.Equals("Campus Manager")|| role.Equals("Implementer") || role.Equals("Event Organizer"))
             {
-                var message = "Upcoming event: " + (item.EventTitle.Length > 40 ? item.EventTitle.Substring(0, 40) + "..." : item.EventTitle) + "!\n"
-                    +"Start time: "+item.StartTime;
-                var link = "/event-detail-EOG/" + item.EventId;
-                await _hubContext.Clients.User(userId + "").SendAsync("ReceiveNotification",
-                    message,
-                    link);
+                listEventIncoming = await _eventRepository.GetEventIncomings(userId);
+                foreach (var item in listEventIncoming)
+                {
+                    var message = "Tháng này! Sự kiện mà bạn tham gia: " + (item.EventTitle.Length > 20 ? item.EventTitle.Substring(0, 20) + "..." : item.EventTitle) + "!\n"
+                        + "Ngày bắt đầu: " + item.StartTime;
+                    var link = "/event-detail-EOG/" + item.EventId;
+                    await _hubContext.Clients.User(userId + "").SendAsync("ReceiveNotification",
+                        message,
+                        link);
+                }
+            }
+            if (role.Equals("Spectator"))
+            {
+                listEventIncoming = await _eventRepository.GetEventParticipantIncomings(userId);
+                foreach (var item in listEventIncoming)
+                {
+                    var message = "Tháng này! Sự kiện mà bạn tham gia: " + (item.EventTitle.Length > 20 ? item.EventTitle.Substring(0, 20) + "..." : item.EventTitle) + "!\n"
+                        + "Ngày bắt đầu: " + item.StartTime;
+                    var link = "/event-detail-spec/" + item.EventId;
+                    await _hubContext.Clients.User(userId + "").SendAsync("ReceiveNotification",
+                        message,
+                        link);
+                }
+            }
+            if (listEventIncoming.Count==0)
+            {
+                return false;
             }
             return true;
             

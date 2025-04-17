@@ -268,7 +268,10 @@ namespace Planify_BackEnd.Controllers
             try
             {
                 var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-                _eventService.EventIncomingNotification(userId);
+                var role = User.FindFirst(ClaimTypes.Role)?.Value;
+                var isSuccess = await _eventService.EventIncomingNotification(userId,role);
+                if (!isSuccess)
+                    return NotFound();
                 return Ok();
             }
             catch (Exception ex)

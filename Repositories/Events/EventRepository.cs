@@ -539,6 +539,32 @@ public class EventRepository : IEventRepository
             throw new Exception(ex.Message);
         }
     }
+    public async Task<List<EventIncomingNotification>> GetEventParticipantIncomings(Guid userId)
+    {
+        try
+        {
+            var now = DateTime.Now;
+            var future = now.AddDays(30);
+            var list = await _context.Participants
+                .Where(p => p.UserId.Equals(userId))
+                .Include(p => p.Event)
+                .Where(p => p.Event.StartTime >= now &&
+                p.Event.StartTime <= future &&
+                p.Event.Status == 2)
+                .Select(jp => new EventIncomingNotification
+                {
+                    EventId = jp.EventId,
+                    EventTitle = jp.Event.EventTitle,
+                    StartTime = jp.Event.StartTime
+                })
+                .ToListAsync();
+            return list;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
     public async Task<PageResultDTO<Event>> MyEvent(int page, int pageSize, Guid createBy, int campusId)
     {
         try

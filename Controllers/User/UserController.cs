@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Azure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.Users;
 using Planify_BackEnd.Services.Users;
 using System.Security.Claims;
+using static Google.Apis.Requests.BatchRequest;
 
 namespace Planify_BackEnd.Controllers.User
 {
@@ -153,24 +155,26 @@ namespace Planify_BackEnd.Controllers.User
         {
             try
             {
-                var user = await _userService.CreateEventOrganizer(userDTO);
-                if (user == null || user.FirstName == null)
+                var response = await _userService.CreateEventOrganizer(userDTO);
+                if (response.Status!=200)
                 {
-                    return BadRequest("Cannot create event organizer!");
+                    return StatusCode(response.Status, response.Message);
                 }
+                var createdUser = response.Result as UserListDTO;
                 UserRoleDTO roleDTO = new UserRoleDTO
                 {
                     Id = 0,
                     RoleId = 3,
-                    UserId = user.Id
+                    UserId = createdUser.Id
                 };
                 var role = await _userService.AddUserRole(roleDTO);
                 if (role == null || role.Id == 0)
                 {
                     return BadRequest("Cannot add user role!");
                 }
-                return Ok(user);
-            }catch(Exception ex)
+                return StatusCode(response.Status, response.Message);
+            }
+            catch(Exception ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -181,12 +185,8 @@ namespace Planify_BackEnd.Controllers.User
         {
             try
             {
-                var user = await _userService.UpdateEventOrganizer(userDTO);
-                if (user == null || user.FirstName == null)
-                {
-                    return BadRequest("Cannot update event organizer!");
-                }
-                return Ok(user);
+                var response = await _userService.UpdateEventOrganizer(userDTO);
+                return StatusCode(response.Status, response.Message);
             }
             catch (Exception ex)
             {
@@ -271,7 +271,7 @@ namespace Planify_BackEnd.Controllers.User
         }
 
         [HttpGet("search/v2")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> SearchUsersForAdmin(int page, int pageSize, string? input, string? roleName)
         {
             var campusId = int.Parse(User.FindFirst("campusId")?.Value);
@@ -314,6 +314,28 @@ namespace Planify_BackEnd.Controllers.User
             {
                 return StatusCode(500, new { Message = "Lỗi hệ thống: " + ex.Message });
             }
+        }
+
+        [HttpGet("get-implementer-and-spectator")]
+        [Authorize(Roles = "Admin, Campus Manager")]
+        public async Task<IActionResult> GetImplementerAndSpectator(int page, int pageSize, string? input)
+        {
+            var campusId = int.Parse(User.FindFirst("campusId")?.Value);
+            var users = await _userService.GetSpectatorAndImplementer(page, pageSize, input, campusId);
+            if (users.TotalCount == 0)
+            {
+                return NotFound("Không tìm thấy người dùng phù hợp.");
+            }
+
+            return Ok(users);
+        }
+        [HttpGet("set-event-organizer")]
+        [Authorize(Roles = "Admin, Campus Manager")]
+        public async Task<IActionResult> SetEventOrganizer(Guid id)
+        {
+            var response = await _userService.SetRoleEOG(id);
+
+            return StatusCode(response.Status, response);
         }
     }
 }

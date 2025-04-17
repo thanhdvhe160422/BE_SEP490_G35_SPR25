@@ -24,7 +24,7 @@ namespace Planify_BackEnd.Services.Users
         {
             try
             {
-                var updateUser = await _userRepository.UpdateManagerAsync( id, user);
+                var updateUser = await _userRepository.UpdateManagerAsync(id, user);
 
                 if (updateUser == null)
                 {
@@ -45,6 +45,7 @@ namespace Planify_BackEnd.Services.Users
                 {
                     return new ResponseDTO(400, "First name is required.", null);
                 }
+                
                 var newUser = new Models.User
                 {
                     Id = user.Id,
@@ -101,7 +102,7 @@ namespace Planify_BackEnd.Services.Users
                         CampusId = c.CampusId,
                         Status = c.Status,
                         Gender = c.Gender,
-                        Avatar = c.Avatar==null? new DTOs.Medias.MediaItemDTO():
+                        Avatar = c.Avatar == null ? new DTOs.Medias.MediaItemDTO() :
                         new DTOs.Medias.MediaItemDTO
                         {
                             Id = c.Avatar.Id,
@@ -117,14 +118,14 @@ namespace Planify_BackEnd.Services.Users
             {
                 throw new Exception(ex.Message);
             }
-           
+
         }
         public async Task<UserDetailDTO> GetUserDetailAsync(Guid id)
         {
             var c = await _userRepository.GetUserDetailAsync(id);
             if (c == null)
             {
-                return null; 
+                return null;
             }
 
             var userDTO = new UserDetailDTO
@@ -143,7 +144,7 @@ namespace Planify_BackEnd.Services.Users
                 CampusName = c.Campus.CampusName,
                 Status = c.Status,
                 Gender = c.Gender ? "Male" : "Female"
-              
+
             };
 
             return userDTO;
@@ -208,7 +209,7 @@ namespace Planify_BackEnd.Services.Users
             try
             {
                 var users = await _userRepository.GetUserByNameOrEmail(input, campusId);
-                
+
                 if (users.TotalCount == 0)
                 {
                     return new PageResultDTO<UserListDTO>(new List<UserListDTO>(), 0, 0, 0);
@@ -264,16 +265,22 @@ namespace Planify_BackEnd.Services.Users
                 roleDTO.UserId = r.UserId;
                 roleDTO.RoleId = r.RoleId;
                 return roleDTO;
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
         }
 
-        public async Task<UserListDTO> CreateEventOrganizer(UserDTO userDTO)
+        public async Task<ResponseDTO> CreateEventOrganizer(UserDTO userDTO)
         {
             try
             {
+                var check = _userRepository.GetUserByEmailAsync(userDTO.Email);
+                if (check != null)
+                {
+                    return new ResponseDTO(400, "Email exists!", userDTO);
+                }
                 Models.User user = new Models.User
                 {
                     Id = Guid.NewGuid(),
@@ -305,18 +312,23 @@ namespace Planify_BackEnd.Services.Users
                     UserName = u.UserName,
                     Password = u.Password,
                 };
-                return userListDTO;
+                return new ResponseDTO(200,"Create successfully!", userListDTO);
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                return new ResponseDTO(400, ex.Message, null);
             }
         }
 
-        public async Task<UserListDTO> UpdateEventOrganizer(UserDTO userDTO)
+        public async Task<ResponseDTO> UpdateEventOrganizer(UserDTO userDTO)
         {
             try
             {
+                var check = _userRepository.GetUserByEmailAsync(userDTO.Email);
+                if (check == null)
+                {
+                    return new ResponseDTO(404, "Cannot found user", userDTO);
+                }
                 Models.User user = new Models.User
                 {
                     Id = userDTO.Id,
@@ -346,11 +358,11 @@ namespace Planify_BackEnd.Services.Users
                     UserName = u.UserName,
                     Password = u.Password,
                 };
-                return userListDTO;
+                return new ResponseDTO(200, "Update successfully!", userListDTO);
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                return new ResponseDTO(400, ex.Message, null);
             }
         }
 
@@ -360,7 +372,8 @@ namespace Planify_BackEnd.Services.Users
             {
                 var result = _userRepository.GetEventOrganizer(page, pageSize, campusId);
                 return result;
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -685,6 +698,74 @@ namespace Planify_BackEnd.Services.Users
             await _userRepository.UpdateUserAsync(user);
 
             return true;
+        }
+
+        public async Task<PageResultDTO<UserListDTO>> GetSpectatorAndImplementer(int page, int pageSize, string? input, int campusId)
+        {
+            try
+            {
+                var users = await _userRepository.GetSpectatorAndImplementer(page, pageSize, input, campusId);
+
+                if (users.TotalCount == 0)
+                {
+                    return new PageResultDTO<UserListDTO>(new List<UserListDTO>(), 0, page, pageSize);
+                }
+                List<UserListDTO> result = new List<UserListDTO>();
+                foreach (var c in users.Items)
+                {
+                    UserListDTO user = new UserListDTO
+                    {
+                        Id = c.Id,
+                        UserName = c.UserName,
+                        Email = c.Email,
+                        FirstName = c.FirstName,
+                        LastName = c.LastName,
+                        Password = c.Password,
+                        DateOfBirth = c.DateOfBirth,
+                        PhoneNumber = c.PhoneNumber,
+                        AddressId = c.AddressId,
+                        AvatarId = c.AvatarId,
+                        CreatedAt = c.CreatedAt,
+                        CampusId = c.CampusId,
+                        Status = c.Status,
+                        Gender = c.Gender,
+                        Avatar = c.Avatar == null ? new DTOs.Medias.MediaItemDTO() :
+                        new DTOs.Medias.MediaItemDTO
+                        {
+                            Id = c.Avatar.Id,
+                            MediaUrl = c.Avatar.MediaUrl
+                        },
+                        RoleName = c.UserRoles.Count == 0 ? "" : c.UserRoles.First().Role.RoleName,
+                    };
+                    result.Add(user);
+                }
+                return new PageResultDTO<UserListDTO>(result, users.TotalCount, page, pageSize);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<ResponseDTO> SetRoleEOG(Guid userId)
+        {
+            try
+            {
+                var userRole = new UserRole
+                {
+                    RoleId = 3,
+                    UserId = userId
+                };
+                var ur = await _userRepository.AddUserRole(userRole);
+                if (ur.Id == 0)
+                {
+                    return new ResponseDTO(400, "Error occurred while set user to event organizer!", null);
+                }
+                return new ResponseDTO(200, "Set role successfully!", userRole);
+            }catch(Exception ex)
+            {
+                return new ResponseDTO(500, "Error occurred while set user to event organizer!", null);
+            }
         }
     }
 }
