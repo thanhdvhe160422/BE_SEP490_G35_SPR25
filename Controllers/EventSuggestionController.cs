@@ -114,6 +114,7 @@ namespace Planify_BackEnd.Controllers
                                  $"- PromotionalPlan (string): Kế hoạch quảng bá\n" +
                                  $"- AmountBudget (decimal): Ngân sách tổng cho sự kiện\n" +
                                  $"- Tasks (mảng): Danh sách nhiệm vụ, mỗi nhiệm vụ bao gồm:\n" +
+                                 $"  - **Quan trọng**: Deadline của nhiệm vụ con phải luôn nhỏ hơn deadline của nhiệm vụ lớn tương ứng (ví dụ: nếu nhiệm vụ có deadline là '2025-06-15 17:00', thì tất cả nhiệm vụ con phải có deadline sớm hơn, ví dụ: '2025-06-10 17:00').\n" +
                                  $"  - TaskName (string): Tên nhiệm vụ\n" +
                                  $"  - TaskDescription (string): Mô tả chi tiết nhiệm vụ\n" +
                                  $"  - Deadline (string, định dạng 'yyyy-MM-dd HH:mm'): Hạn chót nhiệm vụ\n" +
@@ -121,7 +122,7 @@ namespace Planify_BackEnd.Controllers
                                  $"  - SubTasks (mảng): Danh sách nhiệm vụ con, mỗi nhiệm vụ con bao gồm:\n" +
                                  $"    - SubTaskName (string): Tên nhiệm vụ con\n" +
                                  $"    - SubTaskDescription (string): Mô tả chi tiết nhiệm vụ con\n" +
-                                 $"    - Deadline (string, định dạng 'yyyy-MM-dd HH:mm'): Hạn chót nhiệm vụ con\n" +
+                                 $"    - Deadline (string, định dạng 'yyyy-MM-dd HH:mm'): Hạn chót của nhiệm vụ con, phải nhỏ hơn deadline của nhiệm vụ lớn\n" +
                                  $"    - AmountBudget (decimal): Ngân sách cho nhiệm vụ con\n" +
                                  $"- BudgetRows (mảng): Danh sách chi phí, mỗi mục bao gồm:\n" +
                                  $"  - Name (string): Tên mục chi phí\n" +
@@ -202,6 +203,7 @@ namespace Planify_BackEnd.Controllers
                                  $"- PromotionalPlan (string): Kế hoạch quảng bá\n" +
                                  $"- AmountBudget (decimal): Ngân sách tổng cho sự kiện\n" +
                                  $"- Tasks (mảng): Danh sách nhiệm vụ, mỗi nhiệm vụ bao gồm:\n" +
+                                 $"  - **Quan trọng**: Deadline của nhiệm vụ con phải luôn nhỏ hơn deadline của nhiệm vụ lớn tương ứng (ví dụ: nếu nhiệm vụ có deadline là '2025-06-15 17:00', thì tất cả nhiệm vụ con phải có deadline sớm hơn, ví dụ: '2025-06-10 17:00').\n" +
                                  $"  - TaskName (string): Tên nhiệm vụ\n" +
                                  $"  - TaskDescription (string): Mô tả chi tiết nhiệm vụ\n" +
                                  $"  - Deadline (string, định dạng 'yyyy-MM-dd HH:mm'): Hạn chót nhiệm vụ\n" +
@@ -209,7 +211,7 @@ namespace Planify_BackEnd.Controllers
                                  $"  - SubTasks (mảng): Danh sách nhiệm vụ con, mỗi nhiệm vụ con bao gồm:\n" +
                                  $"    - SubTaskName (string): Tên nhiệm vụ con\n" +
                                  $"    - SubTaskDescription (string): Mô tả chi tiết nhiệm vụ con\n" +
-                                 $"    - Deadline (string, định dạng 'yyyy-MM-dd HH:mm'): Hạn chót nhiệm vụ con\n" +
+                                 $"    - Deadline (string, định dạng 'yyyy-MM-dd HH:mm'): Hạn chót của nhiệm vụ con, phải nhỏ hơn deadline của nhiệm vụ lớn\n" +
                                  $"    - AmountBudget (decimal): Ngân sách cho nhiệm vụ con\n" +
                                  $"- BudgetRows (mảng): Danh sách chi phí, mỗi mục bao gồm:\n" +
                                  $"  - Name (string): Tên mục chi phí\n" +
