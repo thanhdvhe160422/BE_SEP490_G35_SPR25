@@ -476,4 +476,37 @@ public class UserRepository : IUserRepository
         _context.Users.Update(user);
         await _context.SaveChangesAsync();
     }
+    public async Task<PageResultDTO<User>> GetSpectatorAndImplementer(int page, int pageSize,string? input, int campusId)
+    {
+        try
+        {
+            var usersQuery = _context.Users
+            .Include(c => c.Campus)
+            .Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
+            .Where(c =>
+                (string.IsNullOrEmpty(input) ||
+                 (c.FirstName.Contains(input) || c.LastName.Contains(input) || c.Email.Contains(input))) &&
+                c.CampusId == campusId &&
+                c.UserRoles.All(ur => ur.Role.RoleName == "Spectator" || ur.Role.RoleName == "Implementer") &&
+                c.UserRoles.Any(ur => ur.Role.RoleName == "Spectator" || ur.Role.RoleName == "Implementer")
+            );
+
+            var count = await usersQuery.CountAsync();
+
+            if (count == 0)
+                return new PageResultDTO<User>(new List<User>(), 0, page, pageSize);
+
+            var result = await usersQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PageResultDTO<User>(result, count, page, pageSize);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+
 }

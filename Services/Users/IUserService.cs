@@ -10,8 +10,8 @@ namespace Planify_BackEnd.Services.Users
         Task<ResponseDTO> UpdateUserStatusAsync(Guid id, int newStatus);
         PageResultDTO<UserListDTO> GetListImplementer(int eventId, int page, int pageSize);
         Task<PageResultDTO<UserListDTO>> GetUserByNameOrEmailAsync(string input, int campusId);
-        Task<UserListDTO> CreateEventOrganizer(UserDTO userDTO);
-        Task<UserListDTO> UpdateEventOrganizer(UserDTO userDTO);
+        Task<ResponseDTO> CreateEventOrganizer(UserDTO userDTO);
+        Task<ResponseDTO> UpdateEventOrganizer(UserDTO userDTO);
         Task<UserRoleDTO> AddUserRole(UserRoleDTO roleDTO);
         Task<ResponseDTO> CreateManagerAsync(UserDTO user);
         Task<ResponseDTO> UpdateManagerAsync(UserUpdateDTO user, Guid id);
@@ -22,5 +22,7 @@ namespace Planify_BackEnd.Services.Users
         Task<PageResultDTO<UserListDTO>> SearchUser(int page, int pageSize, string? input, string? roleName, int campusId);
         Task<ResponseDTO> ImportUsersAsync(int campusId, IFormFile excelFile);
         Task<bool> ChangePasswordAsync(Guid userId, ChangePasswordRequest request);
+        Task<PageResultDTO<UserListDTO>> GetSpectatorAndImplementer(int page, int pageSize, string? input, int campusId);
+        Task<ResponseDTO> SetRoleEOG(Guid userId);
     }
 }

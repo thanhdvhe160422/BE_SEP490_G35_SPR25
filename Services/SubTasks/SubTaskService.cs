@@ -204,7 +204,7 @@ namespace Planify_BackEnd.Services.SubTasks
                 var listJoinUserId = await _subTaskRepository.GetJoinedIdBySubTaskIdAsync(subTaskId);
                 var eventId = await _subTaskRepository.GetEventIdBySubtaskId(subTaskId);
                 var subtask = await _subTaskRepository.GetSubTaskByIdAsync(subTaskId);
-                var message = "Subtask " + subtask.SubTaskName + " has been deleted!";
+                var message = "Nhiệm vụ con " + subtask.SubTaskName + " đã bị xóa!";
                 var link = "/event-detail-EOG/" + eventId;
                 foreach (var id in listJoinUserId)
                 {
@@ -280,7 +280,7 @@ namespace Planify_BackEnd.Services.SubTasks
                 //notification
                 if (response)
                     await _hubContext.Clients.User(userId + "").SendAsync("ReceiveNotification",
-                        "You has been assign to subtask "+ subtask.SubTaskName+ "!",
+                        "Bạn đã được thêm vào nhiệm vụ con "+ subtask.SubTaskName+ "!",
                         "/event-detail-EOG/" + task.EventId);
                 return response;
 

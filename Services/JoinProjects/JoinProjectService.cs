@@ -124,7 +124,7 @@ namespace Planify_BackEnd.Services.JoinProjects
                 var response = await _joinProjectRepository.DeleteImplementerFromEvent(userId, eventId);
                 //notification
                 var e = await _eventRepository.GetEventByIdAsync(eventId);
-                var message = "You have been removed from event " + (e.EventTitle.Length > 40 ? e.EventTitle.Substring(0, 40) + ".." : e.EventTitle) + "!";
+                var message = "Bạn đã bị loại khỏi sự kiện " + (e.EventTitle.Length > 40 ? e.EventTitle.Substring(0, 40) + ".." : e.EventTitle) + "!";
                 if (response)
                     await _hubContext.Clients.User(userId + "").SendAsync("ReceiveNotification",
                     message,
@@ -179,7 +179,7 @@ namespace Planify_BackEnd.Services.JoinProjects
             var result = new { AddedCount = newUserIds.Count, EventId = request.EventId };
             //notification
             var e = await _eventRepository.GetEventByIdAsync(request.EventId);
-            var message = "You have been added to event " + (e.EventTitle.Length > 40 ? e.EventTitle.Substring(0, 40) + ".." : e.EventTitle) + "!";
+            var message = "Bạn đã được thêm vào sự kiện " + (e.EventTitle.Length > 40 ? e.EventTitle.Substring(0, 40) + ".." : e.EventTitle) + "!";
             var link = "/event-detail-EOG/" + request.EventId;
             foreach (var id in newUserIds)
             {
