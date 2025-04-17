@@ -91,13 +91,13 @@ namespace Planify_BackEnd.Controllers.User
                 return BadRequest(new { message = ex.Message });
             }
         }
-        [HttpPut("ban/unban-users/{id}")]
+        [HttpPut("ban/unban-users")]
         //[Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateUserStatusAsync(Guid id)
+        public async Task<IActionResult> UpdateUserStatusAsync()
         {
             try
             {
-               var id = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+               var id = Guid.Parse("1DBDF6C5-7AF5-4411-B47D-26014AE37DD5");
                 var response = await _userService.UpdateUserStatusAsync(id);
                 if (response == null)
                 {

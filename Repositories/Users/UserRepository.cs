@@ -135,7 +135,7 @@ public class UserRepository : IUserRepository
         try
         {
             var existingUser =  _context.Users.Find(id);
-            if (existingUser == null || existingUser.Status == 1)
+            if (existingUser == null || existingUser.Status != 0)
             {
                 return false; // User not found
             }  
