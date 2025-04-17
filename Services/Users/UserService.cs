@@ -276,7 +276,7 @@ namespace Planify_BackEnd.Services.Users
         {
             try
             {
-                var check = _userRepository.GetUserByEmailAsync(userDTO.Email);
+                var check = await _userRepository.GetUserByEmailAsync(userDTO.Email);
                 if (check != null)
                 {
                     return new ResponseDTO(400, "Email exists!", userDTO);
@@ -324,7 +324,7 @@ namespace Planify_BackEnd.Services.Users
         {
             try
             {
-                var check = _userRepository.GetUserByEmailAsync(userDTO.Email);
+                var check = await _userRepository.GetUserByEmailAsync(userDTO.Email);
                 if (check == null)
                 {
                     return new ResponseDTO(404, "Cannot found user", userDTO);
@@ -751,6 +751,12 @@ namespace Planify_BackEnd.Services.Users
         {
             try
             {
+                var user = await _userRepository.GetUserByIdAsync(userId);
+                var role = user.UserRoles.FirstOrDefault(ur => ur.RoleId == 3);
+                if (role != null)
+                {
+                    return new ResponseDTO(200, "User already event organizer!", null);
+                }
                 var userRole = new UserRole
                 {
                     RoleId = 3,
