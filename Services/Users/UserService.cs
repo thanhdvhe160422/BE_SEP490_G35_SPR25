@@ -276,7 +276,7 @@ namespace Planify_BackEnd.Services.Users
         {
             try
             {
-                var check = _userRepository.GetUserByEmailAsync(userDTO.Email);
+                var check = await _userRepository.GetUserByEmailAsync(userDTO.Email);
                 if (check != null)
                 {
                     return new ResponseDTO(400, "Email exists!", userDTO);
@@ -324,7 +324,7 @@ namespace Planify_BackEnd.Services.Users
         {
             try
             {
-                var check = _userRepository.GetUserByEmailAsync(userDTO.Email);
+                var check = await _userRepository.GetUserByEmailAsync(userDTO.Email);
                 if (check == null)
                 {
                     return new ResponseDTO(404, "Cannot found user", userDTO);
