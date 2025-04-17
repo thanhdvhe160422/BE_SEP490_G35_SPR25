@@ -6,7 +6,7 @@ public interface IUserRepository
 {
     PageResultDTO<User> GetListUser(int page, int pageSize);
     Task<User> GetUserDetailAsync(Guid userId);
-    Task<bool> UpdateUserStatusAsync(Guid id, int newStatus);
+    Task<bool> UpdateUserStatusAsync(Guid id);
     Task<User> GetUserByEmailAsync(string email);
     Task<User> GetUserByIdAsync(Guid id);
     PageResultDTO<User> GetListImplementer(int eventId, int page, int pageSize);

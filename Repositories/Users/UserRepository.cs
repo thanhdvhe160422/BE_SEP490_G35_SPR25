@@ -103,7 +103,7 @@ public class UserRepository : IUserRepository
             return null;
         }
     }
-    public async Task<bool> UpdateUserStatusAsync(Guid id, int newStatus)
+    public async Task<bool> UpdateUserStatusAsync(Guid id)
     {
         try
         {
@@ -112,12 +112,34 @@ public class UserRepository : IUserRepository
             {
                 return false; // Không tìm thấy User
             }
-
-            existingUser.Status = newStatus;
+            if (UserIsBanned(id))
+            {
+                existingUser.Status = 1;
+                _context.Users.Update(existingUser);
+                await _context.SaveChangesAsync();
+                return true; 
+            }
+            existingUser.Status = 0;
             _context.Users.Update(existingUser);
             await _context.SaveChangesAsync();
 
-            return true; // Cập nhật thành công
+            return true; 
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An unexpected error occurred while updating the user status.", ex);
+        }
+    }
+    private bool UserIsBanned(Guid id)
+    {
+        try
+        {
+            var existingUser =  _context.Users.Find(id);
+            if (existingUser == null || existingUser.Status == 1)
+            {
+                return false; // User not found
+            }  
+            return true; 
         }
         catch (Exception ex)
         {

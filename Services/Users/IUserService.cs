@@ -7,7 +7,7 @@ namespace Planify_BackEnd.Services.Users
     {
         PageResultDTO<UserListDTO> GetListUser(int page, int pageSize);
         Task<UserDetailDTO> GetUserDetailAsync(Guid id);
-        Task<ResponseDTO> UpdateUserStatusAsync(Guid id, int newStatus);
+        Task<ResponseDTO> UpdateUserStatusAsync(Guid id);
         PageResultDTO<UserListDTO> GetListImplementer(int eventId, int page, int pageSize);
         Task<PageResultDTO<UserListDTO>> GetUserByNameOrEmailAsync(string input, int campusId);
         Task<UserListDTO> CreateEventOrganizer(UserDTO userDTO);
