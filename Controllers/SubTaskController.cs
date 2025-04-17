@@ -23,7 +23,7 @@ namespace Planify_BackEnd.Controllers
         /// <param name="subTaskId"></param>
         /// <returns></returns>
         [HttpGet("{subTaskId}")]
-        //[Authorize(Roles = "Implementer, Event Organizer")]
+        [Authorize(Roles = "Implementer, Event Organizer")]
         public async Task<IActionResult> GetSubTaskById(int subTaskId)
         {
             var response = await _subTaskService.GetSubTaskByIdAsync(subTaskId);
@@ -39,7 +39,7 @@ namespace Planify_BackEnd.Controllers
         /// <param name="taskId"></param>
         /// <returns></returns>
         [HttpGet("get-by-task/{taskId}")]
-        //[Authorize(Roles = "Implementer, Event Organizer")]
+        [Authorize(Roles = "Implementer, Event Organizer")]
         public async Task<IActionResult> GetSubTasksByTaskId(int taskId)
         {
             var response = await _subTaskService.GetSubTasksByTaskIdAsync(taskId);
@@ -154,7 +154,7 @@ namespace Planify_BackEnd.Controllers
             }
         }
         [HttpGet("search/v2")]
-        //[Authorize(Roles = "Event Organizer, Implementer")]
+        [Authorize(Roles = "Event Organizer, Implementer")]
         public async Task<IActionResult> SearchTasksByGroupId(Guid implementerId, DateTime startDate, DateTime endDate)
         {
             try

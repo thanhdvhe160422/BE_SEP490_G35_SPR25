@@ -25,7 +25,7 @@ namespace Planify_BackEnd.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("list/{eventId}")]
-        //[Authorize(Roles = "Event Organizer, Implementer")]
+        [Authorize(Roles = "Event Organizer, Implementer")]
         public async Task<IActionResult> GetAllTasks(int eventId, int page, int pageSize)
         {
             try
@@ -52,7 +52,7 @@ namespace Planify_BackEnd.Controllers
         /// <param name="endDate"></param>
         /// <returns></returns>
         [HttpGet("search")]
-       // [Authorize(Roles = "Event Organizer")]
+        [Authorize(Roles = "Event Organizer")]
         public async Task<IActionResult> SearchTasksAsync(int page, int pageSize, string? name, DateTime startDate, DateTime endDate)
         {
             try
