@@ -98,6 +98,7 @@ namespace Planify_BackEnd.Repositories.FavouriteEvents
                         StartTime = f.Event.StartTime,
                         EndTime = f.Event.EndTime,
                         Placed = f.Event.Placed,
+                        Status = f.Event.Status,
                         EventMedia = f.Event.EventMedia.Select(em=> new EventMediaDto
                         {
                             Id= em.Media.Id,
