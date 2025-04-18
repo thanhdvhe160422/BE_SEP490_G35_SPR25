@@ -183,6 +183,7 @@ public class UserRepository : IUserRepository
         {
             return await _context.Users
                 //.Include(r => r.RoleNavigation)
+                .Include(u=>u.UserRoles)
                 .Include(c => c.Campus)
                 .FirstOrDefaultAsync(u => u.Id == id && u.Status == 1);
         }
@@ -329,6 +330,7 @@ public class UserRepository : IUserRepository
             var count = _context.UserRoles
                 .Include(ur => ur.User)
                 .Where(ur => ur.RoleId == 3&&ur.User.CampusId==campusId)
+                .Distinct()
                 .Count();
             var result = await _context.UserRoles
                 .Include(ur => ur.User).ThenInclude(u => u.Avatar)
@@ -349,7 +351,9 @@ public class UserRepository : IUserRepository
                         Id = ur.User.Avatar.Id,
                         MediaUrl = ur.User.Avatar.MediaUrl
                     }
-                }).ToListAsync();
+                })
+                .Distinct()
+                .ToListAsync();
             return new PageResultDTO<EventOrganizerVM>(result, count, page, pageSize);
         }
         catch(Exception ex)
