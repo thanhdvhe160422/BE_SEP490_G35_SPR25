@@ -13,6 +13,7 @@ namespace Planify_BackEnd.DTOs.FavouriteEvents
         public DateTime? EndTime { get; set; }
 
         public string Placed { get; set; }
+        public int? Status { get; set; }
         public ICollection<EventMediaDto> EventMedia { get; set; }
         public string? StatusMessage
         {
