@@ -45,10 +45,15 @@ namespace Planify_BackEnd.Services.Users
                 {
                     return new ResponseDTO(400, "First name is required.", null);
                 }
-                
+
+                var check = await _userRepository.GetUserByEmailAsync(user.Email);
+                if (check != null)
+                {
+                    return new ResponseDTO(400, "Email exists!", user);
+                }
                 var newUser = new Models.User
                 {
-                    Id = user.Id,
+                    Id = Guid.NewGuid(),
                     Email = user.Email,
                     FirstName = user.FirstName,
                     LastName = user.LastName,
