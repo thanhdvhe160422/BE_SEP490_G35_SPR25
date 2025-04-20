@@ -1,4 +1,5 @@
-﻿using Planify_BackEnd.DTOs.Categories;
+﻿using Planify_BackEnd.DTOs;
+using Planify_BackEnd.DTOs.Categories;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories.Categories;
 
@@ -52,10 +53,20 @@ namespace Planify_BackEnd.Services.Categories
             }
         }
 
-        public async Task<CategoryViewModel> CreateCategory(CategoryDTO categoryDTO)
+        public async Task<ResponseDTO> CreateCategory(CategoryDTO categoryDTO, int campusId)
         {
             try
             {
+                if(string.IsNullOrEmpty(categoryDTO.CategoryEventName.Trim()))
+                {
+                    return new ResponseDTO(400, "Tên không được để trống", categoryDTO);
+                }
+                var c = await _categoryRepository.GetCategoryByName(categoryDTO.CategoryEventName,campusId);
+                if (c!=null)
+                {
+                    return new ResponseDTO(400, "Loại sự kiện này đã tồn tại", categoryDTO);
+                }
+
                 CategoryEvent category = new CategoryEvent
                 {
                     Id = categoryDTO.Id,
@@ -71,15 +82,24 @@ namespace Planify_BackEnd.Services.Categories
                     CampusId = categoryDTO.CampusId,
                     Status = 1
                 };
-                return categoryVm;
+                return new ResponseDTO(200, "Loại sự kiện mới được thêm thành công!", categoryVm);
             }catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                return new ResponseDTO(400, "Lỗi xảy ra khi cập nhật danh mục! " + ex.Message, null);
             }
         }
-        public async Task<CategoryViewModel> UpdateCategory(CategoryDTO categoryDTO)
+        public async Task<ResponseDTO> UpdateCategory(CategoryDTO categoryDTO, int campusId)
         {
 
+            if (string.IsNullOrEmpty(categoryDTO.CategoryEventName.Trim()))
+            {
+                return new ResponseDTO(400, "Tên không được để trống", categoryDTO);
+            }
+            var c = await _categoryRepository.GetCategoryByName(categoryDTO.CategoryEventName, campusId);
+            if (c != null)
+            {
+                return new ResponseDTO(400, "Loại sự kiện này đã tồn tại", categoryDTO);
+            }
             try
             {
                 CategoryEvent category = new CategoryEvent
@@ -97,28 +117,33 @@ namespace Planify_BackEnd.Services.Categories
                     CampusId = categoryDTO.CampusId,
                     Status = 1
                 };
-                return categoryVm;
+                return new ResponseDTO(200, "Cập nhật thành công!", categoryVm);
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                return new ResponseDTO(400, "Lỗi xảy ra khi cập nhật danh mục! " + ex.Message, null);
             }
         }
-        public async Task<bool> DeleteCategory(int categoryId)
+        public async Task<ResponseDTO> DeleteCategory(int categoryId)
         {
             try
             {
+                var category = await _categoryRepository.GetByIdAsync(categoryId);
+                if (category == null)
+                {
+                    return new ResponseDTO(400, "Danh mục không tồn tại", false);
+                }
+                if (category.Events.Count != 0)
+                {
+                    return new ResponseDTO(400, "Đang có sự kiện tồn tại với loại sự kiện này!", false);
+                }
                 var isDeleted = await _categoryRepository.DeleteCategory(categoryId);
-                if (!isDeleted) return false;
-                return true;
-            }
-            catch (NullReferenceException nEx)
-            {
-                throw new NullReferenceException(nEx.Message);
+                if (!isDeleted) return new ResponseDTO(400,"Xóa không thành công!",false);
+                return new ResponseDTO(200, "Xóa không thành công!", false); 
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                return new ResponseDTO(400, "Lỗi xảy ra khi xóa! "+ex.Message, false);
             }
         }
     }
