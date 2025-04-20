@@ -435,39 +435,77 @@ public class UserRepository : IUserRepository
     {
         try
         {
-            var count = _context.Users
-            .Include(c => c.Campus)
-            .Include(u=>u.UserRoles).ThenInclude(ur=>ur.Role)
-            .Where(c => (string.IsNullOrEmpty(input)||(c.FirstName.Contains(input) || c.LastName.Contains(input) || c.Email.Contains(input)))
-                        && (string.IsNullOrEmpty(roleName)||c.UserRoles.Any(ur=>ur.Role.RoleName.Contains(roleName)))
-                        && c.CampusId == campusId
-                        && c.UserRoles.Any(ur => ur.RoleId != 1))
-            .GroupBy(c => c.Id)
-            .Select(g => g.First())
-            .Count();
-            if (count == 0) return new PageResultDTO<User>(new List<User>(), 0, page, pageSize);
-            var result = await _context.Users
-            .Include(c => c.Campus)
-            .Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
-            .Where(c => (string.IsNullOrEmpty(input) || (c.FirstName.Contains(input) || c.LastName.Contains(input) || c.Email.Contains(input)))
-                        && (string.IsNullOrEmpty(roleName) || c.UserRoles.Any(ur => ur.Role.RoleName.Contains(roleName)))
-                        && c.CampusId == campusId
-                        && c.UserRoles.Any(ur => ur.RoleId != 1))
-            .GroupBy(c => c.Id)
-            .Select(g => g.First())
-            .Skip((page - 1) * pageSize).Take(pageSize)
-            .ToListAsync();
-            foreach (var user in result)
-            {
-                var minUserRole = user.UserRoles
-                    .OrderBy(ur => ur.RoleId)
-                    .FirstOrDefault();
+        //    var count = _context.Users
+        //    .Include(c => c.Campus)
+        //    .Include(u=>u.UserRoles).ThenInclude(ur=>ur.Role)
+        //    .Where(c => (string.IsNullOrEmpty(input)||(c.FirstName.Contains(input) || c.LastName.Contains(input) || c.Email.Contains(input)))
+        //                && (string.IsNullOrEmpty(roleName)||c.UserRoles.Any(ur=>ur.Role.RoleName.Equals(roleName)))
+        //                && c.CampusId == campusId
+        //                && c.UserRoles.Any(ur => ur.RoleId != 1))
+        //    .GroupBy(c => c.Id)
+        //    .Select(g => g.First())
+        //    .Count();
+        //    if (count == 0) return new PageResultDTO<User>(new List<User>(), 0, page, pageSize);
+        //    var result = await _context.Users
+        //    .Include(c => c.Campus)
+        //    .Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
+        //    .Where(c => (string.IsNullOrEmpty(input) || (c.FirstName.Contains(input) || c.LastName.Contains(input) || c.Email.Contains(input)))
+        //                && (string.IsNullOrEmpty(roleName) || c.UserRoles.Any(ur => ur.Role.RoleName.Contains(roleName)))
+        //                && c.CampusId == campusId
+        //                && c.UserRoles.Any(ur => ur.RoleId != 1))
+        //    .GroupBy(c => c.Id)
+        //    .Select(g => g.First())
+        //    .Skip((page - 1) * pageSize).Take(pageSize)
+        //    .ToListAsync();
+        //    foreach (var user in result)
+        //    {
+        //        var minUserRole = user.UserRoles
+        //            .OrderBy(ur => ur.RoleId)
+        //            .FirstOrDefault();
 
-                user.UserRoles = minUserRole != null
-                    ? new List<UserRole> { minUserRole }
-                    : new List<UserRole>();
-            }
-            return new PageResultDTO<User>(result, count, page, pageSize);
+        //        user.UserRoles = minUserRole != null
+        //            ? new List<UserRole> { minUserRole }
+        //            : new List<UserRole>();
+        //    }
+        //    return new PageResultDTO<User>(result, count, page, pageSize);
+
+            var query = _context.Users
+                .Include(u => u.Campus)
+                .Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
+                .Where(u => u.CampusId == campusId &&
+                            u.UserRoles.Any(ur => ur.RoleId != 1) &&
+                            (string.IsNullOrEmpty(input) ||
+                             u.FirstName.Contains(input) ||
+                             u.LastName.Contains(input) ||
+                             u.Email.Contains(input)))
+                .AsQueryable();
+            var users = await query
+            .GroupBy(u => u.Id)
+            .Select(g => g.First())
+            .ToListAsync();
+            var filteredUsers = users
+                .Select(user =>
+                {
+                    var minRole = user.UserRoles
+                        .OrderBy(ur => ur.RoleId)
+                        .FirstOrDefault();
+
+                    user.UserRoles = minRole != null
+                        ? new List<UserRole> { minRole }
+                        : new List<UserRole>();
+
+                    return user;
+                }).Where(u => string.IsNullOrEmpty(roleName) ||
+                        u.UserRoles.Any(ur => ur.Role.RoleName.Contains(roleName)))
+            .ToList();
+            var count = filteredUsers.Count;
+
+            var pagedResult = filteredUsers
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return new PageResultDTO<User>(pagedResult, count, page, pageSize);
         }
         catch (Exception ex)
         {
