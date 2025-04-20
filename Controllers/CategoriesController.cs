@@ -33,8 +33,9 @@ namespace Planify_BackEnd.Controllers
         {
             try
             {
-                var response = await _categoryService.CreateCategory(categoryDTO);
-                return Ok(response);
+                var campusClaim = int.Parse(User.Claims.FirstOrDefault(c => c.Type == "campusId").Value);
+                var response = await _categoryService.CreateCategory(categoryDTO,campusClaim);
+                return StatusCode(response.Status,response);
             }catch(Exception ex)
             {
                 return BadRequest(ex.Message);
@@ -46,8 +47,9 @@ namespace Planify_BackEnd.Controllers
         {
             try
             {
-                var response = await _categoryService.UpdateCategory(categoryDTO);
-                return Ok(response);
+                var campusClaim = int.Parse(User.Claims.FirstOrDefault(c => c.Type == "campusId").Value);
+                var response = await _categoryService.UpdateCategory(categoryDTO,campusClaim);
+                return StatusCode(response.Status, response);
             }
             catch (Exception ex)
             {
@@ -62,12 +64,7 @@ namespace Planify_BackEnd.Controllers
             try
             {
                 var response = await _categoryService.DeleteCategory(categoryId);
-                if (!response) return BadRequest("Cannot delete category!");
-                return Ok(response);
-            }
-            catch (NullReferenceException nEx)
-            {
-                return NotFound("Cannot found any category with id " + categoryId);
+                return StatusCode(response.Status, response);
             }
             catch (Exception ex)
             {
