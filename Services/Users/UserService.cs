@@ -154,11 +154,11 @@ namespace Planify_BackEnd.Services.Users
 
             return userDTO;
         }
-        public async Task<ResponseDTO> UpdateUserStatusAsync(Guid id, int newStatus)
+        public async Task<ResponseDTO> UpdateUserStatusAsync(Guid id)
         {
             try
             {
-                var updateUser = await _userRepository.UpdateUserStatusAsync(id, newStatus);
+                var updateUser = await _userRepository.UpdateUserStatusAsync(id);
 
                 return new ResponseDTO(200, "User status updated successfully!", updateUser);
             }
