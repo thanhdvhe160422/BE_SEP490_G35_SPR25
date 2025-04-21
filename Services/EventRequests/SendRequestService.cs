@@ -125,11 +125,11 @@ namespace Planify_BackEnd.Services.EventRequests
                     var user = await _userRepository.GetUserByIdAsync(eventEntity.CreateBy);
                     if (user != null) await _emailSender.SendEmailAsync(user.Email,
                         "Thông Báo Kế Hoạch Của Bạn Đã Được Duyệt",
-                        "Kính gửi " + user.LastName + " " + user.FirstName + ",\n\n" +
-                        "Chúng tôi xin thông báo rằng kế hoạch id " + request.EventId +
-                        " của bạn đã được xem xét và đã được phê duyệt.\n" +
-                        reason + "\n\n" +
-                        "Trân trọng,\nHệ thống tự động");
+                        "Kính gửi " + user.LastName + " " + user.FirstName + ",<br/><br/>" +
+                        "Chúng tôi xin thông báo rằng kế hoạch ID " + request.EventId +
+                        " của bạn đã được xem xét và đã được phê duyệt.<br/>" +
+                        reason + "<br/><br/>" +
+                        "Trân trọng,<br/>Hệ thống tự động");
                 }
                 catch { }
                 return new ResponseDTO(200, "Yêu cầu đã được duyệt", request);
@@ -178,11 +178,12 @@ namespace Planify_BackEnd.Services.EventRequests
                     var user = await _userRepository.GetUserByIdAsync(eventEntity.CreateBy);
                     if (user != null) await _emailSender.SendEmailAsync(user.Email,
                         "Thông Báo Kế Hoạch Của Bạn Đã Bị Từ Chối",
-                        "Kính gửi " + user.LastName + " " + user.FirstName + ",\n\n" +
-                        "Chúng tôi xin thông báo rằng kế hoạch id " + request.EventId +
-                        " của bạn đã được xem xét và hiện tại không thể được phê duyệt.\n" +
-                        reason + "\n\n" +
-                        "Trân trọng,\nHệ thống tự động");
+                        "Kính gửi " + user.LastName + " " + user.FirstName + ",<br/><br/>" +
+                        "Chúng tôi xin thông báo rằng kế hoạch ID " + request.EventId +
+                        " của bạn đã được xem xét và hiện tại không thể được phê duyệt.<br/>" +
+                        reason + "<br/><br/>" +
+                        "Trân trọng,<br/>Hệ thống tự động");
+
                 }
                 catch { }
                 return new ResponseDTO(200, "Yêu cầu đã bị từ chối", request);

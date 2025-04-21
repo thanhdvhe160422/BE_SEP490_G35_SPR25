@@ -8,6 +8,8 @@ using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories;
 using Planify_BackEnd.Repositories.JoinGroups;
 using Planify_BackEnd.Repositories.Tasks;
+using Planify_BackEnd.Services.Notification;
+using System.Drawing;
 using System.Threading.Tasks;
 
 namespace Planify_BackEnd.Services.SubTasks
@@ -19,13 +21,17 @@ namespace Planify_BackEnd.Services.SubTasks
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHubContext<NotificationHub> _hubContext;
         private readonly IJoinProjectRepository _joinProjectRepository;
-        public SubTaskService(ISubTaskRepository subTaskRepository, IHttpContextAccessor httpContextAccessor, ITaskRepository taskRepository, IHubContext<NotificationHub> hubContext,IJoinProjectRepository joinProjectRepository)
+        private readonly IUserRepository _userRepository;
+        private readonly IEmailSender _emailSender;
+        public SubTaskService(ISubTaskRepository subTaskRepository, IHttpContextAccessor httpContextAccessor, ITaskRepository taskRepository, IHubContext<NotificationHub> hubContext,IJoinProjectRepository joinProjectRepository,IUserRepository userRepository,IEmailSender emailSender)
         {
             _taskRepository = taskRepository;
             _subTaskRepository = subTaskRepository;
             _httpContextAccessor = httpContextAccessor;
             _hubContext = hubContext;
             _joinProjectRepository = joinProjectRepository;
+            _userRepository = userRepository;
+            _emailSender = emailSender;
         }
         /// <summary>
         /// Create a new sub-task
@@ -200,18 +206,25 @@ namespace Planify_BackEnd.Services.SubTasks
                 {
                     return new ResponseDTO(404, "Sub-task not found.", null);
                 }
-                //notification
-                var listJoinUserId = await _subTaskRepository.GetJoinedIdBySubTaskIdAsync(subTaskId);
-                var eventId = await _subTaskRepository.GetEventIdBySubtaskId(subTaskId);
-                var subtask = await _subTaskRepository.GetSubTaskByIdAsync(subTaskId);
-                var message = "Nhiệm vụ con " + subtask.SubTaskName + " đã bị xóa!";
-                var link = "/event-detail-EOG/" + eventId;
-                foreach (var id in listJoinUserId)
+                try
                 {
-                    await _hubContext.Clients.User(id + "").SendAsync("ReceiveNotification",
-                        message,
-                        link);
+                    //notification
+                    var listJoinUserId = await _subTaskRepository.GetJoinedIdBySubTaskIdAsync(subTaskId);
+                    var eventId = await _subTaskRepository.GetEventIdBySubtaskId(subTaskId);
+                    var subtask = await _subTaskRepository.GetSubTaskByIdAsync(subTaskId);
+                    var message = "Nhiệm vụ con " + subtask.SubTaskName + " đã bị xóa!";
+                    var link = "/event-detail-EOG/" + eventId;
+                    foreach (var id in listJoinUserId)
+                    {
+                        await _hubContext.Clients.User(id + "").SendAsync("ReceiveNotification",
+                            message,
+                            link);
+                        var user = await _userRepository.GetUserByIdAsync(id);
+                        await _emailSender.SendEmailAsync(user.Email, "Một nhiệm vụ con đã bị xóa",
+                            message+" Trong sự kiện "+subtask.Task.Event.EventTitle);
+                    }
                 }
+                catch{ }
                 return new ResponseDTO(200, "Sub-task deleted successfully!", null);
             }
             catch (Exception ex)
@@ -277,11 +290,21 @@ namespace Planify_BackEnd.Services.SubTasks
                     CreatedAt = DateTime.Now
                 };
                 var response = await _subTaskRepository.AssignSubTask(newJoinTask);
+                try
+                {
                 //notification
-                if (response)
-                    await _hubContext.Clients.User(userId + "").SendAsync("ReceiveNotification",
-                        "Bạn đã được thêm vào nhiệm vụ con "+ subtask.SubTaskName+ "!",
-                        "/event-detail-EOG/" + task.EventId);
+                    var user = await _userRepository.GetUserByIdAsync(userId);
+                    if (response)
+                    {
+                        await _hubContext.Clients.User(userId + "").SendAsync("ReceiveNotification",
+                            "Bạn đã được thêm vào nhiệm vụ con "+ subtask.SubTaskName+ "!",
+                            "/event-detail-EOG/" + task.EventId);
+                        await _emailSender.SendEmailAsync(user.Email,
+                            "Nhiệm vụ mới", "Bạn đã được thêm vào nhiệm vụ con tên " + subtask.SubTaskName + ", " + 
+                            "trong sự kiện "+ subtask.Task.Event.EventTitle);
+                    }
+                }
+                catch { }
                 return response;
 
             }catch(Exception ex)

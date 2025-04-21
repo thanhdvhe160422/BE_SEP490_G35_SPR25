@@ -14,18 +14,15 @@ namespace Planify_BackEnd.Services.Notification
             _emailSettings = emailSettings.Value;
         }
 
-        public Task SendEmailAsync(string email, string subject, string message)
+        public async Task SendEmailAsync(string email, string subject, string message)
         {
-            Execute(email, subject, message, null).Wait();
-
-            return Task.FromResult(0);
+            await Execute(email, subject, message, null);
         }
 
-        public Task SendEmailWithAttachmentsAsync(string email, string subject, string message, List<Attachment> attachments)
-        {
-            Execute(email, subject, message, attachments).Wait();
 
-            return Task.FromResult(0);
+        public async Task SendEmailWithAttachmentsAsync(string email, string subject, string message, List<Attachment> attachments)
+        {
+            await Execute(email, subject, message, attachments);
         }
 
         public async Task Execute(string email, string subject, string message, List<Attachment> attachments)
@@ -62,6 +59,7 @@ namespace Planify_BackEnd.Services.Notification
 
                 using (SmtpClient smtp = new SmtpClient(_emailSettings.ServerAddress, _emailSettings.ServerPort))
                 {
+                    smtp.UseDefaultCredentials = false;
                     smtp.Credentials = new NetworkCredential(_emailSettings.Username, _emailSettings.Password);
                     smtp.EnableSsl = _emailSettings.ServerUseSsl;
 
