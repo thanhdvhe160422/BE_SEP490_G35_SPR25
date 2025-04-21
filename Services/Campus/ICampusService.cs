@@ -7,5 +7,9 @@ namespace Planify_BackEnd.Services.Campus
     {
        Task<IEnumerable<CampusDTO>> GetAllCampus();
         Task<CampusDTO> GetCampusByName(string campusName);
+        Task<ResponseDTO> GetCampusById(int id);
+        Task<ResponseDTO> CreateCampus(CampusDTO campusDTO);
+        Task<ResponseDTO> UpdateCampus(CampusDTO campusDTO);
+        Task<ResponseDTO> DeleteCampus(int id);
     }
 }
