@@ -271,10 +271,9 @@ namespace Planify_BackEnd.Controllers.User
         }
 
         [HttpGet("search/v2")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> SearchUsersForAdmin(int page, int pageSize, string? input, string? roleName)
+        //[Authorize(Roles = "Admin")]
+        public async Task<IActionResult> SearchUsersForAdmin(int page, int pageSize, string? input, string? roleName, int?campusId)
         {
-            var campusId = int.Parse(User.FindFirst("campusId")?.Value);
             var users = await _userService.SearchUser(page, pageSize, input, roleName, campusId);
             if (users.TotalCount == 0)
             {

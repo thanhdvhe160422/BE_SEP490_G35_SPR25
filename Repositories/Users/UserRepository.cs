@@ -431,7 +431,7 @@ public class UserRepository : IUserRepository
         }
     }
 
-    public async Task<PageResultDTO<User>> SearchUser(int page, int pageSize, string? input, string? roleName, int campusId)
+    public async Task<PageResultDTO<User>> SearchUser(int page, int pageSize, string? input, string? roleName, int? campusId)
     {
         try
         {
@@ -472,7 +472,7 @@ public class UserRepository : IUserRepository
             var query = _context.Users
                 .Include(u => u.Campus)
                 .Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
-                .Where(u => u.CampusId == campusId &&
+                .Where(u => (!campusId.HasValue || u.CampusId == campusId) &&
                             u.UserRoles.Any(ur => ur.RoleId != 1) &&
                             (string.IsNullOrEmpty(input) ||
                              u.FirstName.Contains(input) ||
