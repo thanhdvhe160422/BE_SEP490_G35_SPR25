@@ -12,6 +12,8 @@ using Planify_BackEnd.Hub;
 using Planify_BackEnd.Models;
 using Planify_BackEnd.Repositories;
 using Planify_BackEnd.Repositories.JoinGroups;
+using Planify_BackEnd.Services.Notification;
+using static Microsoft.IO.RecyclableMemoryStreamManager;
 
 namespace Planify_BackEnd.Services.JoinProjects
 {
@@ -21,12 +23,16 @@ namespace Planify_BackEnd.Services.JoinProjects
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHubContext<NotificationHub> _hubContext;
         private readonly IEventRepository _eventRepository;
-        public JoinProjectService(IJoinProjectRepository joinProjectRepository, IHttpContextAccessor httpContextAccessor, IHubContext<NotificationHub> hubContext, IEventRepository eventRepository)
+        private readonly IEmailSender _emailSender;
+        private readonly IUserRepository _userRepository;
+        public JoinProjectService(IJoinProjectRepository joinProjectRepository, IHttpContextAccessor httpContextAccessor, IHubContext<NotificationHub> hubContext, IEventRepository eventRepository, IEmailSender emailSender,IUserRepository userRepository)
         {
             _joinProjectRepository = joinProjectRepository;
             _httpContextAccessor = httpContextAccessor;
             _hubContext = hubContext;
             _eventRepository = eventRepository;
+            _emailSender = emailSender;
+            _userRepository = userRepository;
         }
         public PageResultDTO<JoinedProjectDTO> JoiningEvents(int page, int pageSize, Guid userId)
         {
@@ -126,9 +132,18 @@ namespace Planify_BackEnd.Services.JoinProjects
                 var e = await _eventRepository.GetEventByIdAsync(eventId);
                 var message = "Bạn đã bị loại khỏi sự kiện " + (e.EventTitle.Length > 40 ? e.EventTitle.Substring(0, 40) + ".." : e.EventTitle) + "!";
                 if (response)
+                {
+                    var user = await _userRepository.GetUserByIdAsync(userId);
                     await _hubContext.Clients.User(userId + "").SendAsync("ReceiveNotification",
                     message,
                     "/event-detail-EOG/" + eventId);
+                    await _emailSender.SendEmailAsync(user.Email, 
+                        "Thông báo: Bạn đã bị loại khỏi sự kiện " + e.EventTitle,
+                        $"<p>Chúng tôi xin thông báo rằng bạn đã bị loại khỏi sự kiện <strong>{e.EventTitle}</strong>.</p>" +
+                        $"<p>Nếu bạn có bất kỳ thắc mắc nào về quyết định này, vui lòng liên hệ với ban tổ chức để được giải đáp thêm.</p>" +
+                        $"<p>Bạn có thể xem lại chi tiết sự kiện tại liên kết sau: <a href=\"/event-detail-EOG/{eventId}\">Xem chi tiết sự kiện</a></p>"
+                        );
+                }
                 return response;
             }
             catch (Exception ex)
@@ -177,16 +192,26 @@ namespace Planify_BackEnd.Services.JoinProjects
             }
 
             var result = new { AddedCount = newUserIds.Count, EventId = request.EventId };
-            //notification
-            var e = await _eventRepository.GetEventByIdAsync(request.EventId);
-            var message = "Bạn đã được thêm vào sự kiện " + (e.EventTitle.Length > 40 ? e.EventTitle.Substring(0, 40) + ".." : e.EventTitle) + "!";
-            var link = "/event-detail-EOG/" + request.EventId;
-            foreach (var id in newUserIds)
+            try
             {
-                await _hubContext.Clients.User(id + "").SendAsync("ReceiveNotification",
-                    message,
-                    link);
+                //notification
+                var e = await _eventRepository.GetEventByIdAsync(request.EventId);
+                var message = "Bạn đã được thêm vào sự kiện " + (e.EventTitle.Length > 40 ? e.EventTitle.Substring(0, 40) + ".." : e.EventTitle) + "!";
+                var link = "/event-detail-EOG/" + request.EventId;
+                foreach (var id in newUserIds)
+                {
+                    await _hubContext.Clients.User(id + "").SendAsync("ReceiveNotification",
+                        message,
+                        link);
+                    var user = await _userRepository.GetUserByIdAsync(id);
+                    await _emailSender.SendEmailAsync(user.Email,
+                            "Thông báo: Bạn đã được thêm vào sự kiện " + e.EventTitle,
+                            $"<p>Bạn đã được thêm vào sự kiện <strong>{e.EventTitle}</strong>.</p>" +
+                            $"<p>Nếu bạn có bất kỳ thắc mắc nào về quyết định này, vui lòng liên hệ với ban tổ chức để được giải đáp thêm.</p>"
+                            );
+                }
             }
+            catch { }
             return new ResponseDTO(200, $"Successfully added {newUserIds.Count} implementer(s) to event {request.EventId}.", result);
         }
 

@@ -423,7 +423,7 @@ namespace Planify_BackEnd.Services.Users
             }
         }
 
-        public async Task<PageResultDTO<UserListDTO>> SearchUser(int page, int pageSize, string? input, string? roleName, int campusId)
+        public async Task<PageResultDTO<UserListDTO>> SearchUser(int page, int pageSize, string? input, string? roleName, int? campusId)
         {
             try
             {

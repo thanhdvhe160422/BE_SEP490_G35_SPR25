@@ -145,7 +145,9 @@ public class SubTaskRepository : ISubTaskRepository
     {
         try
         {
-            return await _context.SubTasks.FindAsync(subTaskId);
+            return await _context.SubTasks
+                .Include(sb=>sb.Task).ThenInclude(t=>t.Event)
+                .FirstOrDefaultAsync(sb=>sb.Id == subTaskId);
         }
         catch (Exception ex)
         {

@@ -52,13 +52,13 @@ namespace Planify_BackEnd.Services.Participants
                 return new ResponseDTO(400, "Invalid UserId", null);
 
             if (!_repository.EventExists(registerDto.EventId))
-                return new ResponseDTO(404, "Event not found", null);
+                return new ResponseDTO(404, "Không tìm thấy sự kiện", null);
             if (!_repository.UserExists(registerDto.UserId))
-                return new ResponseDTO(404, "User not found", null);
+                return new ResponseDTO(404, "Không tìm thấy người dùng", null);
             if (_repository.IsAlreadyRegistered(registerDto.EventId, registerDto.UserId))
-                return new ResponseDTO(400, "User already registered for this event", null);
+                return new ResponseDTO(400, "Người dùng đã đăng ký rồi", null);
             if (_repository.IsOrganizer(registerDto.UserId, registerDto.EventId))
-                return new ResponseDTO(403, "Organizers cannot register as participants", null);
+                return new ResponseDTO(403, "Organizers không thể đăng kí tham gia", null);
 
             var participant = new Participant
             {
@@ -68,7 +68,7 @@ namespace Planify_BackEnd.Services.Participants
             };
 
             _repository.RegisterParticipant(participant);
-            return new ResponseDTO(201, "Registered successfully", null);
+            return new ResponseDTO(201, "Đăng ký thành công", null);
         }
 
         public ResponseDTO GetRegisteredEvents(Guid userId)
@@ -77,7 +77,7 @@ namespace Planify_BackEnd.Services.Participants
                 return new ResponseDTO(400, "Invalid UserId", null);
 
             if (!_repository.UserExists(userId))
-                return new ResponseDTO(404, "User not found", null);
+                return new ResponseDTO(404, "Không tìm thấy người dùng", null);
 
             var events = _repository.GetRegisteredEvents(userId);
             var result = events.Select(p => new RegisteredEventDTO
@@ -107,17 +107,17 @@ namespace Planify_BackEnd.Services.Participants
                 return new ResponseDTO(400, "Invalid UserId", null);
 
             if (!_repository.EventExists(unregisterDto.EventId))
-                return new ResponseDTO(404, "Event not found", null);
+                return new ResponseDTO(404, "Không tìm thấy sự kiện", null);
             if (!_repository.UserExists(unregisterDto.UserId))
-                return new ResponseDTO(404, "User not found", null);
+                return new ResponseDTO(404, "Không tìm thấy người dùng", null);
             if (!_repository.IsAlreadyRegistered(unregisterDto.EventId, unregisterDto.UserId))
-                return new ResponseDTO(400, "User is not registered for this event", null);
+                return new ResponseDTO(400, "Người dùng không đăng kí sự kiện này", null);
 
             var success = _repository.UnregisterParticipant(unregisterDto.EventId, unregisterDto.UserId);
             if (!success)
-                return new ResponseDTO(500, "Failed to unregister", null);
+                return new ResponseDTO(500, "Không hủy đăng ký được", null);
 
-            return new ResponseDTO(200, "Unregistered successfully", null);
+            return new ResponseDTO(200, "Hủy đăng ký thành công", null);
         }
 
         public ResponseDTO IsAlreadyRegistered(int eventId, Guid userId)

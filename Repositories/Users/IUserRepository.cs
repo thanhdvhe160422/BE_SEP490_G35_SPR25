@@ -21,7 +21,7 @@ public interface IUserRepository
     Task<bool> UpdateRoleEOG(Guid userId, int roleId);
     Task<bool> UpdateRoleCampusManager(Guid userId, int roleId);
     Task<PageResultDTO<EventOrganizerVM>> GetCampusManager(int page, int pageSize, int campusId);
-    Task<PageResultDTO<User>> SearchUser(int page, int pageSize, string? input, string? roleName, int campusId);
+    Task<PageResultDTO<User>> SearchUser(int page, int pageSize, string? input, string? roleName, int? campusId);
     Task<User> AddUserAsync(User user);
     Task<UserRole> AddUserRoleAsync(UserRole userRole);
     Task<Campus?> GetCampusByIdAsync(int campusId);
