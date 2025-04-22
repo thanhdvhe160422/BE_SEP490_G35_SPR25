@@ -54,9 +54,23 @@ namespace Planify_BackEnd.Services.Campus
             }
         }
 
-        public Task<ResponseDTO> DeleteCampus(int id)
+        public async Task<ResponseDTO> DeleteCampus(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var response = await _campusRepository.DeleteCampus(id);
+                if (response)
+                {
+                    return new ResponseDTO(200, "Xóa thành công!", null);
+                }
+                else
+                {
+                    return new ResponseDTO(400, "Xóa không thành công!", null);
+                }
+            }catch(Exception ex)
+            {
+                return new ResponseDTO(500, ex.Message,null);
+            }
         }
 
         public async Task<IEnumerable<CampusDTO>> GetAllCampus()
