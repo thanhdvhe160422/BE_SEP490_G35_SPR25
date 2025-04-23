@@ -14,7 +14,9 @@ namespace Planify_BackEnd.Repositories.Categories
         public async Task<CategoryEvent> GetByIdAsync(int CategoryEventId)
         {
             try {
-                return await _context.CategoryEvents.FirstOrDefaultAsync(a => a.Id == CategoryEventId);
+                return await _context.CategoryEvents
+                    .Include(c=>c.Events)
+                    .FirstOrDefaultAsync(c => c.Id == CategoryEventId);
             } 
             catch (Exception ex)
             {
@@ -36,19 +38,19 @@ namespace Planify_BackEnd.Repositories.Categories
             }
         }
 
-        public async Task<CategoryEvent> GetCategoryByName(string categoryName, int campusId)
+        public async Task<CategoryEvent?> GetCategoryByName(string categoryName, int campusId)
         {
             try
             {
                 var category = await _context.CategoryEvents
-                    .FirstOrDefaultAsync(c => c.CategoryEventName.Contains(categoryName) 
+                    .FirstOrDefaultAsync(c => c.CategoryEventName.Equals(categoryName) 
                     && c.CampusId == campusId
                     && c.Status == 1);
                 return category;
             }
             catch
             {
-                return new CategoryEvent();
+                throw new Exception();
             }
         }
 

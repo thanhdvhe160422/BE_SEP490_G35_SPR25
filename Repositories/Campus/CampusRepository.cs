@@ -9,6 +9,39 @@ public class CampusRepository : ICampusRepository
     {
         _context = context;
     }
+
+    public async Task<bool> CreateCampus(Campus campus)
+    {
+        try
+        {
+            _context.Add(campus);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+
+        }
+    }
+
+    public async Task<bool> DeleteCampus(int id)
+    {
+        try
+        {
+            var campus = await _context.Campuses
+                .FirstOrDefaultAsync(c => c.Id == id);
+            campus.Status = 0;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+
+        }
+    }
+
     public async Task<IEnumerable<Campus>> getAllCampus()
     {
         try
@@ -16,6 +49,20 @@ public class CampusRepository : ICampusRepository
             return await _context.Campuses
                 .Where(c => c.Status == 1)
                 .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+
+        }
+    }
+
+    public async Task<Campus?> GetCampusById(int id)
+    {
+        try
+        {
+            return await _context.Campuses
+                .FirstOrDefaultAsync(c => c.Id == id);
         }
         catch (Exception ex)
         {
@@ -36,6 +83,21 @@ public class CampusRepository : ICampusRepository
         catch
         {
             throw new Exception();
+        }
+    }
+
+    public async Task<bool> UpdateCampus(Campus campus)
+    {
+        try
+        {
+            _context.Update(campus);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+
         }
     }
 }

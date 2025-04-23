@@ -1,4 +1,5 @@
-﻿using Planify_BackEnd.DTOs.Categories;
+﻿using Planify_BackEnd.DTOs;
+using Planify_BackEnd.DTOs.Categories;
 using Planify_BackEnd.Models;
 
 namespace Planify_BackEnd.Services.Categories
@@ -7,8 +8,8 @@ namespace Planify_BackEnd.Services.Categories
     {
         IEnumerable<CategoryViewModel> GetCategoryByCampusId(int campusId);
         Task<CategoryViewModel> GetCategoryByName(string categoryName, int campusId);
-        Task<CategoryViewModel> CreateCategory(CategoryDTO categoryDTO);
-        Task<CategoryViewModel> UpdateCategory(CategoryDTO categoryDTO);
-        Task<bool> DeleteCategory(int categoryId);
+        Task<ResponseDTO> CreateCategory(CategoryDTO categoryDTO,int campusId);
+        Task<ResponseDTO> UpdateCategory(CategoryDTO categoryDTO,int campusId);
+        Task<ResponseDTO> DeleteCategory(int categoryId);
     }
 }
