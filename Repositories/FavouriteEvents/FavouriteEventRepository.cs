@@ -80,8 +80,6 @@ namespace Planify_BackEnd.Repositories.FavouriteEvents
                     .Include(f => f.User)
                     .Where(f => f.UserId == userId &&
                     f.Event.CampusId==campusId)
-                    .Skip((page - 1) * pageSize)
-                    .Take(pageSize)
                     .Count();
                 if (count == 0) return new PageResultDTO<FavouriteEventVM>(new List<FavouriteEventVM>(), 0, page, pageSize);
                 var f = _context.FavouriteEvents
