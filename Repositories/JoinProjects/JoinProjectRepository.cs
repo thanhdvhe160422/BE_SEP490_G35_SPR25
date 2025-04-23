@@ -50,7 +50,7 @@ namespace Planify_BackEnd.Repositories.JoinGroups
                 var count =  _context.JoinProjects
                     .Include(jp=>jp.Event)
                     .Where(jp => jp.UserId == userId &&
-                    jp.Event.EndTime<=now)
+                                 jp.Event.Status == 2)
                     .Distinct()
                     .Count();
                 if (count == 0)
@@ -59,9 +59,9 @@ namespace Planify_BackEnd.Repositories.JoinGroups
                     .Include(jp => jp.Event).ThenInclude(jp=>jp.CategoryEvent)
                     .Include(jp => jp.User)
                     .Where(jp => jp.UserId == userId &&
-                    jp.Event.EndTime <= now)
+                    jp.Event.Status == 2)
                     .Distinct()
-                    .OrderByDescending(jp=>jp.Event.EndTime)
+                    .OrderByDescending(j => j.TimeJoinProject)
                     .Skip((page - 1) * pageSize).Take(pageSize)
                     .ToList();
                 return new PageResultDTO<JoinProject>(list, count, page, pageSize);
