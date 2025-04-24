@@ -329,12 +329,12 @@ public class UserRepository : IUserRepository
         {
             var count = _context.UserRoles
                 .Include(ur => ur.User)
-                .Where(ur => ur.RoleId == 3&&ur.User.CampusId==campusId)
+                .Where(ur => ur.RoleId == 3&&ur.User.CampusId==campusId && ur.User.Status != 0)
                 .Distinct()
                 .Count();
             var result = await _context.UserRoles
                 .Include(ur => ur.User).ThenInclude(u => u.Avatar)
-                .Where(ur => ur.RoleId == 3 && ur.User.CampusId == campusId)
+                .Where(ur => ur.RoleId == 3 && ur.User.CampusId == campusId&&ur.User.Status!=0)
                 .Select(ur => new EventOrganizerVM
                 {
                     Id = ur.User.Id,
@@ -547,7 +547,7 @@ public class UserRepository : IUserRepository
             var usersQuery = _context.Users
             .Include(c => c.Campus)
             .Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
-            .Where(c =>
+            .Where(c => c.Status!=0 &&
                 (string.IsNullOrEmpty(input) ||
                  (c.FirstName.Contains(input) || c.LastName.Contains(input) || c.Email.Contains(input))) &&
                 c.CampusId == campusId &&
