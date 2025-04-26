@@ -251,7 +251,7 @@ namespace Planify_BackEnd.Controllers.User
             }
         }
         [HttpGet("campus-manager")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetCampusManager(int page, int pageSize)
         {
             try
