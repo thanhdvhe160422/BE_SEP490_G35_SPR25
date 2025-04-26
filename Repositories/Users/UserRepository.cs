@@ -79,7 +79,7 @@ public class UserRepository : IUserRepository
                 .Where(u=>u.UserRoles.Any(ur => ur.RoleId != 1))
                 .Skip((page - 1) * pageSize).Take(pageSize)
                 .ToList();
-            return new PageResultDTO<User>(data, count, page, pageSize);
+            return new PageResultDTO<User>(data, data.Count, page, pageSize);
 
         } catch (Exception ex)
         {
@@ -396,17 +396,18 @@ public class UserRepository : IUserRepository
         }
     }
 
-    public async Task<PageResultDTO<EventOrganizerVM>> GetCampusManager(int page, int pageSize, int campusId)
+    public async Task<PageResultDTO<EventOrganizerVM>> GetCampusManager(int page, int pageSize/*, int campusId*/)
     {
         try
         {
             var count = _context.UserRoles
                 .Include(ur => ur.User)
-                .Where(ur => ur.RoleId == 2 && ur.User.CampusId == campusId)
+                .Where(ur => ur.RoleId == 2 /*&& ur.User.CampusId == campusId*/)
                 .Count();
             var result = await _context.UserRoles
                 .Include(ur => ur.User).ThenInclude(u => u.Avatar)
-                .Where(ur => ur.RoleId == 2 && ur.User.CampusId == campusId)
+                .Include(ur => ur.User).ThenInclude(u => u.Campus)
+                .Where(ur => ur.RoleId == 2 /*&& ur.User.CampusId == campusId*/)
                 .Select(ur => new EventOrganizerVM
                 {
                     Id = ur.User.Id,
@@ -416,6 +417,7 @@ public class UserRepository : IUserRepository
                     LastName = ur.User.LastName,
                     Gender = ur.User.Gender,
                     PhoneNumber = ur.User.PhoneNumber,
+                    CampusName = ur.User.Campus.CampusName,
                     Avatar = ur.User.Avatar == null ?
                     new MediumDTO() :
                     new MediumDTO
@@ -423,7 +425,9 @@ public class UserRepository : IUserRepository
                         Id = ur.User.Avatar.Id,
                         MediaUrl = ur.User.Avatar.MediaUrl
                     }
-                }).ToListAsync();
+                })
+                .Skip((page-1)*pageSize).Take(pageSize)
+                .ToListAsync();
             return new PageResultDTO<EventOrganizerVM>(result, count, page, pageSize);
         }
         catch (Exception ex)

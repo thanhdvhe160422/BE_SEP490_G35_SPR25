@@ -251,13 +251,13 @@ namespace Planify_BackEnd.Controllers.User
             }
         }
         [HttpGet("campus-manager")]
-        [Authorize(Roles = "Campus Manager, Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetCampusManager(int page, int pageSize)
         {
             try
             {
-                var campusId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == "campusId").Value);
-                var response = await _userService.GetCampusManager(page, pageSize, campusId);
+                //var campusId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == "campusId").Value);
+                var response = await _userService.GetCampusManager(page, pageSize);
                 if (response.Items.Count() == 0)
                 {
                     return NotFound("Cannot found any campus manager!");

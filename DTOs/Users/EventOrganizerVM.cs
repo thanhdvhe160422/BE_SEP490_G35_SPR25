@@ -19,5 +19,6 @@ namespace Planify_BackEnd.DTOs.Users
         public bool Gender { get; set; }
 
         public MediumDTO? Avatar { get; set; }
+        public string? CampusName{ get; set; }
     }
 }
