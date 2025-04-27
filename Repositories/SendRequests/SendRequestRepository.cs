@@ -1,7 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.SendRequests;
 using Planify_BackEnd.Models;
 using System;
+using System.Globalization;
+using System.Text;
 
 namespace Planify_BackEnd.Repositories.SendRequests
 {
@@ -63,6 +66,55 @@ namespace Planify_BackEnd.Repositories.SendRequests
                 .Where(sr => sr.Event.CreateBy == userId &&
                     sr.Event.CampusId == campusId)
                 .ToListAsync();
+        }
+
+        public async Task<PageResultDTO<SendRequest>> SearchRequest(int page, int pageSize, int campusId, string? eventTitle, int? status)
+        {
+            try
+            {
+                var query = await _context.SendRequests
+                    .Include(sr=>sr.Event)
+                    .Where(r => r.Event.CampusId == campusId &&
+                    !status.HasValue||r.Event.Status==status)
+                    .ToListAsync();
+
+                if (!string.IsNullOrEmpty(eventTitle))
+                {
+                    string normalizedEventName = RemoveDiacritics(eventTitle).ToLower();
+
+                    query = query
+                        .Where(r => !string.IsNullOrEmpty(r.Event.EventTitle) &&
+                            RemoveDiacritics(r.Event.EventTitle).ToLower().Contains(normalizedEventName))
+                        .ToList();
+                }
+                var totalCount = query.Count;
+
+                var data = query
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+                return new PageResultDTO<SendRequest>(data, totalCount, page,pageSize);
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        private string RemoveDiacritics(string text)
+        {
+            var normalizedString = text.Normalize(NormalizationForm.FormD);
+            var stringBuilder = new StringBuilder();
+
+            foreach (var c in normalizedString)
+            {
+                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
+                }
+            }
+
+            return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
         }
     }
 }

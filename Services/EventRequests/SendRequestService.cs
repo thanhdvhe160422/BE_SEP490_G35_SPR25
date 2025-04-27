@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Google.Apis.Drive.v3.Data;
+using Microsoft.AspNetCore.SignalR;
 using Planify_BackEnd.DTOs;
 using Planify_BackEnd.DTOs.SendRequests;
 using Planify_BackEnd.Hub;
@@ -221,6 +222,36 @@ namespace Planify_BackEnd.Services.EventRequests
             catch (Exception ex)
             {
                 return new ResponseDTO(500, $"Error retrieving requests: {ex.Message}", null);
+            }
+        }
+
+        public async Task<PageResultDTO<GetSendRequestDTO>> SearchRequest(int page, int pageSize, int campusId, string? eventTitle, int? status)
+        {
+            try
+            {
+                var requests = await _requestRepository.SearchRequest(page,pageSize, campusId,eventTitle,status);
+
+                if (requests == null || requests.TotalCount==0)
+                {
+                    return new PageResultDTO<GetSendRequestDTO>(new List<GetSendRequestDTO>(),0,page,pageSize);
+                }
+
+                var requestDtos = requests.Items.Select(sr => new GetSendRequestDTO
+                {
+                    Id = sr.Id,
+                    EventId = sr.EventId,
+                    EventTitle = sr.Event.EventTitle,
+                    ManagerId = sr.ManagerId,
+                    Reason = sr.Reason,
+                    Status = sr.Event.Status,
+                    CreatedAt = sr.Event.CreatedAt
+                }).ToList();
+
+                return new PageResultDTO<GetSendRequestDTO>(requestDtos, requests.TotalCount, page, pageSize);
+            }
+            catch
+            {
+                return new PageResultDTO<GetSendRequestDTO>(new List<GetSendRequestDTO>(), 0, page, pageSize);
             }
         }
     }
