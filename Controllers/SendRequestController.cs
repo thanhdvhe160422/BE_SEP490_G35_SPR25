@@ -78,7 +78,7 @@ namespace Planify_BackEnd.Controllers
             return StatusCode(response.Status, response);
         }
         [HttpGet("search")]
-        [Authorize(Roles = "Campus Manager")]
+        [Authorize(Roles = "Campus Manager,Event Organizer")]
         public async Task<IActionResult> SearchRequest(int page, int pageSize, string? eventTitle,int? status,Guid? userId)
         {
             try
