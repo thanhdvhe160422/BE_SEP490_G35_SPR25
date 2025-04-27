@@ -68,14 +68,15 @@ namespace Planify_BackEnd.Repositories.SendRequests
                 .ToListAsync();
         }
 
-        public async Task<PageResultDTO<SendRequest>> SearchRequest(int page, int pageSize, int campusId, string? eventTitle, int? status)
+        public async Task<PageResultDTO<SendRequest>> SearchRequest(int page, int pageSize, int campusId, string? eventTitle, int? status, Guid? userId)
         {
             try
             {
                 var query = await _context.SendRequests
                     .Include(sr=>sr.Event)
                     .Where(r => r.Event.CampusId == campusId &&
-                    !status.HasValue||r.Event.Status==status)
+                    !status.HasValue||r.Event.Status==status &&
+                    !userId.HasValue || r.Event.CreateBy.Equals(userId))
                     .ToListAsync();
 
                 if (!string.IsNullOrEmpty(eventTitle))
