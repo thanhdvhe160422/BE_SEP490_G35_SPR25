@@ -74,9 +74,11 @@ namespace Planify_BackEnd.Repositories.SendRequests
             {
                 var query = await _context.SendRequests
                     .Include(sr=>sr.Event)
-                    .Where(r => r.Event.CampusId == campusId &&
-                    !status.HasValue||r.Event.Status==status &&
-                    !userId.HasValue || r.Event.CreateBy.Equals(userId))
+                    .Where(r =>
+                        r.Event.CampusId == campusId &&
+                        (!status.HasValue || r.Event.Status == status) &&
+                        (!userId.HasValue || r.Event.CreateBy.Equals(userId))
+                    )
                     .ToListAsync();
 
                 if (!string.IsNullOrEmpty(eventTitle))
