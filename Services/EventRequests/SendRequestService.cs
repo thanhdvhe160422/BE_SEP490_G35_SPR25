@@ -225,11 +225,11 @@ namespace Planify_BackEnd.Services.EventRequests
             }
         }
 
-        public async Task<PageResultDTO<GetSendRequestDTO>> SearchRequest(int page, int pageSize, int campusId, string? eventTitle, int? status)
+        public async Task<PageResultDTO<GetSendRequestDTO>> SearchRequest(int page, int pageSize, int campusId, string? eventTitle, int? status, Guid? userId)
         {
             try
             {
-                var requests = await _requestRepository.SearchRequest(page,pageSize, campusId,eventTitle,status);
+                var requests = await _requestRepository.SearchRequest(page,pageSize, campusId,eventTitle,status, userId);
 
                 if (requests == null || requests.TotalCount==0)
                 {

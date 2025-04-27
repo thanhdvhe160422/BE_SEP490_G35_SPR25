@@ -79,12 +79,12 @@ namespace Planify_BackEnd.Controllers
         }
         [HttpGet("search")]
         //[Authorize(Roles = "Campus Manager")]
-        public async Task<IActionResult> SearchRequest(int page, int pageSize, string? eventTitle,int? status)
+        public async Task<IActionResult> SearchRequest(int page, int pageSize, string? eventTitle,int? status,Guid? userId)
         {
             try
             {
                 var campusId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == "campusId").Value);
-                var response = await _sendRequestService.SearchRequest(page,pageSize,campusId,eventTitle,status);
+                var response = await _sendRequestService.SearchRequest(page,pageSize,campusId,eventTitle,status,userId);
                 if (response == null || response.TotalCount == 0)
                 {
                     return NotFound("Cannot found any request!");
