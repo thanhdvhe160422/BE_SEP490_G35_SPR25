@@ -93,7 +93,7 @@ namespace Planify_BackEnd.Controllers
         /// <param name="eventId"></param>
         /// <returns></returns>
         [HttpGet("get-event-detail")]
-        [Authorize(Roles = "Event Organizer, Campus Manager")]
+        [Authorize(Roles = "Event Organizer, Campus Manager, Implementer")]
         public async Task<IActionResult> GetEventDetail(int eventId)
         {
             var response = await _eventService.GetEventDetailAsync(eventId);
