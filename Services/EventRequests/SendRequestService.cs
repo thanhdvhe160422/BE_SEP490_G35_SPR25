@@ -214,7 +214,9 @@ namespace Planify_BackEnd.Services.EventRequests
                     ManagerId = sr.ManagerId,
                     Reason = sr.Reason,
                     Status = sr.Event.Status,
-                    CreatedAt = sr.Event.CreatedAt
+                    CreatedAt = sr.Event.CreatedAt,
+                    EventStartTime = sr.Event.StartTime,
+                    EventEndTime = sr.Event.EndTime
                 }).ToList();
 
                 return new ResponseDTO(200, "Requests retrieved successfully.", requestDtos);
@@ -244,7 +246,9 @@ namespace Planify_BackEnd.Services.EventRequests
                     ManagerId = sr.ManagerId,
                     Reason = sr.Reason,
                     Status = sr.Event.Status,
-                    CreatedAt = sr.Event.CreatedAt
+                    CreatedAt = sr.Event.CreatedAt,
+                    EventStartTime = sr.Event.StartTime,
+                    EventEndTime = sr.Event.EndTime
                 }).ToList();
 
                 return new PageResultDTO<GetSendRequestDTO>(requestDtos, requests.TotalCount, page, pageSize);

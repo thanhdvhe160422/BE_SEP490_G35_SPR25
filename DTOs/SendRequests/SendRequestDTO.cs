@@ -14,5 +14,7 @@
         public string Reason { get; set; } = null!;
         public int Status { get; set; }
         public DateTime CreatedAt { get; set; }
+        public DateTime? EventStartTime { get; set; }
+        public DateTime? EventEndTime { get; set; }
     }
 }
