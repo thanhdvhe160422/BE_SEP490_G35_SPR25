@@ -61,7 +61,7 @@ namespace Planify_BackEnd.Repositories.Dashboards
             try
             {
                 return await _context.Events
-                    .Where(e => e.Status == 1 || e.Status == 2 &&
+                    .Where(e => e.Status == 2 &&
                     e.CampusId == campusId)
                     .OrderByDescending(e => e.StartTime)
                     .Take(5)
