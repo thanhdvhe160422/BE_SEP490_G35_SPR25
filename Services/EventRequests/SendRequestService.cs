@@ -216,7 +216,8 @@ namespace Planify_BackEnd.Services.EventRequests
                     Status = sr.Event.Status,
                     CreatedAt = sr.Event.CreatedAt,
                     EventStartTime = sr.Event.StartTime,
-                    EventEndTime = sr.Event.EndTime
+                    EventEndTime = sr.Event.EndTime,
+                    requestStatus = sr.Status
                 }).ToList();
 
                 return new ResponseDTO(200, "Requests retrieved successfully.", requestDtos);
@@ -227,11 +228,11 @@ namespace Planify_BackEnd.Services.EventRequests
             }
         }
 
-        public async Task<PageResultDTO<GetSendRequestDTO>> SearchRequest(int page, int pageSize, int campusId, string? eventTitle, int? status, Guid? userId)
+        public async Task<PageResultDTO<GetSendRequestDTO>> SearchRequest(int page, int pageSize, int campusId, string? eventTitle, int? status, Guid? userId, int? requestStatus)
         {
             try
             {
-                var requests = await _requestRepository.SearchRequest(page,pageSize, campusId,eventTitle,status, userId);
+                var requests = await _requestRepository.SearchRequest(page,pageSize, campusId,eventTitle,status, userId, requestStatus);
 
                 if (requests == null || requests.TotalCount==0)
                 {
@@ -248,7 +249,8 @@ namespace Planify_BackEnd.Services.EventRequests
                     Status = sr.Event.Status,
                     CreatedAt = sr.Event.CreatedAt,
                     EventStartTime = sr.Event.StartTime,
-                    EventEndTime = sr.Event.EndTime
+                    EventEndTime = sr.Event.EndTime,
+                    requestStatus = sr.Event.Status,
                 }).ToList();
 
                 return new PageResultDTO<GetSendRequestDTO>(requestDtos, requests.TotalCount, page, pageSize);
