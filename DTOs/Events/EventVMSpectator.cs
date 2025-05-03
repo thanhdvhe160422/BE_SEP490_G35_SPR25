@@ -49,15 +49,15 @@ namespace Planify_BackEnd.DTOs.Events
             {
                 if (StartTime.HasValue && StartTime.Value <= DateTime.Now && EndTime.HasValue && EndTime.Value >= DateTime.Now)
                 {
-                    return "Running";
+                    return "Đang diễn ra";
                 }
                 else if (StartTime.HasValue && StartTime.Value > DateTime.Now)
                 {
-                    return "Not Start Yet";
+                    return "Chưa bắt đầu";
                 }
                 else if (EndTime.HasValue && EndTime.Value < DateTime.Now)
                 {
-                    return "Closed";
+                    return "Đã kết thúc";
                 }
                 return string.Empty;
             }
