@@ -55,7 +55,7 @@ namespace Planify_BackEnd.Services.EventRequests
                 if (eventEntity == null)
                     return new ResponseDTO(404, "Không tìm thấy sự kiện", null);
 
-                if (eventEntity.Status != 0)
+                if (eventEntity.Status != 0 && eventEntity.Status != -1)
                     return new ResponseDTO(400, "Sự kiện không thể tạo yêu cầu mới do trạng thái hiện tại", null);
 
                 var existingRequest = await _requestRepository.GetRequestByIdAsync(requestDTO.EventId);
