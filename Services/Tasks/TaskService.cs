@@ -14,6 +14,8 @@ using System.Threading.Tasks;
 using Google.Apis.Drive.v3.Data;
 using Microsoft.AspNetCore.SignalR;
 using Planify_BackEnd.Hub;
+using Microsoft.AspNetCore.Identity;
+using Planify_BackEnd.Services.Notification;
 namespace Planify_BackEnd.Services.Tasks
 {
     public class TaskService : ITaskService
@@ -22,11 +24,15 @@ namespace Planify_BackEnd.Services.Tasks
         private readonly ITaskRepository _taskRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHubContext<NotificationHub> _hubContext;
-        public TaskService(ITaskRepository taskRepository, IHttpContextAccessor httpContextAccessor,IHubContext<NotificationHub> hubContext)
+        private readonly IEmailSender _emailSender;
+        private readonly IUserRepository _userRepository;
+        public TaskService(ITaskRepository taskRepository, IHttpContextAccessor httpContextAccessor,IHubContext<NotificationHub> hubContext,IEmailSender emailSender, IUserRepository userRepository)
         {
             _taskRepository = taskRepository;
             _httpContextAccessor = httpContextAccessor;
             _hubContext = hubContext;
+            _emailSender = emailSender;
+            _userRepository = userRepository;
         }
         public async Task<ResponseDTO> CreateTaskAsync(TaskCreateRequestDTO taskDTO, Guid organizerId)
         {
@@ -295,15 +301,98 @@ namespace Planify_BackEnd.Services.Tasks
                 //notification
                 var task = _taskRepository.GetTaskById(taskId);
                 var listJoined = await _taskRepository.GetJoinedIdByTaskId(taskId);
-                var message = "Task " + task.TaskName + "has been deleted!";
+                var message = "Nhiệm vụ " + task.TaskName + "đã bị xóa!";
                 var link = "/event-detail-EOG/" + task.EventId;
+                string htmlContent = $@"
+                    <!DOCTYPE html>
+                    <html lang='vi'>
+                    <head>
+                      <meta charset='UTF-8'>
+                      <title>Thông báo nhiệm vụ bị xóa</title>
+                      <style>
+                        body {{
+                          margin: 0;
+                          font-family: Arial, sans-serif;
+                          background-color: #f7f7ff;
+                          text-align: center;
+                          padding: 40px 20px;
+                        }}
+                        .container {{
+                          background-color: white;
+                          max-width: 600px;
+                          margin: auto;
+                          padding: 40px 20px;
+                          border-radius: 8px;
+                        }}
+                        .logo img {{
+                          width: 140px;
+                          margin-bottom: 40px;
+                        }}
+                        h1 {{
+                          font-size: 26px;
+                          font-weight: bold;
+                          color: #cc0000;
+                        }}
+                        .description {{
+                          font-size: 15px;
+                          color: #333;
+                          margin-top: 30px;
+                          margin-bottom: 20px;
+                          line-height: 1.6;
+                        }}
+                        .button {{
+                          margin-top: 30px;
+                        }}
+                        .button a {{
+                          background-color: #6666ff;
+                          color: white;
+                          text-decoration: none;
+                          padding: 12px 28px;
+                          border-radius: 25px;
+                          font-size: 16px;
+                          font-weight: bold;
+                        }}
+                      </style>
+                    </head>
+                    <body>
+                      <div class='container'>
+                        <div class='logo'>
+                          <img src='https://domain.com/logo-fptu.png' alt='planify logo'>
+                        </div>
+
+                        <h1>Nhiệm vụ đã bị xóa</h1>
+
+                        <p class='description'>
+                          {message}<br/><br/>
+                          Nếu bạn có thắc mắc hoặc cần thêm thông tin, vui lòng liên hệ với ban tổ chức.
+                        </p>
+
+                        <div class='button'>
+                          <a href='{link}'>Xem chi tiết sự kiện</a>
+                        </div>
+
+                        <br><br>
+                        <p class='description'>Trân trọng, hệ thống tự động</p>
+                      </div>
+                    </body>
+                    </html>";
                 if (listJoined != null&&listJoined.Count>0)
                 {
-                    foreach(var id in listJoined)
+                    foreach (var id in listJoined)
                     {
                         await _hubContext.Clients.User(id + "").SendAsync("ReceiveNotification",
                             message,
                             link);
+                        var user = await _userRepository.GetUserByIdAsync(id);
+                        if (user != null)
+                        {
+
+                            await _emailSender.SendEmailAsync(
+                                user.Email,
+                                $"Thông báo: Nhiệm vụ \"{task.TaskName}\" đã bị xóa",
+                                htmlContent
+                            );
+                        }
                     }
                 }
                 return new ResponseDTO(200, "Task deleted successfully!", null);
