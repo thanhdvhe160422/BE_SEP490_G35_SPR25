@@ -10,5 +10,6 @@
         public string EventTitle { get; set; }
         public DateTime EventStartTime { get; set; }
         public DateTime EventEndTime { get; set; }
+        public int? requestStatus { get; set; }
     }
 }

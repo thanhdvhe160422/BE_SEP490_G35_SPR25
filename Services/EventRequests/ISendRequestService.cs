@@ -11,6 +11,6 @@ namespace Planify_BackEnd.Services.EventRequests
         Task<ResponseDTO> ApproveRequestAsync(int id, Guid managerId, string reason);
         Task<ResponseDTO> RejectRequestAsync(int id, Guid managerId, string reason);
         Task<ResponseDTO> GetMyRequestsAsync(Guid userId, int campusId);
-        Task<PageResultDTO<GetSendRequestDTO>> SearchRequest(int page, int pageSize, int campusId, string? eventTitle, int? status,Guid? userId);
+        Task<PageResultDTO<GetSendRequestDTO>> SearchRequest(int page, int pageSize, int campusId, string? eventTitle, int? status,Guid? userId,int? requestStatus);
     }
 }
