@@ -213,7 +213,7 @@ namespace Planify_BackEnd.Services.SubTasks
                     var eventId = await _subTaskRepository.GetEventIdBySubtaskId(subTaskId);
                     var subtask = await _subTaskRepository.GetSubTaskByIdAsync(subTaskId);
                     var message = "Nhiệm vụ con " + subtask.SubTaskName + " đã bị xóa!";
-                    var link = "/event-detail-EOG/" + eventId;
+                    var link = "https://fptu-planify.com/event-detail-EOG/" + eventId;
                     foreach (var id in listJoinUserId)
                     {
                         await _hubContext.Clients.User(id + "").SendAsync("ReceiveNotification",
@@ -289,7 +289,7 @@ namespace Planify_BackEnd.Services.SubTasks
                             <body>
                               <div class='container'>
                                 <div class='logo'>
-                                  <img src='https://yourdomain.com/logo-fptu.png' alt='planify logo'>
+                                  <img src='https://fptu-planify.com/img/logo/logo-fptu.png' alt='planify logo'>
                                 </div>
 
                                 <h1>Nhiệm vụ con đã bị xóa</h1>
@@ -300,7 +300,7 @@ namespace Planify_BackEnd.Services.SubTasks
                                 </p>
 
                                 <div class='button'>
-                                  <a href='/event-detail-EOG/{subtask.Task.EventId}'>Xem chi tiết sự kiện</a>
+                                  <a href='https://fptu-planify.com/event-detail-EOG/{subtask.Task.EventId}'>Xem chi tiết sự kiện</a>
                                 </div>
 
                                 <br><br>
@@ -386,7 +386,7 @@ namespace Planify_BackEnd.Services.SubTasks
                     {
                         await _hubContext.Clients.User(userId + "").SendAsync("ReceiveNotification",
                             "Bạn đã được thêm vào nhiệm vụ con "+ subtask.SubTaskName+ "!",
-                            "/event-detail-EOG/" + task.EventId);
+                            "https://fptu-planify.com/event-detail-EOG/" + task.EventId);
                         //await _emailSender.SendEmailAsync(user.Email,
                         //    "Nhiệm vụ mới", "Bạn đã được thêm vào nhiệm vụ con tên " + subtask.SubTaskName + ", " + 
                         //    "trong sự kiện "+ subtask.Task.Event.EventTitle);
@@ -457,7 +457,7 @@ namespace Planify_BackEnd.Services.SubTasks
                             <body>
                               <div class='container'>
                                 <div class='logo'>
-                                  <img src='https://yourdomain.com/logo-fptu.png' alt='planify logo'>
+                                  <img src='https://fptu-planify.com/img/logo/logo-fptu.png' alt='planify logo'>
                                 </div>
 
                                 <h1>Bạn đã được thêm vào nhiệm vụ con mới</h1>
@@ -468,7 +468,7 @@ namespace Planify_BackEnd.Services.SubTasks
                                 </p>
 
                                 <div class='button'>
-                                  <a href='/event-detail-EOG/{subtask.Task.EventId}'>Xem chi tiết sự kiện</a>
+                                  <a href='https://fptu-planify.com/event-detail-EOG/{subtask.Task.EventId}'>Xem chi tiết sự kiện</a>
                                 </div>
 
                                 <br><br>

@@ -122,7 +122,7 @@ namespace Planify_BackEnd.Services.EventRequests
                 {
                     await _notificationHubContext.Clients.User(eventEntity.CreateBy + "").SendAsync("ReceiveNotification",
                         "Your request has been approved!",
-                        "/event-detail-EOG/" + request.EventId);
+                        "https://fptu-planify.com/event-detail-EOG/" + request.EventId);
                     var user = await _userRepository.GetUserByIdAsync(eventEntity.CreateBy);
                     //if (user != null) await _emailSender.SendEmailAsync(user.Email,
                     //    "Thông Báo Kế Hoạch Của Bạn Đã Được Duyệt",
@@ -198,7 +198,7 @@ namespace Planify_BackEnd.Services.EventRequests
                         <body>
                           <div class='container'>
                             <div class='logo'>
-                              <img src='https://yourdomain.com/logo-fptu.png' alt='planify logo'>
+                              <img src='https://fptu-planify.com/img/logo/logo-fptu.png' alt='planify logo'>
                             </div>
 
                             <h1>Kế hoạch của bạn đã được duyệt</h1>
@@ -210,7 +210,7 @@ namespace Planify_BackEnd.Services.EventRequests
                             </p>
 
                             <div class='button'>
-                              <a href='{"https://domain.com/event-detail-EOG/" + request.EventId}'>Xem chi tiết</a>
+                              <a href='{"https://fptu-planify.com/event-detail-EOG/" + request.EventId}'>Xem chi tiết</a>
                             </div>
                             <br></br>
                             <p class='description'>
@@ -271,7 +271,7 @@ namespace Planify_BackEnd.Services.EventRequests
                 {
                     await _notificationHubContext.Clients.User(eventEntity.CreateBy + "").SendAsync("ReceiveNotification",
                         "Your request has been reject!",
-                        "/event-detail-EOG/" + request.EventId);
+                        "https://fptu-planify.com/event-detail-EOG/" + request.EventId);
                     var user = await _userRepository.GetUserByIdAsync(eventEntity.CreateBy);
                     if (user != null)
                     {
@@ -340,7 +340,7 @@ namespace Planify_BackEnd.Services.EventRequests
                         <body>
                           <div class='container'>
                             <div class='logo'>
-                              <img src='https://domain.com/logo-fptu.png' alt='planify logo'>
+                              <img src='https://fptu-planify.com/img/logo/logo-fptu.png' alt='planify logo'>
                             </div>
 
                             <h1>Kế hoạch của bạn đã bị từ chối</h1>
@@ -352,7 +352,7 @@ namespace Planify_BackEnd.Services.EventRequests
                             </p>
 
                             <div class='button'>
-                              <a href='{"https://domain.com/event-detail-EOG/" + request.EventId}'>Xem chi tiết</a>
+                              <a href='{"https://fptu-planify.com/event-detail-EOG/" + request.EventId}'>Xem chi tiết</a>
                             </div>
                             <br><br>
                             <p class='description'>

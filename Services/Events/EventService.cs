@@ -450,7 +450,7 @@ public class EventService : IEventService
                     var e = await _eventRepository.GetEventByIdAsync(eventId);
                     var listJoined = await _joinProjectRepository.GetUserIdJoinedEvent(eventId);
                     var message = "Đã xóa sự kiện " + (e.EventTitle.Length > 40 ? e.EventTitle.Substring(0, 40) + ".." : e.EventTitle) + "!";
-                    var link = "/event-detail-EOG/" + eventId;
+                    var link = "https://fptu-planify.com/event-detail-EOG/" + eventId;
 
                     string htmlContent = $@"
                     <!DOCTYPE html>
@@ -506,7 +506,7 @@ public class EventService : IEventService
                     <body>
                       <div class='container'>
                         <div class='logo'>
-                          <img src='https://domain.com/logo-fptu.png' alt='planify logo'>
+                          <img src='https://fptu-planify.com/img/logo/logo-fptu.png' alt='planify logo'>
                         </div>
 
                         <h1>Sự kiện đã bị xóa</h1>
@@ -961,7 +961,7 @@ public class EventService : IEventService
                 {
                     var message = "Tháng này! Sự kiện mà bạn tham gia: " + (item.EventTitle.Length > 20 ? item.EventTitle.Substring(0, 20) + "..." : item.EventTitle) + "!\n"
                         + "Ngày bắt đầu: " + item.StartTime;
-                    var link = "/event-detail-EOG/" + item.EventId;
+                    var link = "https://fptu-planify.com/event-detail-EOG/" + item.EventId;
                     await _hubContext.Clients.User(userId + "").SendAsync("ReceiveNotification",
                         message,
                         link);
@@ -974,7 +974,7 @@ public class EventService : IEventService
                 {
                     var message = "Tháng này! Sự kiện mà bạn tham gia: " + (item.EventTitle.Length > 20 ? item.EventTitle.Substring(0, 20) + "..." : item.EventTitle) + "!\n"
                         + "Ngày bắt đầu: " + item.StartTime;
-                    var link = "/event-detail-spec/" + item.EventId;
+                    var link = "https://fptu-planify.com/event-detail-spec/" + item.EventId;
                     await _hubContext.Clients.User(userId + "").SendAsync("ReceiveNotification",
                         message,
                         link);

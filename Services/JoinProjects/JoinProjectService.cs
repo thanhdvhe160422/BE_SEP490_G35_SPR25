@@ -136,7 +136,7 @@ namespace Planify_BackEnd.Services.JoinProjects
                     var user = await _userRepository.GetUserByIdAsync(userId);
                     await _hubContext.Clients.User(userId + "").SendAsync("ReceiveNotification",
                     message,
-                    "/event-detail-EOG/" + eventId);
+                    "https://fptu-planify.com/event-detail-EOG/" + eventId);
                     //await _emailSender.SendEmailAsync(user.Email, 
                     //    "Thông báo: Bạn đã bị loại khỏi sự kiện " + e.EventTitle,
                     //    $"<p>Chúng tôi xin thông báo rằng bạn đã bị loại khỏi sự kiện <strong>{e.EventTitle}</strong>.</p>" +
@@ -210,7 +210,7 @@ namespace Planify_BackEnd.Services.JoinProjects
                         <body>
                           <div class='container'>
                             <div class='logo'>
-                              <img src='https://yourdomain.com/logo-fptu.png' alt='planify logo'>
+                              <img src='https://fptu-planify.com/img/logo/logo-fptu.png' alt='planify logo'>
                             </div>
 
                             <h1>Bạn đã bị loại khỏi sự kiện</h1>
@@ -222,7 +222,7 @@ namespace Planify_BackEnd.Services.JoinProjects
                             </p>
 
                             <div class='button'>
-                              <a href='/event-detail-EOG/{eventId}'>Xem chi tiết sự kiện</a>
+                              <a href='https://fptu-planify.com/event-detail-EOG/{eventId}'>Xem chi tiết sự kiện</a>
                             </div>
 
                             <br><br>
@@ -286,7 +286,7 @@ namespace Planify_BackEnd.Services.JoinProjects
                 //notification
                 var e = await _eventRepository.GetEventByIdAsync(request.EventId);
                 var message = "Bạn đã được thêm vào sự kiện " + (e.EventTitle.Length > 40 ? e.EventTitle.Substring(0, 40) + ".." : e.EventTitle) + "!";
-                var link = "/event-detail-EOG/" + request.EventId;
+                var link = "https://fptu-planify.com/event-detail-EOG/" + request.EventId;
                 foreach (var id in newUserIds)
                 {
                     await _hubContext.Clients.User(id + "").SendAsync("ReceiveNotification",
@@ -365,7 +365,7 @@ namespace Planify_BackEnd.Services.JoinProjects
                         <body>
                           <div class='container'>
                             <div class='logo'>
-                              <img src='https://yourdomain.com/logo-fptu.png' alt='planify logo'>
+                              <img src='https://fptu-planify.com/img/logo/logo-fptu.png' alt='planify logo'>
                             </div>
 
                             <h1>Bạn đã được thêm vào sự kiện</h1>
@@ -376,7 +376,7 @@ namespace Planify_BackEnd.Services.JoinProjects
                             </p>
 
                             <div class='button'>
-                              <a href='/event-detail-EOG/{e.Id}'>Xem chi tiết sự kiện</a>
+                              <a href='https://fptu-planify.com/event-detail-EOG/{e.Id}'>Xem chi tiết sự kiện</a>
                             </div>
 
                             <br><br>
