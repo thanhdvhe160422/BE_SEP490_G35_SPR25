@@ -435,7 +435,7 @@ namespace Planify_BackEnd.Services.EventRequests
                     CreatedAt = sr.Event.CreatedAt,
                     EventStartTime = sr.Event.StartTime,
                     EventEndTime = sr.Event.EndTime,
-                    requestStatus = sr.Event.Status,
+                    requestStatus = sr.Status,
                 }).ToList();
 
                 return new PageResultDTO<GetSendRequestDTO>(requestDtos, requests.TotalCount, page, pageSize);

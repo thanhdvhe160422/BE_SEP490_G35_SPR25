@@ -21,7 +21,6 @@ namespace Planify_BackEnd.Repositories.SendRequests
         {
             return await _context.SendRequests
                 .Include(sr => sr.Event)
-                .Where(sr=>sr.Status==0)
                 .Select(sr => new SendRequestWithEventDTO
                 {
                     Id = sr.Id,
