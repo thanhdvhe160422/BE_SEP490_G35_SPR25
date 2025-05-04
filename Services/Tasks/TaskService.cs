@@ -302,7 +302,8 @@ namespace Planify_BackEnd.Services.Tasks
                 var task = _taskRepository.GetTaskById(taskId);
                 var listJoined = await _taskRepository.GetJoinedIdByTaskId(taskId);
                 var message = "Nhiệm vụ " + task.TaskName + "đã bị xóa!";
-                var link = "/event-detail-EOG/" + task.EventId;
+                var link = "https://fptu-planify.com/event-detail-EOG/" + task.EventId;
+
                 string htmlContent = $@"
                     <!DOCTYPE html>
                     <html lang='vi'>
@@ -357,7 +358,7 @@ namespace Planify_BackEnd.Services.Tasks
                     <body>
                       <div class='container'>
                         <div class='logo'>
-                          <img src='https://domain.com/logo-fptu.png' alt='planify logo'>
+                          <img src='https://fptu-planify.com/img/logo/logo-fptu.png' alt='planify logo'>
                         </div>
 
                         <h1>Nhiệm vụ đã bị xóa</h1>
