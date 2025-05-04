@@ -358,7 +358,7 @@ namespace Planify_BackEnd.Services.Tasks
                     <body>
                       <div class='container'>
                         <div class='logo'>
-                          <img src='https://fptu-planify.com/img/logo/logo-fptu.png' alt='planify logo'>
+                           
                         </div>
 
                         <h1>Nhiệm vụ đã bị xóa</h1>

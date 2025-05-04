@@ -289,7 +289,7 @@ namespace Planify_BackEnd.Services.SubTasks
                             <body>
                               <div class='container'>
                                 <div class='logo'>
-                                  <img src='https://fptu-planify.com/img/logo/logo-fptu.png' alt='planify logo'>
+                                   
                                 </div>
 
                                 <h1>Nhiệm vụ con đã bị xóa</h1>
@@ -457,7 +457,7 @@ namespace Planify_BackEnd.Services.SubTasks
                             <body>
                               <div class='container'>
                                 <div class='logo'>
-                                  <img src='https://fptu-planify.com/img/logo/logo-fptu.png' alt='planify logo'>
+                                   
                                 </div>
 
                                 <h1>Bạn đã được thêm vào nhiệm vụ con mới</h1>

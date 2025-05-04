@@ -506,7 +506,7 @@ public class EventService : IEventService
                     <body>
                       <div class='container'>
                         <div class='logo'>
-                          <img src='https://fptu-planify.com/img/logo/logo-fptu.png' alt='planify logo'>
+                           
                         </div>
 
                         <h1>Sự kiện đã bị xóa</h1>
