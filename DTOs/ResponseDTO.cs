@@ -4,7 +4,7 @@
     {       
         public int Status { get; set; }
         public string Message { get; set; } = "";
-        public DateTime DateTime { get; set; } = DateTime.UtcNow;
+        public DateTime DateTime { get; set; } = DateTime.Now;
         public object? Result { get; set; }
 
         public ResponseDTO(int status, string message, object? result)

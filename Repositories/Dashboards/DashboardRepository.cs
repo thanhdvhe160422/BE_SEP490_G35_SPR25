@@ -16,7 +16,7 @@ namespace Planify_BackEnd.Repositories.Dashboards
         {
             var events = await _context.Events
                 .Where(e => e.Status == 2 &&
-                            e.EndTime < DateTime.UtcNow &&
+                            e.EndTime < DateTime.Now &&
                             e.StartTime.Year == year)
                 .ToListAsync();
 

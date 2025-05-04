@@ -551,7 +551,7 @@ namespace Planify_BackEnd.Services.Users
                     }
 
                     // Check email uniqueness
-                    if (await _userRepository.EmailExistsAsync(userDto.Email, campusId))
+                    if (await _userRepository.EmailExistsAsync(userDto.Email))
                     {
                         errors.Add($"Dòng {rowIndex}: Email {userDto.Email} đã tồn tại.");
                         rowIndex++;
@@ -569,7 +569,7 @@ namespace Planify_BackEnd.Services.Users
                         Gender = userDto.Gender,
                         CampusId = campusId,
                         Status = 1, // Active status
-                        CreatedAt = DateTime.UtcNow
+                        CreatedAt = DateTime.Now
                     };
 
                     users.Add(user);
@@ -638,7 +638,7 @@ namespace Planify_BackEnd.Services.Users
             {
                 errors.Add($"Dòng {rowIndex}: Định dạng ngày sinh không hợp lệ. Sử dụng định dạng dd/MM/yyyy (ví dụ: 15/03/2000) hoặc yyyy-MM-dd (ví dụ: 2000-03-15).");
             }
-            else if (user.DateOfBirth > DateTime.UtcNow.AddYears(-17))
+            else if (user.DateOfBirth > DateTime.Now.AddYears(-17))
             {
                 errors.Add($"Dòng {rowIndex}: Người dùng phải ít nhất 17 tuổi.");
             }

@@ -536,9 +536,9 @@ public class UserRepository : IUserRepository
         return await _context.Campuses.FindAsync(campusId);
     }
 
-    public async Task<bool> EmailExistsAsync(string email, int campusId)
+    public async Task<bool> EmailExistsAsync(string email)
     {
-        return await _context.Users.AnyAsync(u => u.Email == email && u.CampusId == campusId);
+        return await _context.Users.AnyAsync(u => u.Email == email);
     }
     public async System.Threading.Tasks.Task UpdateUserAsync(User user)
     {
