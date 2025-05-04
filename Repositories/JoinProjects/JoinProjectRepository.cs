@@ -99,7 +99,7 @@ namespace Planify_BackEnd.Repositories.JoinGroups
                 {
                     UserId = implementerId,
                     EventId = eventId,
-                    TimeJoinProject = DateTime.UtcNow,
+                    TimeJoinProject = DateTime.Now,
                 }).ToList();
 
                 _context.JoinProjects.AddRange(joinProjects);
@@ -127,7 +127,7 @@ namespace Planify_BackEnd.Repositories.JoinGroups
                 {
                     UserId = implementerId,
                     EventId = eventId,
-                    TimeJoinProject = DateTime.UtcNow,
+                    TimeJoinProject = DateTime.Now,
                 };
 
                 _context.JoinProjects.AddRange(joinProjects);

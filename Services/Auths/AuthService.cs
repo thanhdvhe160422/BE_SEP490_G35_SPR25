@@ -110,7 +110,7 @@ public class AuthService : IAuthService
             issuer: issuer,
             audience: audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(expirationMinutes)),
+            expires: DateTime.Now.AddMinutes(Convert.ToDouble(expirationMinutes)),
             signingCredentials: creds
         );
 
@@ -160,9 +160,9 @@ public class AuthService : IAuthService
         {
             throw new Exception("Invalid expiration claim format.");
         }
-        var expiryDate = DateTimeOffset.FromUnixTimeSeconds(expUnixTime).UtcDateTime;
+        var expiryDate = DateTimeOffset.FromUnixTimeSeconds(expUnixTime).DateTime;
 
-        if (expiryDate > DateTime.UtcNow)
+        if (expiryDate > DateTime.Now)
         {
             throw new Exception("Access token is still valid.");
         }

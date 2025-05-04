@@ -35,7 +35,7 @@
 //                {
 //                    ImplementerId = implementerId,
 //                    GroupId = groupId,
-//                    TimeJoin = DateTime.UtcNow,
+//                    TimeJoin = DateTime.Now,
 //                    Status = 1 // Active
 //                }).ToList();
 

@@ -120,7 +120,7 @@ public class EventService : IEventService
             if (string.IsNullOrWhiteSpace(eventDTO.EventTitle))
                 return new ResponseDTO(400, "Tên sự kiện là bắt buộc.", null);
 
-            if (eventDTO.StartTime < DateTime.UtcNow.AddMonths(2))
+            if (eventDTO.StartTime < DateTime.Now.AddMonths(2))
                 return new ResponseDTO(400, "Thời gian bắt đầu phải cách thời gian hiện tại ít nhất 2 tháng.", null);
 
             if (eventDTO.StartTime >= eventDTO.EndTime)
@@ -164,7 +164,7 @@ public class EventService : IEventService
                 CategoryEventId = eventDTO.CategoryEventId,
                 Placed = eventDTO.Placed,
                 CreateBy = organizerId,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.Now,
                 MeasuringSuccess = eventDTO.MeasuringSuccess,
                 Goals = eventDTO.Goals,
                 MonitoringProcess = eventDTO.MonitoringProcess,
@@ -184,7 +184,7 @@ public class EventService : IEventService
                     if (string.IsNullOrWhiteSpace(task.TaskName))
                         return new ResponseDTO(400, "Tên task là bắt buộc.", null);
 
-                    if (task.Deadline.HasValue && task.Deadline <= DateTime.UtcNow)
+                    if (task.Deadline.HasValue && task.Deadline <= DateTime.Now)
                         return new ResponseDTO(400, $"Hạn chót của task '{task.TaskName}' phải sau thời gian hiện tại.", null);
 
                     if (task.Budget < 0)
@@ -199,7 +199,7 @@ public class EventService : IEventService
                         Deadline = task.Deadline,
                         AmountBudget = task.Budget,
                         CreateBy = organizerId,
-                        CreateDate = DateTime.UtcNow,
+                        CreateDate = DateTime.Now,
                         Status = 0
                     };
                     await _taskRepository.CreateTaskAsync(newTask);
@@ -604,7 +604,7 @@ public class EventService : IEventService
             if (string.IsNullOrWhiteSpace(eventDTO.EventTitle))
                 return new ResponseDTO(400, "Tên sự kiện là bắt buộc.", null);
 
-            if (eventDTO.StartTime < DateTime.UtcNow.AddMonths(2))
+            if (eventDTO.StartTime < DateTime.Now.AddMonths(2))
                 return new ResponseDTO(400, "Thời gian bắt đầu phải cách thời gian hiện tại ít nhất 2 tháng.", null);
 
             if (eventDTO.StartTime >= eventDTO.EndTime)
@@ -647,7 +647,7 @@ public class EventService : IEventService
                 CategoryEventId = eventDTO.CategoryEventId,
                 Placed = eventDTO.Placed,
                 CreateBy = organizerId,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.Now,
                 MeasuringSuccess = eventDTO.MeasuringSuccess,
                 Goals = eventDTO.Goals,
                 MonitoringProcess = eventDTO.MonitoringProcess,
@@ -668,7 +668,7 @@ public class EventService : IEventService
                     if (string.IsNullOrWhiteSpace(task.TaskName))
                         return new ResponseDTO(400, "Tên task là bắt buộc.", null);
 
-                    if (task.Deadline > DateTime.UtcNow)
+                    if (task.Deadline > DateTime.Now)
                         return new ResponseDTO(400, $"Deadline of task '{task.TaskName}' must be after now.", null);
 
                     if (task.Budget < 0)
@@ -683,7 +683,7 @@ public class EventService : IEventService
                         Deadline = task.Deadline,
                         AmountBudget = task.Budget,
                         CreateBy = organizerId,
-                        CreateDate = DateTime.UtcNow,
+                        CreateDate = DateTime.Now,
                         Status = 0
                     };
                     await _taskRepository.CreateTaskAsync(newTask);

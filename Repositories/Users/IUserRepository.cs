@@ -25,7 +25,7 @@ public interface IUserRepository
     Task<User> AddUserAsync(User user);
     Task<UserRole> AddUserRoleAsync(UserRole userRole);
     Task<Campus?> GetCampusByIdAsync(int campusId);
-    Task<bool> EmailExistsAsync(string email, int campusId);
+    Task<bool> EmailExistsAsync(string email);
     System.Threading.Tasks.Task UpdateUserAsync(User user);
     Task<PageResultDTO<User>> GetSpectatorAndImplementer(int page, int pageSize, string? input, int campusId);
 }

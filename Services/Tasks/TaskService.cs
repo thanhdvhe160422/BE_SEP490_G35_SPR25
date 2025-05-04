@@ -59,7 +59,7 @@ namespace Planify_BackEnd.Services.Tasks
                         AmountBudget = taskDTO.AmountBudget,
                         Status = 1,
                         CreateBy = organizerId,
-                        CreateDate = DateTime.UtcNow
+                        CreateDate = DateTime.Now
                     };
                     await _taskRepository.CreateTaskAsync(newTask);
                     return new ResponseDTO(201, "Task creates successfully!", newTask);
