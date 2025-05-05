@@ -55,7 +55,7 @@ namespace Planify_BackEnd.Services.EventRequests
                 if (eventEntity == null)
                     return new ResponseDTO(404, "Không tìm thấy sự kiện", null);
 
-                if (eventEntity.Status != 0)
+                if (eventEntity.Status != 0 && eventEntity.Status != -1)
                     return new ResponseDTO(400, "Sự kiện không thể tạo yêu cầu mới do trạng thái hiện tại", null);
 
                 var existingRequest = await _requestRepository.GetRequestByIdAsync(requestDTO.EventId);
@@ -112,7 +112,7 @@ namespace Planify_BackEnd.Services.EventRequests
                 request.Reason = reason;
                 eventEntity.Status = 2; // Đã duyệt
                 eventEntity.IsPublic = 1; // Public
-                eventEntity.TimePublic = DateTime.UtcNow;
+                eventEntity.TimePublic = DateTime.Now;
 
                 await _requestRepository.UpdateRequestAsync(request);
                 await _eventRepository.UpdateEventAsync(eventEntity);
@@ -122,15 +122,111 @@ namespace Planify_BackEnd.Services.EventRequests
                 {
                     await _notificationHubContext.Clients.User(eventEntity.CreateBy + "").SendAsync("ReceiveNotification",
                         "Your request has been approved!",
-                        "/event-detail-EOG/" + request.EventId);
+                        "https://fptu-planify.com/event-detail-EOG/" + request.EventId);
                     var user = await _userRepository.GetUserByIdAsync(eventEntity.CreateBy);
-                    if (user != null) await _emailSender.SendEmailAsync(user.Email,
-                        "Thông Báo Kế Hoạch Của Bạn Đã Được Duyệt",
-                        "Kính gửi " + user.LastName + " " + user.FirstName + ",<br/><br/>" +
-                        "Chúng tôi xin thông báo rằng kế hoạch ID " + request.EventId +
-                        " của bạn đã được xem xét và đã được phê duyệt.<br/>" +
-                        reason + "<br/><br/>" +
-                        "Trân trọng,<br/>Hệ thống tự động");
+                    //if (user != null) await _emailSender.SendEmailAsync(user.Email,
+                    //    "Thông Báo Kế Hoạch Của Bạn Đã Được Duyệt",
+                    //    "Kính gửi " + user.LastName + " " + user.FirstName + ",<br/><br/>" +
+                    //    "Chúng tôi xin thông báo rằng kế hoạch sự kiện " + eventEntity.EventTitle+
+                    //    " của bạn đã được xem xét và đã được phê duyệt.<br/>" +
+                    //    reason + "<br/><br/>" +
+                    //    "Trân trọng,<br/>Hệ thống tự động");
+                    if (user != null)
+                    {
+                        string htmlContent = $@"
+                        <!DOCTYPE html>
+                        <html lang='vi'>
+                        <head>
+                          <meta charset='UTF-8'>
+                          <title>Thông Báo Kế Hoạch Được Duyệt</title>
+                          <style>
+                            body {{
+                              margin: 0;
+                              font-family: Arial, sans-serif;
+                              background-color: #f7f7ff;
+                              text-align: center;
+                              padding: 40px 20px;
+                            }}
+
+                            .container {{
+                              background-color: white;
+                              max-width: 600px;
+                              margin: auto;
+                              padding: 40px 20px;
+                              border-radius: 8px;
+                            }}
+
+                            .logo img {{
+                              width: 140px;
+                              margin-bottom: 40px;
+                            }}
+
+                            h1 {{
+                              font-size: 28px;
+                              font-weight: bold;
+                              margin: 0;
+                              line-height: 1.2;
+                              color: #000000;
+                            }}
+
+                            .description {{
+                              font-size: 15px;
+                              color: #333;
+                              margin-top: 30px;
+                              margin-bottom: 20px;
+                              line-height: 1.6;
+                              max-width: 500px;
+                              margin-left: auto;
+                              margin-right: auto;
+                            }}
+
+                            .button {{
+                              margin-top: 30px;
+                            }}
+
+                            .button a {{
+                              background-color: #6666ff;
+                              color: white;
+                              text-decoration: none;
+                              padding: 12px 28px;
+                              border-radius: 25px;
+                              font-size: 16px;
+                              font-weight: bold;
+                            }}
+                          </style>
+                        </head>
+                        <body>
+                          <div class='container'>
+                            <div class='logo'>
+                               
+                            </div>
+
+                            <h1>Kế hoạch của bạn đã được duyệt</h1>
+
+                            <p class='description'>
+                              Kính gửi {user.LastName} {user.FirstName},<br/><br/>
+                              Chúng tôi xin thông báo rằng kế hoạch sự kiện <strong>{eventEntity.EventTitle}</strong> của bạn đã được xem xét và <strong>đã được phê duyệt</strong>.<br/><br/>
+                              Lý do: {reason}
+                            </p>
+
+                            <div class='button'>
+                              <a href='{"https://fptu-planify.com/event-detail-EOG/" + request.EventId}'>Xem chi tiết</a>
+                            </div>
+                            <br></br>
+                            <p class='description'>
+                              Trân trọng, hệ thống tự động
+                            </p>
+                          </div>
+                        </body>
+                        </html>";
+
+                        await _emailSender.SendEmailAsync(
+                            user.Email,
+                            "Thông Báo Kế Hoạch Của Bạn Đã Được Duyệt",
+                            htmlContent
+                        );
+                    }
+
                 }
                 catch { }
                 return new ResponseDTO(200, "Yêu cầu đã được duyệt", request);
@@ -175,15 +271,104 @@ namespace Planify_BackEnd.Services.EventRequests
                 {
                     await _notificationHubContext.Clients.User(eventEntity.CreateBy + "").SendAsync("ReceiveNotification",
                         "Your request has been reject!",
-                        "/event-detail-EOG/" + request.EventId);
+                        "https://fptu-planify.com/event-detail-EOG/" + request.EventId);
                     var user = await _userRepository.GetUserByIdAsync(eventEntity.CreateBy);
-                    if (user != null) await _emailSender.SendEmailAsync(user.Email,
-                        "Thông Báo Kế Hoạch Của Bạn Đã Bị Từ Chối",
-                        "Kính gửi " + user.LastName + " " + user.FirstName + ",<br/><br/>" +
-                        "Chúng tôi xin thông báo rằng kế hoạch ID " + request.EventId +
-                        " của bạn đã được xem xét và hiện tại không thể được phê duyệt.<br/>" +
-                        reason + "<br/><br/>" +
-                        "Trân trọng,<br/>Hệ thống tự động");
+                    if (user != null)
+                    {
+                        string htmlContent = $@"
+                        <!DOCTYPE html>
+                        <html lang='vi'>
+                        <head>
+                          <meta charset='UTF-8'>
+                          <title>Thông Báo Kế Hoạch Bị Từ Chối</title>
+                          <style>
+                            body {{
+                              margin: 0;
+                              font-family: Arial, sans-serif;
+                              background-color: #f7f7ff;
+                              text-align: center;
+                              padding: 40px 20px;
+                            }}
+
+                            .container {{
+                              background-color: white;
+                              max-width: 600px;
+                              margin: auto;
+                              padding: 40px 20px;
+                              border-radius: 8px;
+                            }}
+
+                            .logo img {{
+                              width: 140px;
+                              margin-bottom: 40px;
+                            }}
+
+                            h1 {{
+                              font-size: 28px;
+                              font-weight: bold;
+                              margin: 0;
+                              line-height: 1.2;
+                              color: #cc0000;
+                            }}
+
+                            .description {{
+                              font-size: 15px;
+                              color: #333;
+                              margin-top: 30px;
+                              margin-bottom: 20px;
+                              line-height: 1.6;
+                              max-width: 500px;
+                              margin-left: auto;
+                              margin-right: auto;
+                            }}
+
+                            .button {{
+                              margin-top: 30px;
+                            }}
+
+                            .button a {{
+                              background-color: #6666ff;
+                              color: white;
+                              text-decoration: none;
+                              padding: 12px 28px;
+                              border-radius: 25px;
+                              font-size: 16px;
+                              font-weight: bold;
+                            }}
+                          </style>
+                        </head>
+                        <body>
+                          <div class='container'>
+                            <div class='logo'>
+                               
+                            </div>
+
+                            <h1>Kế hoạch của bạn đã bị từ chối</h1>
+
+                            <p class='description'>
+                              Kính gửi {user.LastName} {user.FirstName},<br/><br/>
+                              Chúng tôi rất tiếc phải thông báo rằng kế hoạch sự kiện <strong>{eventEntity.EventTitle}</strong> của bạn <strong>đã bị từ chối</strong> sau quá trình xem xét.<br/><br/>
+                              Lý do từ chối: {reason}
+                            </p>
+
+                            <div class='button'>
+                              <a href='{"https://fptu-planify.com/event-detail-EOG/" + request.EventId}'>Xem chi tiết</a>
+                            </div>
+                            <br><br>
+                            <p class='description'>
+                              Trân trọng, hệ thống tự động
+                            </p>
+                          </div>
+                        </body>
+                        </html>";
+
+                        await _emailSender.SendEmailAsync(
+                            user.Email,
+                            "Thông Báo Kế Hoạch Của Bạn Bị Từ Chối",
+                            htmlContent
+                        );
+                    }
+
 
                 }
                 catch { }
@@ -214,7 +399,10 @@ namespace Planify_BackEnd.Services.EventRequests
                     ManagerId = sr.ManagerId,
                     Reason = sr.Reason,
                     Status = sr.Event.Status,
-                    CreatedAt = sr.Event.CreatedAt
+                    CreatedAt = sr.Event.CreatedAt,
+                    EventStartTime = sr.Event.StartTime,
+                    EventEndTime = sr.Event.EndTime,
+                    requestStatus = sr.Status
                 }).ToList();
 
                 return new ResponseDTO(200, "Requests retrieved successfully.", requestDtos);
@@ -225,11 +413,11 @@ namespace Planify_BackEnd.Services.EventRequests
             }
         }
 
-        public async Task<PageResultDTO<GetSendRequestDTO>> SearchRequest(int page, int pageSize, int campusId, string? eventTitle, int? status, Guid? userId)
+        public async Task<PageResultDTO<GetSendRequestDTO>> SearchRequest(int page, int pageSize, int campusId, string? eventTitle, int? status, Guid? userId, int? requestStatus)
         {
             try
             {
-                var requests = await _requestRepository.SearchRequest(page,pageSize, campusId,eventTitle,status, userId);
+                var requests = await _requestRepository.SearchRequest(page,pageSize, campusId,eventTitle,status, userId, requestStatus);
 
                 if (requests == null || requests.TotalCount==0)
                 {
@@ -244,7 +432,10 @@ namespace Planify_BackEnd.Services.EventRequests
                     ManagerId = sr.ManagerId,
                     Reason = sr.Reason,
                     Status = sr.Event.Status,
-                    CreatedAt = sr.Event.CreatedAt
+                    CreatedAt = sr.Event.CreatedAt,
+                    EventStartTime = sr.Event.StartTime,
+                    EventEndTime = sr.Event.EndTime,
+                    requestStatus = sr.Status,
                 }).ToList();
 
                 return new PageResultDTO<GetSendRequestDTO>(requestDtos, requests.TotalCount, page, pageSize);

@@ -21,7 +21,7 @@ public class EventRepository : IEventRepository
     {
         try
         {
-            var now = DateTime.UtcNow;
+            var now = DateTime.Now;
 
             var count = _context.Events
                 .Where(e => e.Status == 2 && e.CampusId == campusId)

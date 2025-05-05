@@ -213,15 +213,103 @@ namespace Planify_BackEnd.Services.SubTasks
                     var eventId = await _subTaskRepository.GetEventIdBySubtaskId(subTaskId);
                     var subtask = await _subTaskRepository.GetSubTaskByIdAsync(subTaskId);
                     var message = "Nhiệm vụ con " + subtask.SubTaskName + " đã bị xóa!";
-                    var link = "/event-detail-EOG/" + eventId;
+                    var link = "https://fptu-planify.com/event-detail-EOG/" + eventId;
                     foreach (var id in listJoinUserId)
                     {
                         await _hubContext.Clients.User(id + "").SendAsync("ReceiveNotification",
                             message,
                             link);
                         var user = await _userRepository.GetUserByIdAsync(id);
-                        await _emailSender.SendEmailAsync(user.Email, "Một nhiệm vụ con đã bị xóa",
-                            message+" Trong sự kiện "+subtask.Task.Event.EventTitle);
+                        //await _emailSender.SendEmailAsync(user.Email, "Một nhiệm vụ con đã bị xóa",
+                        //    message+" Trong sự kiện "+subtask.Task.Event.EventTitle);
+                        await _emailSender.SendEmailAsync(
+                            user.Email,
+                            "Một nhiệm vụ con đã bị xóa",
+                            $@"
+                            <!DOCTYPE html>
+                            <html lang='vi'>
+                            <head>
+                              <meta charset='UTF-8'>
+                              <title>Thông báo nhiệm vụ con bị xóa</title>
+                              <style>
+                                body {{
+                                  margin: 0;
+                                  font-family: Arial, sans-serif;
+                                  background-color: #f7f7ff;
+                                  text-align: center;
+                                  padding: 40px 20px;
+                                }}
+
+                                .container {{
+                                  background-color: white;
+                                  max-width: 600px;
+                                  margin: auto;
+                                  padding: 40px 20px;
+                                  border-radius: 8px;
+                                }}
+
+                                .logo img {{
+                                  width: 140px;
+                                  margin-bottom: 40px;
+                                }}
+
+                                h1 {{
+                                  font-size: 26px;
+                                  font-weight: bold;
+                                  margin: 0;
+                                  color: #cc0000;
+                                }}
+
+                                .description {{
+                                  font-size: 15px;
+                                  color: #333;
+                                  margin-top: 30px;
+                                  margin-bottom: 20px;
+                                  line-height: 1.6;
+                                  max-width: 500px;
+                                  margin-left: auto;
+                                  margin-right: auto;
+                                }}
+
+                                .button {{
+                                  margin-top: 30px;
+                                }}
+
+                                .button a {{
+                                  background-color: #6666ff;
+                                  color: white;
+                                  text-decoration: none;
+                                  padding: 12px 28px;
+                                  border-radius: 25px;
+                                  font-size: 16px;
+                                  font-weight: bold;
+                                }}
+                              </style>
+                            </head>
+                            <body>
+                              <div class='container'>
+                                <div class='logo'>
+                                   
+                                </div>
+
+                                <h1>Nhiệm vụ con đã bị xóa</h1>
+
+                                <p class='description'>
+                                  Một nhiệm vụ con mà bạn đang tham gia đã bị xóa trong sự kiện <strong>{subtask.Task.Event.EventTitle}</strong>.<br/><br/>
+                                  {message}
+                                </p>
+
+                                <div class='button'>
+                                  <a href='https://fptu-planify.com/event-detail-EOG/{subtask.Task.EventId}'>Xem chi tiết sự kiện</a>
+                                </div>
+
+                                <br><br>
+                                <p class='description'>Trân trọng, hệ thống tự động</p>
+                              </div>
+                            </body>
+                            </html>"
+                        );
+
                     }
                 }
                 catch{ }
@@ -298,10 +386,98 @@ namespace Planify_BackEnd.Services.SubTasks
                     {
                         await _hubContext.Clients.User(userId + "").SendAsync("ReceiveNotification",
                             "Bạn đã được thêm vào nhiệm vụ con "+ subtask.SubTaskName+ "!",
-                            "/event-detail-EOG/" + task.EventId);
-                        await _emailSender.SendEmailAsync(user.Email,
-                            "Nhiệm vụ mới", "Bạn đã được thêm vào nhiệm vụ con tên " + subtask.SubTaskName + ", " + 
-                            "trong sự kiện "+ subtask.Task.Event.EventTitle);
+                            "https://fptu-planify.com/event-detail-EOG/" + task.EventId);
+                        //await _emailSender.SendEmailAsync(user.Email,
+                        //    "Nhiệm vụ mới", "Bạn đã được thêm vào nhiệm vụ con tên " + subtask.SubTaskName + ", " + 
+                        //    "trong sự kiện "+ subtask.Task.Event.EventTitle);
+                        await _emailSender.SendEmailAsync(
+                            user.Email,
+                            "Nhiệm vụ mới",
+                            $@"
+                            <!DOCTYPE html>
+                            <html lang='vi'>
+                            <head>
+                              <meta charset='UTF-8'>
+                              <title>Thông báo nhiệm vụ mới</title>
+                              <style>
+                                body {{
+                                  margin: 0;
+                                  font-family: Arial, sans-serif;
+                                  background-color: #f7f7ff;
+                                  text-align: center;
+                                  padding: 40px 20px;
+                                }}
+
+                                .container {{
+                                  background-color: white;
+                                  max-width: 600px;
+                                  margin: auto;
+                                  padding: 40px 20px;
+                                  border-radius: 8px;
+                                }}
+
+                                .logo img {{
+                                  width: 140px;
+                                  margin-bottom: 40px;
+                                }}
+
+                                h1 {{
+                                  font-size: 26px;
+                                  font-weight: bold;
+                                  margin: 0;
+                                  color: #0066cc;
+                                }}
+
+                                .description {{
+                                  font-size: 15px;
+                                  color: #333;
+                                  margin-top: 30px;
+                                  margin-bottom: 20px;
+                                  line-height: 1.6;
+                                  max-width: 500px;
+                                  margin-left: auto;
+                                  margin-right: auto;
+                                }}
+
+                                .button {{
+                                  margin-top: 30px;
+                                }}
+
+                                .button a {{
+                                  background-color: #6666ff;
+                                  color: white;
+                                  text-decoration: none;
+                                  padding: 12px 28px;
+                                  border-radius: 25px;
+                                  font-size: 16px;
+                                  font-weight: bold;
+                                }}
+                              </style>
+                            </head>
+                            <body>
+                              <div class='container'>
+                                <div class='logo'>
+                                   
+                                </div>
+
+                                <h1>Bạn đã được thêm vào nhiệm vụ con mới</h1>
+
+                                <p class='description'>
+                                  Bạn đã được thêm vào nhiệm vụ con tên <strong>{subtask.SubTaskName}</strong> trong sự kiện <strong>{subtask.Task.Event.EventTitle}</strong>.<br/><br/>
+                                  Vui lòng kiểm tra chi tiết và thực hiện nhiệm vụ đúng thời hạn được giao.
+                                </p>
+
+                                <div class='button'>
+                                  <a href='https://fptu-planify.com/event-detail-EOG/{subtask.Task.EventId}'>Xem chi tiết sự kiện</a>
+                                </div>
+
+                                <br><br>
+                                <p class='description'>Trân trọng, hệ thống tự động</p>
+                              </div>
+                            </body>
+                            </html>"
+                        );
+
                     }
                 }
                 catch { }

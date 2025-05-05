@@ -136,13 +136,102 @@ namespace Planify_BackEnd.Services.JoinProjects
                     var user = await _userRepository.GetUserByIdAsync(userId);
                     await _hubContext.Clients.User(userId + "").SendAsync("ReceiveNotification",
                     message,
-                    "/event-detail-EOG/" + eventId);
-                    await _emailSender.SendEmailAsync(user.Email, 
+                    "https://fptu-planify.com/event-detail-EOG/" + eventId);
+                    //await _emailSender.SendEmailAsync(user.Email, 
+                    //    "Thông báo: Bạn đã bị loại khỏi sự kiện " + e.EventTitle,
+                    //    $"<p>Chúng tôi xin thông báo rằng bạn đã bị loại khỏi sự kiện <strong>{e.EventTitle}</strong>.</p>" +
+                    //    $"<p>Nếu bạn có bất kỳ thắc mắc nào về quyết định này, vui lòng liên hệ với ban tổ chức để được giải đáp thêm.</p>" +
+                    //    $"<p>Bạn có thể xem lại chi tiết sự kiện tại liên kết sau: <a href=\"/event-detail-EOG/{eventId}\">Xem chi tiết sự kiện</a></p>"
+                    //    );
+                    await _emailSender.SendEmailAsync(
+                        user.Email,
                         "Thông báo: Bạn đã bị loại khỏi sự kiện " + e.EventTitle,
-                        $"<p>Chúng tôi xin thông báo rằng bạn đã bị loại khỏi sự kiện <strong>{e.EventTitle}</strong>.</p>" +
-                        $"<p>Nếu bạn có bất kỳ thắc mắc nào về quyết định này, vui lòng liên hệ với ban tổ chức để được giải đáp thêm.</p>" +
-                        $"<p>Bạn có thể xem lại chi tiết sự kiện tại liên kết sau: <a href=\"/event-detail-EOG/{eventId}\">Xem chi tiết sự kiện</a></p>"
-                        );
+                        $@"
+                        <!DOCTYPE html>
+                        <html lang='vi'>
+                        <head>
+                          <meta charset='UTF-8'>
+                          <title>Thông báo loại khỏi sự kiện</title>
+                          <style>
+                            body {{
+                              margin: 0;
+                              font-family: Arial, sans-serif;
+                              background-color: #f7f7ff;
+                              text-align: center;
+                              padding: 40px 20px;
+                            }}
+
+                            .container {{
+                              background-color: white;
+                              max-width: 600px;
+                              margin: auto;
+                              padding: 40px 20px;
+                              border-radius: 8px;
+                            }}
+
+                            .logo img {{
+                              width: 140px;
+                              margin-bottom: 40px;
+                            }}
+
+                            h1 {{
+                              font-size: 26px;
+                              font-weight: bold;
+                              margin: 0;
+                              color: #cc0000;
+                            }}
+
+                            .description {{
+                              font-size: 15px;
+                              color: #333;
+                              margin-top: 30px;
+                              margin-bottom: 20px;
+                              line-height: 1.6;
+                              max-width: 500px;
+                              margin-left: auto;
+                              margin-right: auto;
+                            }}
+
+                            .button {{
+                              margin-top: 30px;
+                            }}
+
+                            .button a {{
+                              background-color: #6666ff;
+                              color: white;
+                              text-decoration: none;
+                              padding: 12px 28px;
+                              border-radius: 25px;
+                              font-size: 16px;
+                              font-weight: bold;
+                            }}
+                          </style>
+                        </head>
+                        <body>
+                          <div class='container'>
+                            <div class='logo'>
+                               
+                            </div>
+
+                            <h1>Bạn đã bị loại khỏi sự kiện</h1>
+
+                            <p class='description'>
+                              Chúng tôi xin thông báo rằng bạn đã bị loại khỏi sự kiện <strong>{e.EventTitle}</strong>.
+                              <br/><br/>
+                              Nếu bạn có bất kỳ thắc mắc nào về quyết định này, vui lòng liên hệ với ban tổ chức để được giải đáp thêm.
+                            </p>
+
+                            <div class='button'>
+                              <a href='https://fptu-planify.com/event-detail-EOG/{eventId}'>Xem chi tiết sự kiện</a>
+                            </div>
+
+                            <br><br>
+                            <p class='description'>Trân trọng, hệ thống tự động</p>
+                          </div>
+                        </body>
+                        </html>"
+                    );
+
                 }
                 return response;
             }
@@ -197,18 +286,106 @@ namespace Planify_BackEnd.Services.JoinProjects
                 //notification
                 var e = await _eventRepository.GetEventByIdAsync(request.EventId);
                 var message = "Bạn đã được thêm vào sự kiện " + (e.EventTitle.Length > 40 ? e.EventTitle.Substring(0, 40) + ".." : e.EventTitle) + "!";
-                var link = "/event-detail-EOG/" + request.EventId;
+                var link = "https://fptu-planify.com/event-detail-EOG/" + request.EventId;
                 foreach (var id in newUserIds)
                 {
                     await _hubContext.Clients.User(id + "").SendAsync("ReceiveNotification",
                         message,
                         link);
                     var user = await _userRepository.GetUserByIdAsync(id);
-                    await _emailSender.SendEmailAsync(user.Email,
-                            "Thông báo: Bạn đã được thêm vào sự kiện " + e.EventTitle,
-                            $"<p>Bạn đã được thêm vào sự kiện <strong>{e.EventTitle}</strong>.</p>" +
-                            $"<p>Nếu bạn có bất kỳ thắc mắc nào về quyết định này, vui lòng liên hệ với ban tổ chức để được giải đáp thêm.</p>"
-                            );
+                    //await _emailSender.SendEmailAsync(user.Email,
+                    //        "Thông báo: Bạn đã được thêm vào sự kiện " + e.EventTitle,
+                    //        $"<p>Bạn đã được thêm vào sự kiện <strong>{e.EventTitle}</strong>.</p>" +
+                    //        $"<p>Nếu bạn có bất kỳ thắc mắc nào về quyết định này, vui lòng liên hệ với ban tổ chức để được giải đáp thêm.</p>"
+                    //        );
+                    await _emailSender.SendEmailAsync(
+                        user.Email,
+                        "Thông báo: Bạn đã được thêm vào sự kiện " + e.EventTitle,
+                        $@"
+                        <!DOCTYPE html>
+                        <html lang='vi'>
+                        <head>
+                          <meta charset='UTF-8'>
+                          <title>Thông báo thêm vào sự kiện</title>
+                          <style>
+                            body {{
+                              margin: 0;
+                              font-family: Arial, sans-serif;
+                              background-color: #f7f7ff;
+                              text-align: center;
+                              padding: 40px 20px;
+                            }}
+
+                            .container {{
+                              background-color: white;
+                              max-width: 600px;
+                              margin: auto;
+                              padding: 40px 20px;
+                              border-radius: 8px;
+                            }}
+
+                            .logo img {{
+                              width: 140px;
+                              margin-bottom: 40px;
+                            }}
+
+                            h1 {{
+                              font-size: 26px;
+                              font-weight: bold;
+                              margin: 0;
+                              color: #008000;
+                            }}
+
+                            .description {{
+                              font-size: 15px;
+                              color: #333;
+                              margin-top: 30px;
+                              margin-bottom: 20px;
+                              line-height: 1.6;
+                              max-width: 500px;
+                              margin-left: auto;
+                              margin-right: auto;
+                            }}
+
+                            .button {{
+                              margin-top: 30px;
+                            }}
+
+                            .button a {{
+                              background-color: #6666ff;
+                              color: white;
+                              text-decoration: none;
+                              padding: 12px 28px;
+                              border-radius: 25px;
+                              font-size: 16px;
+                              font-weight: bold;
+                            }}
+                          </style>
+                        </head>
+                        <body>
+                          <div class='container'>
+                            <div class='logo'>
+                               
+                            </div>
+
+                            <h1>Bạn đã được thêm vào sự kiện</h1>
+
+                            <p class='description'>
+                              Xin chúc mừng! Bạn đã được thêm vào sự kiện <strong>{e.EventTitle}</strong>.<br/><br/>
+                              Nếu bạn có bất kỳ thắc mắc nào về quyết định này, vui lòng liên hệ với ban tổ chức để được giải đáp thêm.
+                            </p>
+
+                            <div class='button'>
+                              <a href='https://fptu-planify.com/event-detail-EOG/{e.Id}'>Xem chi tiết sự kiện</a>
+                            </div>
+
+                            <br><br>
+                            <p class='description'>Trân trọng, hệ thống tự động</p>
+                          </div>
+                        </body>
+                        </html>"
+                    );
+
                 }
             }
             catch { }

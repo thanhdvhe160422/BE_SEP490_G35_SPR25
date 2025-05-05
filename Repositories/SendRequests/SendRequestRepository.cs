@@ -30,7 +30,8 @@ namespace Planify_BackEnd.Repositories.SendRequests
                     ManagerId = sr.ManagerId,
                     EventTitle = sr.Event.EventTitle,
                     EventStartTime = sr.Event.StartTime,
-                    EventEndTime = sr.Event.EndTime
+                    EventEndTime = sr.Event.EndTime,
+                    requestStatus = sr.Status
                 })
                 .ToListAsync();
         }
@@ -68,7 +69,7 @@ namespace Planify_BackEnd.Repositories.SendRequests
                 .ToListAsync();
         }
 
-        public async Task<PageResultDTO<SendRequest>> SearchRequest(int page, int pageSize, int campusId, string? eventTitle, int? status, Guid? userId)
+        public async Task<PageResultDTO<SendRequest>> SearchRequest(int page, int pageSize, int campusId, string? eventTitle, int? status, Guid? userId, int? requestStatus)
         {
             try
             {
@@ -77,6 +78,7 @@ namespace Planify_BackEnd.Repositories.SendRequests
                     .Where(r =>
                         r.Event.CampusId == campusId &&
                         (!status.HasValue || r.Event.Status == status) &&
+                        (!requestStatus.HasValue || r.Status == requestStatus) &&
                         (!userId.HasValue || r.Event.CreateBy.Equals(userId))
                     )
                     .ToListAsync();

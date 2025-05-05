@@ -11,6 +11,6 @@ namespace Planify_BackEnd.Repositories.SendRequests
         Task<SendRequest> CreateRequestAsync(SendRequest request);
         System.Threading.Tasks.Task UpdateRequestAsync(SendRequest request);
         Task<List<SendRequest>> GetRequestsByUserIdAsync(Guid userId, int campusId);
-        Task<PageResultDTO<SendRequest>> SearchRequest(int page, int pageSize, int campusId,string? eventTitle, int? status, Guid? userId);
+        Task<PageResultDTO<SendRequest>> SearchRequest(int page, int pageSize, int campusId,string? eventTitle, int? status, Guid? userId, int? requestStatus);
     }
 }

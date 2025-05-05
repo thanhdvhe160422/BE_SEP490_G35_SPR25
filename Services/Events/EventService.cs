@@ -18,6 +18,8 @@ using Planify_BackEnd.Hub;
 using Google.Apis.Drive.v3.Data;
 using System.Net.NetworkInformation;
 using System.Numerics;
+using Planify_BackEnd.Services.Notification;
+using Microsoft.AspNetCore.Identity;
 
 public class EventService : IEventService
 {
@@ -28,7 +30,9 @@ public class EventService : IEventService
     private readonly GoogleDriveService _googleDriveService;
     private readonly IHubContext<NotificationHub> _hubContext;
     private readonly IJoinProjectRepository _joinProjectRepository;
-    public EventService(IEventRepository eventRepository, IHttpContextAccessor httpContextAccessor, GoogleDriveService googleDriveService, ISubTaskRepository subTaskRepository, ITaskRepository taskRepository,IHubContext<NotificationHub> hubContext, IJoinProjectRepository joinProjectRepository)
+    private readonly IEmailSender _emailSender;
+    private readonly IUserRepository _userRepository;
+    public EventService(IEventRepository eventRepository, IHttpContextAccessor httpContextAccessor, GoogleDriveService googleDriveService, ISubTaskRepository subTaskRepository, ITaskRepository taskRepository,IHubContext<NotificationHub> hubContext, IJoinProjectRepository joinProjectRepository,IEmailSender emailSender,IUserRepository userRepository)
     {
         _eventRepository = eventRepository;
         _httpContextAccessor = httpContextAccessor;
@@ -37,6 +41,8 @@ public class EventService : IEventService
         _taskRepository = taskRepository;
         _hubContext = hubContext;
         _joinProjectRepository = joinProjectRepository;
+        _emailSender = emailSender;
+        _userRepository = userRepository;
     }
     /// <summary>
     /// get all event by campusId and paging
@@ -114,7 +120,7 @@ public class EventService : IEventService
             if (string.IsNullOrWhiteSpace(eventDTO.EventTitle))
                 return new ResponseDTO(400, "Tên sự kiện là bắt buộc.", null);
 
-            if (eventDTO.StartTime < DateTime.UtcNow.AddMonths(2))
+            if (eventDTO.StartTime < DateTime.Now.AddMonths(2))
                 return new ResponseDTO(400, "Thời gian bắt đầu phải cách thời gian hiện tại ít nhất 2 tháng.", null);
 
             if (eventDTO.StartTime >= eventDTO.EndTime)
@@ -158,7 +164,7 @@ public class EventService : IEventService
                 CategoryEventId = eventDTO.CategoryEventId,
                 Placed = eventDTO.Placed,
                 CreateBy = organizerId,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.Now,
                 MeasuringSuccess = eventDTO.MeasuringSuccess,
                 Goals = eventDTO.Goals,
                 MonitoringProcess = eventDTO.MonitoringProcess,
@@ -178,7 +184,7 @@ public class EventService : IEventService
                     if (string.IsNullOrWhiteSpace(task.TaskName))
                         return new ResponseDTO(400, "Tên task là bắt buộc.", null);
 
-                    if (task.Deadline.HasValue && task.Deadline <= DateTime.UtcNow)
+                    if (task.Deadline.HasValue && task.Deadline <= DateTime.Now)
                         return new ResponseDTO(400, $"Hạn chót của task '{task.TaskName}' phải sau thời gian hiện tại.", null);
 
                     if (task.Budget < 0)
@@ -193,7 +199,7 @@ public class EventService : IEventService
                         Deadline = task.Deadline,
                         AmountBudget = task.Budget,
                         CreateBy = organizerId,
-                        CreateDate = DateTime.UtcNow,
+                        CreateDate = DateTime.Now,
                         Status = 0
                     };
                     await _taskRepository.CreateTaskAsync(newTask);
@@ -438,15 +444,100 @@ public class EventService : IEventService
             //notification
             if (response)
             {
-                var e = await _eventRepository.GetEventByIdAsync(eventId);
-                var listJoined = await _joinProjectRepository.GetUserIdJoinedEvent(eventId);
-                var message = "You have been removed from event " + (e.EventTitle.Length>40?e.EventTitle.Substring(0,40)+"..":e.EventTitle) + "!";
-                var link = "/event-detail-EOG/" + eventId;
-                foreach (var id in listJoined) {
-                    await _hubContext.Clients.User(id + "").SendAsync("ReceiveNotification",
-                    message,
-                    link);
+                try
+                {
+
+                    var e = await _eventRepository.GetEventByIdAsync(eventId);
+                    var listJoined = await _joinProjectRepository.GetUserIdJoinedEvent(eventId);
+                    var message = "Đã xóa sự kiện " + (e.EventTitle.Length > 40 ? e.EventTitle.Substring(0, 40) + ".." : e.EventTitle) + "!";
+                    var link = "https://fptu-planify.com/event-detail-EOG/" + eventId;
+
+                    string htmlContent = $@"
+                    <!DOCTYPE html>
+                    <html lang='vi'>
+                    <head>
+                      <meta charset='UTF-8'>
+                      <title>Thông báo bị loại khỏi sự kiện</title>
+                      <style>
+                        body {{
+                          margin: 0;
+                          font-family: Arial, sans-serif;
+                          background-color: #f7f7ff;
+                          text-align: center;
+                          padding: 40px 20px;
+                        }}
+                        .container {{
+                          background-color: white;
+                          max-width: 600px;
+                          margin: auto;
+                          padding: 40px 20px;
+                          border-radius: 8px;
+                        }}
+                        .logo img {{
+                          width: 140px;
+                          margin-bottom: 40px;
+                        }}
+                        h1 {{
+                          font-size: 26px;
+                          font-weight: bold;
+                          color: #cc0000;
+                        }}
+                        .description {{
+                          font-size: 15px;
+                          color: #333;
+                          margin-top: 30px;
+                          margin-bottom: 20px;
+                          line-height: 1.6;
+                        }}
+                        .button {{
+                          margin-top: 30px;
+                        }}
+                        .button a {{
+                          background-color: #6666ff;
+                          color: white;
+                          text-decoration: none;
+                          padding: 12px 28px;
+                          border-radius: 25px;
+                          font-size: 16px;
+                          font-weight: bold;
+                        }}
+                      </style>
+                    </head>
+                    <body>
+                      <div class='container'>
+                        <div class='logo'>
+                           
+                        </div>
+
+                        <h1>Sự kiện đã bị xóa</h1>
+
+                        <p class='description'>
+                          {message}<br/><br/>
+                          Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ với ban tổ chức để được hỗ trợ thêm.
+                        </p>
+
+                        <div class='button'>
+                          <a href='{link}'>Xem chi tiết sự kiện</a>
+                        </div>
+
+                        <br><br>
+                        <p class='description'>Trân trọng, hệ thống tự động</p>
+                      </div>
+                    </body>
+                    </html>";
+                    foreach (var id in listJoined)
+                    {
+                        await _hubContext.Clients.User(id + "").SendAsync("ReceiveNotification",
+                        message,
+                        link);
+                        var user = await _userRepository.GetUserByIdAsync(id);
+                        await _emailSender.SendEmailAsync(
+                            user.Email,
+                            "Thông báo: Sự kiện đã bị xóa ",
+                            htmlContent);
+                    }
                 }
+                catch { }
             }
             return response;
         }
@@ -513,7 +604,7 @@ public class EventService : IEventService
             if (string.IsNullOrWhiteSpace(eventDTO.EventTitle))
                 return new ResponseDTO(400, "Tên sự kiện là bắt buộc.", null);
 
-            if (eventDTO.StartTime < DateTime.UtcNow.AddMonths(2))
+            if (eventDTO.StartTime < DateTime.Now.AddMonths(2))
                 return new ResponseDTO(400, "Thời gian bắt đầu phải cách thời gian hiện tại ít nhất 2 tháng.", null);
 
             if (eventDTO.StartTime >= eventDTO.EndTime)
@@ -556,7 +647,7 @@ public class EventService : IEventService
                 CategoryEventId = eventDTO.CategoryEventId,
                 Placed = eventDTO.Placed,
                 CreateBy = organizerId,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.Now,
                 MeasuringSuccess = eventDTO.MeasuringSuccess,
                 Goals = eventDTO.Goals,
                 MonitoringProcess = eventDTO.MonitoringProcess,
@@ -577,7 +668,7 @@ public class EventService : IEventService
                     if (string.IsNullOrWhiteSpace(task.TaskName))
                         return new ResponseDTO(400, "Tên task là bắt buộc.", null);
 
-                    if (task.Deadline > DateTime.UtcNow)
+                    if (task.Deadline > DateTime.Now)
                         return new ResponseDTO(400, $"Deadline of task '{task.TaskName}' must be after now.", null);
 
                     if (task.Budget < 0)
@@ -592,7 +683,7 @@ public class EventService : IEventService
                         Deadline = task.Deadline,
                         AmountBudget = task.Budget,
                         CreateBy = organizerId,
-                        CreateDate = DateTime.UtcNow,
+                        CreateDate = DateTime.Now,
                         Status = 0
                     };
                     await _taskRepository.CreateTaskAsync(newTask);
@@ -870,7 +961,7 @@ public class EventService : IEventService
                 {
                     var message = "Tháng này! Sự kiện mà bạn tham gia: " + (item.EventTitle.Length > 20 ? item.EventTitle.Substring(0, 20) + "..." : item.EventTitle) + "!\n"
                         + "Ngày bắt đầu: " + item.StartTime;
-                    var link = "/event-detail-EOG/" + item.EventId;
+                    var link = "https://fptu-planify.com/event-detail-EOG/" + item.EventId;
                     await _hubContext.Clients.User(userId + "").SendAsync("ReceiveNotification",
                         message,
                         link);
@@ -883,7 +974,7 @@ public class EventService : IEventService
                 {
                     var message = "Tháng này! Sự kiện mà bạn tham gia: " + (item.EventTitle.Length > 20 ? item.EventTitle.Substring(0, 20) + "..." : item.EventTitle) + "!\n"
                         + "Ngày bắt đầu: " + item.StartTime;
-                    var link = "/event-detail-spec/" + item.EventId;
+                    var link = "https://fptu-planify.com/event-detail-spec/" + item.EventId;
                     await _hubContext.Clients.User(userId + "").SendAsync("ReceiveNotification",
                         message,
                         link);
