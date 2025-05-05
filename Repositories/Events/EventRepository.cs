@@ -103,10 +103,9 @@ public class EventRepository : IEventRepository
 
         try
         {
+            // Base query with minimal includes and split query for performance
             var eventDetail = await _context.Events
-                .Include(e=>e.Tasks).ThenInclude(t=>t.SubTasks)
-                .ThenInclude(st=>st.JoinTasks).ThenInclude(jt=>jt.User)
-                .Include(e=>e.SendRequests)
+                .AsSplitQuery() // Split related data into separate queries
                 .Where(e => e.Id == eventId)
                 .Select(e => new EventDetailDto
                 {
@@ -129,9 +128,9 @@ public class EventRepository : IEventRepository
                     PromotionalPlan = e.PromotionalPlan,
                     TargetAudience = e.TargetAudience,
                     SloganEvent = e.SloganEvent,
-                    CampusName = e.Campus.CampusName,
+                    CampusName = e.Campus != null ? e.Campus.CampusName : null,
                     CategoryEventId = e.CategoryEventId,
-                    CategoryEventName = e.CategoryEvent.CategoryEventName,
+                    CategoryEventName = e.CategoryEvent != null ? e.CategoryEvent.CategoryEventName : null,
                     CreatedBy = new UserDto
                     {
                         Id = e.CreateByNavigation.Id,
@@ -152,95 +151,7 @@ public class EventRepository : IEventRepository
                         FirstName = e.UpdateByNavigation.FirstName,
                         LastName = e.UpdateByNavigation.LastName,
                         Email = e.UpdateByNavigation.Email
-                    } : null,
-                    EventMedia = e.EventMedia
-                    .Where(em=>em.Status==1).Select(em => new EventMediaDto
-                    {
-                        Id = em.Id,
-                        MediaUrl = em.Media != null ? em.Media.MediaUrl : null
-                    }).ToList(),
-                    FavouriteEvents = e.FavouriteEvents.Select(fe => new FavouriteEventDto
-                    {
-                        UserId = fe.UserId,
-                        UserFullName = $"{fe.User.FirstName} {fe.User.LastName}"
-                    }).ToList(),
-                    JoinProjects = e.JoinProjects
-                        .Where(jp => jp.TimeOutProject == null)
-                        .Select(jp => new JoinProjectDto
-                        {
-                            UserId = jp.UserId,
-                            UserFullName = $"{jp.User.FirstName} {jp.User.LastName}",
-                            TimeJoinProject = jp.TimeJoinProject
-                        }).ToList(),
-                    Risks = e.Risks.Select(r => new RiskDto
-                    {
-                        Id = r.Id,
-                        Name = r.Name,
-                        Reason = r.Reason,
-                        Solution = r.Solution,
-                        Description = r.Description
-                    }).ToList(),
-                    Activities = e.Activities.Select(a => new ActivityDto
-                    {
-                        Id = a.Id,
-                        EventId = a.EventId,
-                        Name = a.Name,
-                        Content = a.Content
-                    }).ToList(),
-                    Tasks = e.Tasks
-                        .Where(t => t.Status == 1 || t.Status == 0)
-                        .Select(t => new TaskDetailDto
-                        {
-                            Id = t.Id,
-                            TaskName = t.TaskName,
-                            TaskDescription = t.TaskDescription,
-                            StartTime = t.StartTime,
-                            Deadline = t.Deadline,
-                            AmountBudget = t.AmountBudget,
-                            CreatedAt = t.CreateDate,
-                            CreatedBy = new UserDto
-                            {
-                                Id = t.CreateByNavigation.Id,
-                                FirstName = t.CreateByNavigation.FirstName,
-                                LastName = t.CreateByNavigation.LastName,
-                                Email = t.CreateByNavigation.Email
-                            },
-                            Status = t.Status,
-                            SubTasks = t.SubTasks
-                                .Where(st => st.Status == 1 || st.Status == 0)
-                                .Select(st => new SubTaskDetailDto
-                                {
-                                    Id = st.Id,
-                                    SubTaskName = st.SubTaskName,
-                                    SubTaskDescription = st.SubTaskDescription,
-                                    StartTime = st.StartTime,
-                                    Deadline = st.Deadline,
-                                    AmountBudget = st.AmountBudget,
-                                    CreatedBy = new UserDto
-                                    {
-                                        Id = st.CreateByNavigation.Id,
-                                        FirstName = st.CreateByNavigation.FirstName,
-                                        LastName = st.CreateByNavigation.LastName,
-                                        Email = st.CreateByNavigation.Email
-                                    },
-                                    Status = st.Status,
-                                    JoinSubTask = st.JoinTasks.Select(jt=>new UserNameVM
-                                    {
-                                        Id = jt.UserId,
-                                        Email = jt.User.Email,
-                                        FirstName = jt.User.FirstName,
-                                        LastName = jt.User.LastName,
-                                    }).ToList()
-                                }).ToList()
-                        }).ToList(),
-                    CostBreakdowns = e.CostBreakdowns.Select(cb => new CostBreakdownDetailDto
-                    {
-                        Id = cb.Id,
-                        Name = cb.Name,
-                        Quantity = cb.Quantity,
-                        PriceByOne = cb.PriceByOne
-                    }).ToList(),
-                    RequestId = e.SendRequests.OrderByDescending(sr => sr.Id).Select(sr => sr.Id).FirstOrDefault()
+                    } : null
                 })
                 .FirstOrDefaultAsync();
 
@@ -248,6 +159,123 @@ public class EventRepository : IEventRepository
             {
                 throw new Exception($"Không tìm thấy sự kiện với ID {eventId}.");
             }
+
+            // Load related collections separately to avoid large joins
+            eventDetail.EventMedia = await _context.EventMedia
+                .Where(em => em.EventId == eventId && em.Status == 1)
+                .Select(em => new EventMediaDto
+                {
+                    Id = em.Id,
+                    MediaUrl = em.Media != null ? em.Media.MediaUrl : null
+                })
+                .ToListAsync();
+
+            eventDetail.FavouriteEvents = await _context.FavouriteEvents
+                .Where(fe => fe.EventId == eventId)
+                .Select(fe => new FavouriteEventDto
+                {
+                    UserId = fe.UserId,
+                    UserFullName = $"{fe.User.FirstName} {fe.User.LastName}"
+                })
+                .ToListAsync();
+
+            eventDetail.JoinProjects = await _context.JoinProjects
+                .Where(jp => jp.EventId == eventId && jp.TimeOutProject == null)
+                .Select(jp => new JoinProjectDto
+                {
+                    UserId = jp.UserId,
+                    UserFullName = $"{jp.User.FirstName} {jp.User.LastName}",
+                    TimeJoinProject = jp.TimeJoinProject
+                })
+                .ToListAsync();
+
+            eventDetail.Risks = await _context.Risks
+                .Where(r => r.EventId == eventId)
+                .Select(r => new RiskDto
+                {
+                    Id = r.Id,
+                    Name = r.Name,
+                    Reason = r.Reason,
+                    Solution = r.Solution,
+                    Description = r.Description
+                })
+                .ToListAsync();
+
+            eventDetail.Activities = await _context.Activities
+                .Where(a => a.EventId == eventId)
+                .Select(a => new ActivityDto
+                {
+                    Id = a.Id,
+                    EventId = a.EventId,
+                    Name = a.Name,
+                    Content = a.Content
+                })
+                .ToListAsync();
+
+            eventDetail.Tasks = await _context.Tasks
+                .Where(t => t.EventId == eventId && (t.Status == 1 || t.Status == 0))
+                .Select(t => new TaskDetailDto
+                {
+                    Id = t.Id,
+                    TaskName = t.TaskName,
+                    TaskDescription = t.TaskDescription,
+                    StartTime = t.StartTime,
+                    Deadline = t.Deadline,
+                    AmountBudget = t.AmountBudget,
+                    CreatedAt = t.CreateDate,
+                    CreatedBy = new UserDto
+                    {
+                        Id = t.CreateByNavigation.Id,
+                        FirstName = t.CreateByNavigation.FirstName,
+                        LastName = t.CreateByNavigation.LastName,
+                        Email = t.CreateByNavigation.Email
+                    },
+                    Status = t.Status,
+                    SubTasks = t.SubTasks
+                        .Where(st => st.Status == 1 || st.Status == 0)
+                        .Select(st => new SubTaskDetailDto
+                        {
+                            Id = st.Id,
+                            SubTaskName = st.SubTaskName,
+                            SubTaskDescription = st.SubTaskDescription,
+                            StartTime = st.StartTime,
+                            Deadline = st.Deadline,
+                            AmountBudget = st.AmountBudget,
+                            CreatedBy = new UserDto
+                            {
+                                Id = st.CreateByNavigation.Id,
+                                FirstName = st.CreateByNavigation.FirstName,
+                                LastName = st.CreateByNavigation.LastName,
+                                Email = st.CreateByNavigation.Email
+                            },
+                            Status = st.Status,
+                            JoinSubTask = st.JoinTasks.Select(jt => new UserNameVM
+                            {
+                                Id = jt.UserId,
+                                Email = jt.User.Email,
+                                FirstName = jt.User.FirstName,
+                                LastName = jt.User.LastName
+                            }).ToList()
+                        }).ToList()
+                })
+                .ToListAsync();
+
+            eventDetail.CostBreakdowns = await _context.CostBreakdowns
+                .Where(cb => cb.EventId == eventId)
+                .Select(cb => new CostBreakdownDetailDto
+                {
+                    Id = cb.Id,
+                    Name = cb.Name,
+                    Quantity = cb.Quantity,
+                    PriceByOne = cb.PriceByOne
+                })
+                .ToListAsync();
+
+            eventDetail.RequestId = await _context.SendRequests
+                .Where(sr => sr.EventId == eventId)
+                .OrderByDescending(sr => sr.Id)
+                .Select(sr => sr.Id)
+                .FirstOrDefaultAsync();
 
             return eventDetail;
         }
