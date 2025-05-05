@@ -460,10 +460,10 @@ namespace Planify_BackEnd.Services.SubTasks
                                    
                                 </div>
 
-                                <h1>Bạn đã được thêm vào nhiệm vụ con mới</h1>
+                                <h1>Bạn đã được thêm vào nhiệm vụ mới</h1>
 
                                 <p class='description'>
-                                  Bạn đã được thêm vào nhiệm vụ con tên <strong>{subtask.SubTaskName}</strong> trong sự kiện <strong>{subtask.Task.Event.EventTitle}</strong>.<br/><br/>
+                                  Bạn đã được thêm vào nhiệm vụ mới <strong>{subtask.SubTaskName}</strong> trong sự kiện <strong>{subtask.Task.Event.EventTitle}</strong>.<br/><br/>
                                   Vui lòng kiểm tra chi tiết và thực hiện nhiệm vụ đúng thời hạn được giao.
                                 </p>
 
