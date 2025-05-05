@@ -58,7 +58,7 @@ namespace Planify_BackEnd.Services.Participants
             if (_repository.IsAlreadyRegistered(registerDto.EventId, registerDto.UserId))
                 return new ResponseDTO(400, "Người dùng đã đăng ký rồi", null);
             if (_repository.IsOrganizer(registerDto.UserId, registerDto.EventId))
-                return new ResponseDTO(403, "Organizers không thể đăng kí tham gia", null);
+                return new ResponseDTO(403, "Bạn đã tham gia tạo sự kiện, không thể đăng kí tham gia", null);
 
             var participant = new Participant
             {
