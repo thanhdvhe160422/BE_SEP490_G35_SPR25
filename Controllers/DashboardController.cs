@@ -23,7 +23,7 @@ namespace Planify_BackEnd.Controllers
             return Ok(stats);
         }
         [HttpGet("used-categories")]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetUsedCategories()
         {
             var result = await _dashboardService.GetUsedCategoriesAsync();

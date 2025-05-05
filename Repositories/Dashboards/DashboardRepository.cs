@@ -46,10 +46,10 @@ namespace Planify_BackEnd.Repositories.Dashboards
         {
             return await _context.Events
                 .Where(e => e.Status == 2)
-                .GroupBy(e => new { e.CategoryEventId, e.CategoryEvent.CategoryEventName })
+                .GroupBy(e => new { e.CategoryEvent.Id, e.CategoryEvent.CategoryEventName })
                 .Select(g => new CategoryUsageDTO
                 {
-                    CategoryEventId = g.Key.CategoryEventId,
+                    CategoryEventId = g.Key.Id,
                     CategoryEventName = g.Key.CategoryEventName,
                     TotalUsed = g.Count()
                 })
