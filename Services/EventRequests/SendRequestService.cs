@@ -35,9 +35,9 @@ namespace Planify_BackEnd.Services.EventRequests
             _userRepository = userRepository;
         }
 
-        public async Task<ResponseDTO> GetRequestsAsync()
+        public async Task<ResponseDTO> GetRequestsAsync(int campusId)
         {
-            var requests = await _requestRepository.GetRequestsAsync();
+            var requests = await _requestRepository.GetRequestsAsync(campusId);
             return new ResponseDTO(200, "Lấy danh sách yêu cầu thành công", requests);
         }
 

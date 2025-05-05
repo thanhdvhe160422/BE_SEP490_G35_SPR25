@@ -17,10 +17,11 @@ namespace Planify_BackEnd.Repositories.SendRequests
             _context = context;
         }
 
-        public async Task<List<SendRequestWithEventDTO>> GetRequestsAsync()
+        public async Task<List<SendRequestWithEventDTO>> GetRequestsAsync(int campusId)
         {
             return await _context.SendRequests
                 .Include(sr => sr.Event)
+                .Where(sr=>sr.Event.CampusId==campusId)
                 .Select(sr => new SendRequestWithEventDTO
                 {
                     Id = sr.Id,
