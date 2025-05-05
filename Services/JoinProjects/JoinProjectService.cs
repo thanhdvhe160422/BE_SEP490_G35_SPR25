@@ -210,7 +210,7 @@ namespace Planify_BackEnd.Services.JoinProjects
                         <body>
                           <div class='container'>
                             <div class='logo'>
-                              <img src='https://fptu-planify.com/img/logo/logo-fptu.png' alt='planify logo'>
+                               
                             </div>
 
                             <h1>Bạn đã bị loại khỏi sự kiện</h1>
@@ -365,7 +365,7 @@ namespace Planify_BackEnd.Services.JoinProjects
                         <body>
                           <div class='container'>
                             <div class='logo'>
-                              <img src='https://fptu-planify.com/img/logo/logo-fptu.png' alt='planify logo'>
+                               
                             </div>
 
                             <h1>Bạn đã được thêm vào sự kiện</h1>

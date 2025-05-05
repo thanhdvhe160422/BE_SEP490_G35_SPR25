@@ -198,7 +198,7 @@ namespace Planify_BackEnd.Services.EventRequests
                         <body>
                           <div class='container'>
                             <div class='logo'>
-                              <img src='https://fptu-planify.com/img/logo/logo-fptu.png' alt='planify logo'>
+                               
                             </div>
 
                             <h1>Kế hoạch của bạn đã được duyệt</h1>
@@ -340,7 +340,7 @@ namespace Planify_BackEnd.Services.EventRequests
                         <body>
                           <div class='container'>
                             <div class='logo'>
-                              <img src='https://fptu-planify.com/img/logo/logo-fptu.png' alt='planify logo'>
+                               
                             </div>
 
                             <h1>Kế hoạch của bạn đã bị từ chối</h1>
