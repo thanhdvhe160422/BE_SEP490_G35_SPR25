@@ -28,7 +28,7 @@ namespace Planify_BackEnd.Controllers
             }
         }
         [HttpPost]
-        //[Authorize(Roles = "Campus Manager")]
+        [Authorize(Roles = "Campus Manager")]
         public async Task<IActionResult> CreateCategory(CategoryDTO categoryDTO)
         {
             try
