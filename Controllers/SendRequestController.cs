@@ -19,9 +19,11 @@ namespace Planify_BackEnd.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetRequests()
         {
-            var response = await _sendRequestService.GetRequestsAsync();
+            var campusId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == "campusId").Value);
+            var response = await _sendRequestService.GetRequestsAsync(campusId);
             return StatusCode(response.Status, response);
         }
 
