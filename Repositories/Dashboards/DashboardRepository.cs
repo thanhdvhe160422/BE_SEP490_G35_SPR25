@@ -44,18 +44,21 @@ namespace Planify_BackEnd.Repositories.Dashboards
 
         public async Task<List<CategoryUsageDTO>> GetUsedCategoriesAsync()
         {
-            return await _context.Events
-                .Where(e => e.Status == 2)
-                .GroupBy(e => new { e.CategoryEventId, e.CategoryEvent.CategoryEventName })
-                .Select(g => new CategoryUsageDTO
+            var result = await _context.CategoryEvents
+                .Where(c => c.Status == 1)
+                .Select(c => new CategoryUsageDTO
                 {
-                    CategoryEventId = g.Key.CategoryEventId,
-                    CategoryEventName = g.Key.CategoryEventName,
-                    TotalUsed = g.Count()
+                    CategoryEventId = c.Id,
+                    CategoryEventName = c.CategoryEventName,
+                    TotalUsed = _context.Events
+                        .Count(e => e.Status == 2 && e.CategoryEventId == c.Id)
                 })
                 .OrderByDescending(x => x.TotalUsed)
                 .ToListAsync();
+
+            return result;
         }
+
         public async Task<List<RecentEventDTO>> GetLatestEventsAsync(int campusId)
         {
             try
