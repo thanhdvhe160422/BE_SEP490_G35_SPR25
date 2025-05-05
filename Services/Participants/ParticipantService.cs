@@ -64,7 +64,7 @@ namespace Planify_BackEnd.Services.Participants
             {
                 EventId = registerDto.EventId,
                 UserId = registerDto.UserId,
-                RegistrationTime = DateTime.UtcNow
+                RegistrationTime = DateTime.Now
             };
 
             _repository.RegisterParticipant(participant);

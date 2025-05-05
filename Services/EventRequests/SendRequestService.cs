@@ -112,7 +112,7 @@ namespace Planify_BackEnd.Services.EventRequests
                 request.Reason = reason;
                 eventEntity.Status = 2; // Đã duyệt
                 eventEntity.IsPublic = 1; // Public
-                eventEntity.TimePublic = DateTime.UtcNow;
+                eventEntity.TimePublic = DateTime.Now;
 
                 await _requestRepository.UpdateRequestAsync(request);
                 await _eventRepository.UpdateEventAsync(eventEntity);
