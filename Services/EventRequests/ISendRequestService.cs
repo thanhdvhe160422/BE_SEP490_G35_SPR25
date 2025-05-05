@@ -6,7 +6,7 @@ namespace Planify_BackEnd.Services.EventRequests
 {
     public interface ISendRequestService
     {
-        Task<ResponseDTO> GetRequestsAsync();
+        Task<ResponseDTO> GetRequestsAsync(int campusId);
         Task<ResponseDTO> CreateRequestAsync(SendRequestDTO requestDTO);
         Task<ResponseDTO> ApproveRequestAsync(int id, Guid managerId, string reason);
         Task<ResponseDTO> RejectRequestAsync(int id, Guid managerId, string reason);
